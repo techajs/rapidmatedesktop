@@ -1,0 +1,22 @@
+{
+    "welcome": "Bienvenue!",
+    "login": "Connexion",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgot_password": "Mot de passe oublié?",
+    "sign_in": "Se connecter",
+    "register": "S'inscrire",
+    "dont_have_account": "Vous n'avez pas encore de compte?",
+    "login_with_email": "Connexion avec email",
+    "terms_of_use": "Conditions d'utilisation",
+    "i_have_read_agree": "J'ai lu et j'accepte les",
+    "already_have_an_account": "Vous avez déjà un compte ?",
+    "choose_profile": "Choisir un profil",
+    "before_creating_profile": "Avant de créer votre profil, sélectionnez votre rôle sur cette application.",
+    "i_am_here_as": "Je suis ici en tant que",
+    "enterprise": "Entreprise",
+    "delivery_boy": "Livreur",
+    "pickup_dropoff": "Ramassage & Dépôt",
+     "continue": "Continuer"
+  }
+  
