@@ -9,7 +9,7 @@ import CommonHeader from "../../common/CommonHeader";
 import { UseFetch } from "../../utils/UseFetch";
 
 const AddPickupDetails = () => {
-  const user = UseFetch();
+  const {user} = UseFetch();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",

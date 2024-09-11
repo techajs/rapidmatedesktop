@@ -7,6 +7,7 @@ import localforage from "localforage";
 import { useDispatch, useSelector } from "react-redux";
 import { authenticateUser, signUpVerifyApi } from "../data_manager/dataManage";
 import { loginStart, loginSuccess } from "../redux/authSlice";
+import { getLookup } from "../utils/UseFetch";
 
 function SingupVerify() {
   const location = useLocation();
@@ -82,6 +83,8 @@ function SingupVerify() {
                       dispatch(
                         loginSuccess({ role: userRole, user: userData })
                       );
+                      const objData=getLookup()
+                      dispatch(commonDataList(objData))
                       navigateBasedOnRole(
                         successResponse[0]._response.user_profile[0].role
                       );

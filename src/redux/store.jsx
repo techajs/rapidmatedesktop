@@ -18,12 +18,7 @@ const persistConfig = {
 
 // Root reducer
 const rootReducer = combineReducers({
-  userData: userSlice,
-  enterpriseData: enterpriseDataSlice,
-  consumerData: consumerDataSlice,
-  deliveryboyData: deliveryboyDataSlice,
   commonData: commonDataSlice,
-  adminData: adminSlice,
   auth: authSlice,
 });
 

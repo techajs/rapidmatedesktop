@@ -17,7 +17,7 @@ import CommonHeader from "../../common/CommonHeader";
 
 function OrderView() {
   const checkboxTypes = ["checkbox"];
-  const user = UseFetch();
+  const {user} = UseFetch();
   return (
     <>
       <CommonHeader userData={user} />

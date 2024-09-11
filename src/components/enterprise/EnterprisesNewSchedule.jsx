@@ -11,7 +11,7 @@ import CommonHeader from '../../common/CommonHeader';
 import { UseFetch } from '../../utils/UseFetch';
 
 function EnterprisesNewSchedule() {
-  const user =UseFetch()
+  const {user} =UseFetch()
   return (
     <>
     <CommonHeader userData={user}/>

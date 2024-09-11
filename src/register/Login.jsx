@@ -14,9 +14,13 @@ import { userLoginData } from "../redux/userSlice";
 import { loginSuccess, loginStart, loginFailed } from "../redux/authSlice";
 import { adminLoginData } from "../redux/adminSlice";
 import axios from "axios";
-import { authenticateUser } from "../data_manager/dataManage";
+import { authenticateUser, getLookupData } from "../data_manager/dataManage";
 import localforage from "localforage";
+import { commonDataList } from "../redux/commonDataSlice";
+import { UseFetch } from "../utils/UseFetch";
 const Login = () => {
+  const {lookup}=UseFetch()
+  console.log(lookup)
   // useEffect(()=>{
   //   async function removIds(){
   //     await localforage.removeItem("tokenInfo");
@@ -115,9 +119,9 @@ const Login = () => {
                 localforage.setItem(1, getToken);
                 // localforage.setItem(2, refreshToken);
                 dispatch(loginSuccess({role:userRole, user: userData }));
-                navigateBasedOnRole(
-                  successResponse[0]._response.user_profile[0].role
-                );
+                console.log("user => "+lookup)
+                dispatch(commonDataList(lookup))
+                navigateBasedOnRole(successResponse[0]._response.user_profile[0].role);
               } else {
                 setErmessage("Login failed due to missing token or user data.");
                 setIserror(true);

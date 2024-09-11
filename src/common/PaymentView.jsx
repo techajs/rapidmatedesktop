@@ -15,7 +15,7 @@ import CommonHeader from './CommonHeader';
 import { useSelector } from 'react-redux';
 
 function PaymentView() {
-  const user = UseFetch();
+  const {user} = UseFetch();
   
 
   return (
