@@ -26,25 +26,28 @@ import {
 const CommonHeader = ({ userData }) => {
   const { userDetails, userInfo } = { ...userData };
   const [showModal, setShowModal] = useState(false);
-  const navigate =useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated, role } = useSelector((state) =>state.auth );
-  const baseUrl=role?.toLowerCase().replace(/_/g, '');
+  const { isAuthenticated, role } = useSelector((state) => state.auth);
+  const baseUrl = role?.toLowerCase().replace(/_/g, "");
   const handleLogout = () => {
     dispatch(logout());
     localforage.clear();
-    navigate('/');
+    navigate("/");
   };
   const openModal = () => {
     setShowModal(true);
   };
-  
+
   return (
     <div className={Styles.pickupHeader}>
       <nav className={Styles.nav}>
         <input type="checkbox" id={Styles.navCheck} />
         <div className={Styles.navHeader}>
-          <Link to={!isAuthenticated && !role ? '/' : `/${baseUrl}/dashboard`} className={Styles.homeHeaderLogocard}>
+          <Link
+            to={!isAuthenticated && !role ? "/" : `/${baseUrl}/dashboard`}
+            className={Styles.homeHeaderLogocard}
+          >
             <img className={Styles.homeHeaderLogo} src={Logo} alt="logo" />
             <h4 className={Styles.homeHeaderCompanyName}>Rapidmate</h4>
           </Link>
@@ -57,36 +60,43 @@ const CommonHeader = ({ userData }) => {
           </label>
         </div>
         <ul className={Styles.navList}>
-          {userDetails?.role === 'ENTERPRISE' && enterpriseRoute.map((routes, index) => (
+          {userDetails?.role === "ENTERPRISE" &&
+            enterpriseRoute.map((routes, index) => (
+              <li key={index}>
+                <Link to={routes.path}>{routes.title}</Link>
+              </li>
+            ))}
+          {userDetails?.role === "CONSUMER" &&
+            consumerRoute.map((routes, index) => (
+              <li key={index}>
+                <Link to={routes.path}>{routes.title}</Link>
+              </li>
+            ))}
+          {/* {userDetails?.role === 'DELIVERY_BOY' && deliveryboyRoute.map((routes, index) => (
             <li key={index}>
               <Link to={routes.path}>{routes.title}</Link>
             </li>
-          ))}
-          {userDetails?.role === 'CONSUMER' && consumerRoute.map((routes, index) => (
-            <li key={index}>
-              <Link to={routes.path}>{routes.title}</Link>
-            </li>
-          ))}
-          {userDetails?.role === 'DELIVERY_BOY' && deliveryboyRoute.map((routes, index) => (
-            <li key={index}>
-              <Link to={routes.path}>{routes.title}</Link>
-            </li>
-          ))}
-          
+          ))} */}
+
           <div className={Styles.loginNavList}>
-            <li>
-              <button className={Styles.pickupHomeSettingsBtn}>
-                <FontAwesomeIcon icon={faGear} />
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={openModal}
-                className={Styles.pickupHomeSettingsBtn}
-              >
-                <FontAwesomeIcon icon={faBell} />
-              </button>
-            </li>
+            {userDetails?.role !== "DELIVERY_BOY" && (
+              <>
+                <li>
+                  <button className={Styles.pickupHomeSettingsBtn}>
+                    <FontAwesomeIcon icon={faGear} />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={openModal}
+                    className={Styles.pickupHomeSettingsBtn}
+                  >
+                    <FontAwesomeIcon icon={faBell} />
+                  </button>
+                </li>
+              </>
+            )}
+
             <li>
               <Dropdown>
                 <Dropdown.Toggle
@@ -103,7 +113,7 @@ const CommonHeader = ({ userData }) => {
                 <Dropdown.Menu>
                   <Dropdown.Item
                     as={Link}
-                    to="/enterprise-account"
+                    to="#"
                     className={Styles.pickupHeaderAccountTextsActions}
                   >
                     <FontAwesomeIcon
@@ -128,7 +138,6 @@ const CommonHeader = ({ userData }) => {
                     <FontAwesomeIcon
                       className={Styles.pickupHeaderAccountsIcons}
                       icon={faRightToBracket}
-                      
                     />{" "}
                     Sign Out
                   </Dropdown.Item>

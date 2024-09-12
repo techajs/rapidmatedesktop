@@ -1,25 +1,11 @@
+import React from "react";
 import {axiosCall} from '../api_manager/ApiManager';
 import {API, HTTPMethod} from '../utils/Constants';
 
 export const authenticateUser = (params, successCallback, errorCallback) => {
-  // console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
+  console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
   axiosCall(
     API.loginAuthenticateUrl,
-    HTTPMethod.POST,
-    params,
-    response => {
-      successCallback(response);
-    },
-    errorResponse => {
-      errorCallback(errorResponse);
-    },
-  );
-};
-
-export const logoutUser = (params, successCallback, errorCallback) => {
-  // console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
-  axiosCall(
-    API.logoutAuthenticateUrl,
     HTTPMethod.POST,
     params,
     response => {
@@ -222,13 +208,6 @@ export const getDeliveryBoyViewOrdersList = (
   successCallback,
   errorCallback,
 ) => {
-  console.log(
-    API.viewDeliveryBoyOrderUrl +
-      postParams.extentedId +
-      '?status=' +
-      postParams.status,
-    postParams,
-  );
   axiosCall(
     API.viewDeliveryBoyOrderUrl +
       postParams.extentedId +
@@ -284,7 +263,7 @@ export const addPayment = (params, successCallback, errorCallback) => {
 
 export const uploadDocumentsApi = (params, successCallback, errorCallback) => {
   const myHeaders = new Headers();
-  myHeaders.append('upload_type', 'ORDER_DOC');
+  // myHeaders.append('upload_type', 'ORDER_DOC');
 
   const requestOptions = {
     method: 'POST',
@@ -358,7 +337,6 @@ export const updateUserProfile = (
       : userRole == 'DELIVERY_BOY'
       ? 'deliveryboy'
       : 'enterprise';
-  console.log(userRole, params, API.updateUserProfile + setUrl);
   axiosCall(
     API.updateUserProfile + setUrl,
     HTTPMethod.PUT,
@@ -656,6 +634,90 @@ export const deleteAddressBookforConsumer = (
     API.addressBookUpDeleteConsumerUrl + param.id,
     HTTPMethod.DELETE,
     param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const createEnterpriseBranch = (
+  params,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.enterprisebranchCreate,
+    HTTPMethod.POST,
+    params,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const cancelOrderConsumer = (params, successCallback, errorCallback) => {
+  axiosCall(
+    API.cancelOrderUrl,
+    HTTPMethod.POST,
+    params,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const downloadInvoiceOrder = (
+  params,
+  successCallback,
+  errorCallback,
+) => {
+  console.log('print_data==>', API.orderPickupUrl + '/invoice/' + params);
+  axiosCall(
+    API.orderPickupUrl + '/invoice/' + params,
+    HTTPMethod.GET,
+    {},
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const getDeliveryBoyListUsingDate = (
+  params,
+  successCallback,
+  errorCallback,
+) => {
+  console.log('print_data==>', API.deliveryBoyPlanningSetupDateList, params);
+  axiosCall(
+    API.deliveryBoyPlanningSetupDateList,
+    HTTPMethod.POST,
+    params,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const checkPromoCode = (params, successCallback, errorCallback) => {
+  axiosCall(
+    API.checkPromoCodeUrl,
+    HTTPMethod.POST,
+    params,
     response => {
       successCallback(response);
     },

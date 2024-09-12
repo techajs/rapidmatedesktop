@@ -6,18 +6,44 @@ import Logo from "../../assets/images/Logo-icon.png";
 import Calender from "../../assets/images/Calender-Icon.png";
 import Location from "../../assets/images/Location-Icon.png";
 import Both from "../../assets/images/Calender-Both.png";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { UseFetch } from "../../utils/UseFetch";
+import { updateUserProfile } from "../../data_manager/dataManage";
+import { loginSuccess } from "../../redux/authSlice";
 function AddWorkType() {
-  const { lookup } = UseFetch();
-  const [selectedCard, setSelectedCard] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { lookup,user } = UseFetch();
+  const [workType, setWorkType] = useState(user?.userDetails?.work_type_id || null);
   const { isAuthenticated, role } = useSelector((state) => state.auth);
   const baseUrl = role?.toLowerCase().replace(/_/g, "");
-  const handleCardClick = (cardId) => {
-    setSelectedCard(cardId);
+  const handleCardClick = (workTypeId) => {
+    setWorkType(workTypeId);
   };
 
+  const continueHandler=(e)=>{
+    e.preventDefault()
+    let profileParams = {
+      ext_id: user.userDetails.ext_id,
+      work_type_id: workType,
+    };
+    updateUserProfile(
+      user.userDetails.role,
+      profileParams,
+      successResponse => {
+        const userData = {
+          userInfo:user.userInfo,
+          userDetails:{...user.userDetails, work_type_id: workType},
+        };
+        dispatch(loginSuccess({role:user.userDetails.role, user: userData }));
+        navigate('/deliveryboy/dashboard')
+      },
+      errorResponse => {
+        console.log('updateUserProfile', errorResponse);
+      },
+    );
+  }
   return (
     <section className={Styles.profileChooseSec}>
       <div className="container">
@@ -48,9 +74,9 @@ function AddWorkType() {
             <div key={index} className="col-md-4">
               <div
                 className={`${Styles.deliveryboyProfileTypeMainCard} ${
-                  selectedCard === worktype.work_type ? Styles.selected : ""
+                  workType === worktype.id ? Styles.selected : ""
                 }`}
-                onClick={() => handleCardClick(worktype.work_type)}
+                onClick={() => handleCardClick(worktype.id)}
               >
                 <div className={Styles.DeliveryboyProfiletypeImgCard}>
                   <img
@@ -70,10 +96,10 @@ function AddWorkType() {
                 <div className={Styles.deliveryboyProfiletypeCircleCard}>
                   <div
                     className={`${Styles.deliveryboyProfileTypeCircle} ${
-                      selectedCard === worktype.work_type ? Styles.checked : ""
+                      workType === worktype.id ? Styles.checked : ""
                     }`}
                   >
-                    {selectedCard === worktype.work_type && (
+                    {workType === worktype.id && (
                       <FontAwesomeIcon icon={faCheck} />
                     )}
                   </div>
@@ -83,11 +109,12 @@ function AddWorkType() {
           ))}
           <div className="mt-5">
             <Link
-              to="/deliveryboy/dashboard"
+              to="#"
               className={Styles.pickupSignupContinueBtn}
               type="button"
+              onClick={continueHandler}
             >
-              Continue
+              Save & Continue
             </Link>
           </div>
         </div>

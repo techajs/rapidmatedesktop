@@ -269,16 +269,7 @@ function ConsumerDashboard() {
                             ? Styles.selected
                             : ""
                         }`}
-                        onClick={() => {
-                          if (destiantionRef.current.value!=='') {
-                            setSelectedVehicle(vehicle.vehicle_type);
-                            setSelectedVehicleDetails(vehicle);
-                            const price = getPriceUsingVechicelType(vehicle.id);
-                            setSelectedVehiclePrice(price);
-                          } else {
-                            alert("Enter pickup and dropoff address.");
-                          }
-                        }}
+                        
                       >
                         <button
                           className={Styles.pickupHomeInfoBtnIcon}
@@ -294,9 +285,19 @@ function ConsumerDashboard() {
                           className={`${Styles.homePickupBicycle} ${vehicle.className}`}
                           src={getImage(vehicle)}
                           alt={`${vehicle.vehicle_type} Icon`}
+                          onClick={() => {
+                            if (destiantionRef.current.value!=='') {
+                              setSelectedVehicle(vehicle.vehicle_type);
+                              setSelectedVehicleDetails(vehicle);
+                              const price = getPriceUsingVechicelType(vehicle.id);
+                              setSelectedVehiclePrice(price);
+                            } else {
+                              alert("Enter pickup and dropoff address.");
+                            }
+                          }}
                         />
                       </div>
-                      <div className={Styles.pickupHomeVehicleTypeCap}>
+                      <div className={Styles.pickupHomeVehicleTypeCap} >
                         <h4 className={Styles.pickupHomeVehicleTypeByName}>
                           {vehicle.vehicle_type}
                         </h4>

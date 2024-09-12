@@ -119,7 +119,6 @@ const Login = () => {
                 localforage.setItem(1, getToken);
                 // localforage.setItem(2, refreshToken);
                 dispatch(loginSuccess({role:userRole, user: userData }));
-                console.log("user => "+lookup)
                 dispatch(commonDataList(lookup))
                 navigateBasedOnRole(successResponse[0]._response.user_profile[0].role);
               } else {

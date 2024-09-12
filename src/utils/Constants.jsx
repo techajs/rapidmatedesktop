@@ -23,7 +23,6 @@ export const apiHost = {
 
 export const API = {
   loginAuthenticateUrl: BASE_URL + 'authuser/login',
-  logoutAuthenticateUrl: BASE_URL + 'authuser/logout',
   signUpUrl: BASE_URL + 'authuser/signup',
   signupVerifyUrl: BASE_URL + 'authuser/signupverify',
   forgotPasswordUrl: BASE_URL + 'authuser/forgotpassword',
@@ -61,4 +60,8 @@ export const API = {
   getCompanyListUrl: BASE_URL + 'deliveryboy/connections/',
   getDistancePriceListUrl: BASE_URL + 'vehicletypes/price/list?d=',
   getFaqListUrl: BASE_URL + 'faq',
+  enterprisebranchCreate: BASE_URL + 'enterprisebranch',
+  cancelOrderUrl: BASE_URL + 'order/cancel',
+  deliveryBoyPlanningSetupDateList: BASE_URL + 'order/deliveryboy/plan/list',
+  checkPromoCodeUrl: 'promocode/check',
 };
