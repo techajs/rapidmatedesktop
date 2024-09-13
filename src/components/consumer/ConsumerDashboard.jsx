@@ -3,28 +3,13 @@ import Styles from "../../assets/css/home.module.css";
 import { MAPS_API_KEY } from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faLocationDot,
   faArrowRight,
-  faLocationCrosshairs,
-  faLocationArrow,
 } from "@fortawesome/free-solid-svg-icons";
-import Info from "../../assets/images/info.png";
-import Bicycle from "../../assets/images/Bicycle.png";
-import Scooter from "../../assets/images/Scooter.png";
-import Car from "../../assets/images/Car.png";
-import Partner from "../../assets/images/Partner.png";
-import Van from "../../assets/images/Van.png";
-import Pickup from "../../assets/images/Pickup.png";
-import Truck from "../../assets/images/Truck.png";
-import Other from "../../assets/images/Package.png";
-
-import DateAndTimePicker from "../../common/PickupHomeDateTimePicker";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import {
   GoogleMap,
   useJsApiLoader,
   Marker,
-  Autocomplete,
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import {
@@ -32,16 +17,18 @@ import {
   getDistancePriceList,
 } from "../../data_manager/dataManage";
 import PickupVehicleDimensionsModal from "./PickupVehicleDimensionsModal";
+import LocationInput from "../consumer/common/LocationInput"
+import DateTimePicker from "./common/DateTimePicker";
+import VehicleSelection from "./common/VehicleSelection"
 const libraries = ['places'];
 function ConsumerDashboard() {
   const navigate = useNavigate();
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [center, setCenter] = useState({lat:48.85754309772872, lng:2.3513877855537912});
-  const [map, setMap] = useState(null);
-  const [distanceTime, setDistanceTime] = useState();
-  const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
   const [selectedVehiclePrice, setSelectedVehiclePrice] = useState(null);
+  const [center, setCenter] = useState({lat:48.85754309772872, lng:2.3513877855537912});
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -49,8 +36,12 @@ function ConsumerDashboard() {
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const [distancePriceList, setDistancePriceList] = useState([]);
-  const originRef = useRef();
-  const destiantionRef = useRef();
+  const [vehicleDetail,setVehicleDetail]=useState(null)
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [dropoffLocation, setDropoffLocation] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [map, setMap] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -76,28 +67,21 @@ function ConsumerDashboard() {
       );
     };
     getAllVehiclesType();
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const geocoder = new google.maps.Geocoder();
-        setCenter({ lat, lng });
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === "OK") {
-            if (results[0]) {
-              originRef.current.value = results[0].formatted_address;
-            }
-          } else {
-            console.error(
-              "Geocode was not successful for the following reason: " + status
-            );
-          }
-        });
-      },
-      (error) => {
-        console.error("Error getting current location: " + error.message);
-      }
-    );
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+          setCenter({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+          // Fallback to a default location if needed
+        }
+      );
+    }
+    
   }, []);
   useEffect(() => {
     const getDistancePrice = () => {
@@ -124,192 +108,92 @@ function ConsumerDashboard() {
     return <div>Loading map...</div>;
   }
 
-  const getImage = (vehicleData) => {
-    switch (vehicleData.vehicle_type_id) {
-      case 1:
-        return Bicycle;
-      case 2:
-        return Scooter;
-      case 3:
-        return Car;
-      case 4:
-        return Partner;
-      case 5:
-        return Van;
-      case 6:
-        return Pickup;
-      case 7:
-        return Truck;
-      default:
-        return Other;
+  const calculateRoute = async () => {
+    // Calculate route between pickup and dropoff locations
+    if (pickupLocation && dropoffLocation) {
+      const directionService = new google.maps.DirectionsService();
+      const results = await directionService.route({
+        origin: pickupLocation,
+        destination: dropoffLocation,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+      setDirectionsResponse(results);
+      setDistance(results.routes[0].legs[0].distance.text);
+      setDuration(results.routes[0].legs[0].duration.text);
     }
   };
 
-  const openModal = (vehicle) => {
-    setSelectedVehicle(vehicle);
-    setShowModal(true);
-  };
-
-  async function calculateRoute() {
-    if (originRef.current.value === "" || destiantionRef.current.value === "") {
+  const handleContinue = () => {
+    if (!pickupLocation || !dropoffLocation || !selectedVehicle) {
+      alert('Please fill all fields.');
       return;
     }
-    setDirectionsResponse(null);
-    const directionService = new google.maps.DirectionsService();
-    const results = await directionService.route({
-      origin: originRef.current.value,
-      destination: destiantionRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration.text);
-  }
-  const getPriceUsingVechicelType = vehicleTypeId => {
-    //€
-    let finalPrice = 0;
-    let result = distancePriceList.filter(
-      priceList => priceList.vehicle_type_id == vehicleTypeId,
-    );
-    finalPrice = result[0]?.total_price;
-    return finalPrice;
+
+    const payload = {
+      pickupLocation,
+      dropoffLocation,
+      date,
+      time,
+      selectedVehicle,
+      distance,
+      duration,
+      selectedVehicleDetails,
+      selectedVehiclePrice,
+    };
+
+    console.log('Payload:', payload);
+    // Here you would typically send the payload to your backend
   };
 
-  const handlerContinue=()=>{
-    const destination = destiantionRef.current.value;
-    
-    if (destination?.trim() && selectedVehicle?.trim()) {
-      navigate("/consumer/pickup-details");
-    } else {
-      // Alert user if no destination is provided
-      alert("Please enter a dropoff location and select a vehicle.");
+  const getPriceUsingVehicleType = (vehicleTypeId) => {
+    const result = distancePriceList.find((priceList) => priceList.vehicle_type_id === vehicleTypeId);
+    return result?.total_price || 0;
+  };
+  const openModal = (vehicle) => {
+    setVehicleDetail(vehicle);
+    setShowModal(true);
+  };
+  const handleMapClick = (event, type) => {
+    const { latLng } = event;
+    const location = {
+      lat: latLng.lat(),
+      lng: latLng.lng(),
+    };
+
+    if (type === 'pickup') {
+      setPickupLocation(location);
+    } else if (type === 'dropoff') {
+      setDropoffLocation(location);
     }
-    
-  }
+
+    calculateRoute();
+  };
   return (
     <section className={Styles.requestPickupSec}>
       <div className={`row ${Styles.manageRow}`}>
         <div className="col-md-3">
           <div className={Styles.requestPickupMaincard}>
             <p className={Styles.pickupRequestText}>Request a Pick up!</p>
-            <div className={Styles.homePickupDropAddressCards}>
-              <div className={Styles.pickupAddresAutocompleteCard}>
-                <FontAwesomeIcon
-                  className={Styles.pickupHomeLocationIcon}
-                  icon={faLocationDot}
-                />
-                <div style={{ width: "100%" }}>
-                  <Autocomplete>
-                    <input
-                      className={Styles.homeMapPlaceSearch}
-                      type="text"
-                      placeholder="Enter pickup location"
-                      ref={originRef}
-                    />
-                  </Autocomplete>
-                </div>
+            <LocationInput
+              setPickupLocation={setPickupLocation}
+              setDropoffLocation={setDropoffLocation}
+              calculateRoute={calculateRoute}
+            />
 
-                <FontAwesomeIcon
-                  className="pickupHome-rightArrow-icon"
-                  icon={faArrowRight}
-                />
-              </div>
-
-              <div className={Styles.homePickupLocationsBorderShowoff} />
-
-              <div className={Styles.pickupAddresAutocompleteCard}>
-                <FontAwesomeIcon
-                  className="dropHome-location-icon"
-                  icon={faLocationCrosshairs}
-                />
-                <div style={{ width: "100%" }}>
-                  <Autocomplete>
-                    <input
-                      className={Styles.homeMapPlaceSearch}
-                      type="text"
-                      placeholder="Enter drop-off location"
-                      ref={destiantionRef}
-                      onBlur={calculateRoute}
-                    />
-                  </Autocomplete>
-                </div>
-
-                <FontAwesomeIcon
-                  className="pickupHome-rightArrow-icon"
-                  icon={faArrowRight}
-                />
-              </div>
-            </div>
-
-            <div>
-              <p className={Styles.pickupRequestText}>
-                Request it now or schedule for later
-              </p>
-              <DateAndTimePicker />
-            </div>
-            <div className={Styles.homePickupVehicleCardMain}>
-              {/* Display Selected Vehicle Price */}
-              <div className={Styles.selectedVehiclePriceCard}>
-                <p className={Styles.pickupRequestText}>Choose the vehicle</p>
-                {selectedVehiclePrice && (
-                  <p className={Styles.selectedVehiclePriceText}>
-                    {selectedVehiclePrice} €
-                  </p>
-                )}
-              </div>
-              <div className="row">
-                {loading ? (
-                  <p>Loading....</p>
-                ) : (
-                  vehicleTypeList.map((vehicle, index) => (
-                    <div key={index} className="col-md-4">
-                      <div
-                        className={`${Styles.homePickupVehiclesCard} ${
-                          selectedVehicle === vehicle.vehicle_type
-                            ? Styles.selected
-                            : ""
-                        }`}
-                        
-                      >
-                        <button
-                          className={Styles.pickupHomeInfoBtnIcon}
-                          onClick={() => openModal(vehicle)}
-                        >
-                          <img
-                            className={Styles.homePickupInfo}
-                            src={Info}
-                            alt="info-Icon"
-                          />
-                        </button>
-                        <img
-                          className={`${Styles.homePickupBicycle} ${vehicle.className}`}
-                          src={getImage(vehicle)}
-                          alt={`${vehicle.vehicle_type} Icon`}
-                          onClick={() => {
-                            if (destiantionRef.current.value!=='') {
-                              setSelectedVehicle(vehicle.vehicle_type);
-                              setSelectedVehicleDetails(vehicle);
-                              const price = getPriceUsingVechicelType(vehicle.id);
-                              setSelectedVehiclePrice(price);
-                            } else {
-                              alert("Enter pickup and dropoff address.");
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className={Styles.pickupHomeVehicleTypeCap} >
-                        <h4 className={Styles.pickupHomeVehicleTypeByName}>
-                          {vehicle.vehicle_type}
-                        </h4>
-                        <p className={Styles.pickupHomeVehicleCap}>
-                          {vehicle.vehicle_type_desc}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <DateTimePicker setDate={setDate} setTime={setTime}/>
+            {/* Vehicle Selection Component */}
+            <VehicleSelection
+              vehicleTypeList={vehicleTypeList}
+              selectedVehicle={selectedVehicle}
+              setSelectedVehicle={setSelectedVehicle}
+              setSelectedVehicleDetails={setSelectedVehicleDetails}
+              selectedVehiclePrice={selectedVehiclePrice}
+              setSelectedVehiclePrice={setSelectedVehiclePrice}
+              getPriceUsingVehicleType={getPriceUsingVehicleType}
+              openModal={openModal}
+              dropoffLocation={dropoffLocation}
+              
+            />
           </div>
 
           <div
@@ -322,7 +206,7 @@ function ConsumerDashboard() {
               zIndex: "1000",
             }}
           >
-            <button onClick={handlerContinue} className={Styles.goToOrderDetails}>
+            <button onClick={handleContinue} className={Styles.goToOrderDetails}>
               <p className={Styles.pickuphomeContinueBt}>
                 Continue to order details
               </p>
@@ -361,11 +245,10 @@ function ConsumerDashboard() {
               </div>
             </div>
           )}
-
           <GoogleMap
             center={center}
             zoom={14}
-            mapContainerStyle={{ height: "93vh", width: "100%" }}
+            mapContainerStyle={{ width: '100%', height: '90.5vh' }}
             options={{
               zoomControl: false,
               streetViewControl: false,
@@ -374,10 +257,14 @@ function ConsumerDashboard() {
             }}
             onLoad={(map) => setMap(map)}
           >
-            <Marker position={center} />
-            {directionsResponse && (
-              <DirectionsRenderer directions={directionsResponse} />
+             {pickupLocation && (
+              <Marker position={pickupLocation} label="Pickup" />
             )}
+            {dropoffLocation && (
+              <Marker position={dropoffLocation} label="Dropoff" />
+            )}
+            {currentLocation && <Marker position={currentLocation}/>}
+            {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
           </GoogleMap>
         </div>
       </div>
@@ -385,7 +272,7 @@ function ConsumerDashboard() {
       <PickupVehicleDimensionsModal
         show={showModal}
         handleClose={() => setShowModal(false)}
-        vehicle={selectedVehicle}
+        vehicle={vehicleDetail}
       />
     </section>
   );

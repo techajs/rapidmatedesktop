@@ -3,7 +3,7 @@ import {axiosCall} from '../api_manager/ApiManager';
 import {API, HTTPMethod} from '../utils/Constants';
 
 export const authenticateUser = (params, successCallback, errorCallback) => {
-  console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
+  // console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
   axiosCall(
     API.loginAuthenticateUrl,
     HTTPMethod.POST,
@@ -18,14 +18,14 @@ export const authenticateUser = (params, successCallback, errorCallback) => {
 };
 
 export const signUpUser = (params, successCallback, errorCallback) => {
-  console.log('print_data===>signUpUser', params, API.signUpUrl);
+  // console.log('print_data===>signUpUser', params, API.signUpUrl);
   axiosCall(
     API.signUpUrl,
     HTTPMethod.POST,
     params,
     response => {
       successCallback(response);
-      console.log('print_data===>signUpUser', response);
+      // console.log('print_data===>signUpUser', response);
     },
     errorResponse => {
       errorCallback(errorResponse);
@@ -104,7 +104,7 @@ export const getLocationId = (params, successCallback, errorCallback) => {
 };
 
 export const createPickupOrder = (params, successCallback, errorCallback) => {
-  console.log('createPickupOrder', params, API.orderPickupUrl);
+  // console.log('createPickupOrder', params, API.orderPickupUrl);
   axiosCall(
     API.orderPickupUrl,
     HTTPMethod.POST,
@@ -247,7 +247,7 @@ export const getConsumerViewOrdersList = (
 };
 
 export const addPayment = (params, successCallback, errorCallback) => {
-  console.log('addPayment', params, API.payment);
+  // console.log('addPayment', params, API.payment);
   axiosCall(
     API.payment,
     HTTPMethod.POST,
@@ -369,11 +369,11 @@ export const getAllocatedDeliveryBoy = (
   successCallback,
   errorCallback,
 ) => {
-  console.log(
-    'getAllocatedDeliveryBoy',
-    params,
-    API.getAllocatedDeliveryBoy + params.orderNumber,
-  );
+  // console.log(
+  //   'getAllocatedDeliveryBoy',
+  //   params,
+  //   API.getAllocatedDeliveryBoy + params.orderNumber,
+  // );
   axiosCall(
     API.getAllocatedDeliveryBoy + params.orderNumber,
     HTTPMethod.GET,
@@ -680,7 +680,7 @@ export const downloadInvoiceOrder = (
   successCallback,
   errorCallback,
 ) => {
-  console.log('print_data==>', API.orderPickupUrl + '/invoice/' + params);
+  // console.log('print_data==>', API.orderPickupUrl + '/invoice/' + params);
   axiosCall(
     API.orderPickupUrl + '/invoice/' + params,
     HTTPMethod.GET,
@@ -699,7 +699,7 @@ export const getDeliveryBoyListUsingDate = (
   successCallback,
   errorCallback,
 ) => {
-  console.log('print_data==>', API.deliveryBoyPlanningSetupDateList, params);
+  // console.log('print_data==>', API.deliveryBoyPlanningSetupDateList, params);
   axiosCall(
     API.deliveryBoyPlanningSetupDateList,
     HTTPMethod.POST,

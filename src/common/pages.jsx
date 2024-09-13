@@ -28,7 +28,8 @@ import OrderView from "../components/consumer/OrderView"
 import PaymentView from "./PaymentView"
 import AddVehicle from "../components/deliveryboy/AddVehicle"
 import AddWorkType from "../components/deliveryboy/AddWorkType"
-
+import PastOrder from "../components/consumer/Pastorder"
+import OrderDetail from "../components/consumer/OrderDetail"
 export {
     Home,
     HomeHeader,
@@ -59,5 +60,7 @@ export {
     OrderView,
     PaymentView,
     AddVehicle,
-    AddWorkType
+    AddWorkType,
+    PastOrder,
+    OrderDetail,
 }

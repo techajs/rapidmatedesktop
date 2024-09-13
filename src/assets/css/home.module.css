@@ -1265,7 +1265,7 @@ a {
 }
 
 .requestPickupMaincard {
-  padding: 25px 25px;
+  padding: 20px 17px;
 }
 
 .requestPickupSec {
@@ -1366,6 +1366,29 @@ a {
 
 .homePickupVehicleCardMain {
   margin: 10px 0px;
+  height: 342px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+}
+.homePickupVehicleCardMain::-webkit-scrollbar {
+  width: 4px;
+}
+/* Track */
+.homePickupVehicleCardMain::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 5px;
+}
+ 
+/* Handle */
+.homePickupVehicleCardMain::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.homePickupVehicleCardMain::-webkit-scrollbar-thumb:hover {
+  background:var(--secondary-color);
 }
 
 .pickupHomeVehicleTypeByName {

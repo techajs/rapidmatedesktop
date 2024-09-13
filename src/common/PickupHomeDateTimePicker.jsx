@@ -1,3 +1,4 @@
+// DateAndTimePicker.js
 import React, { useState } from "react";
 import DateTimePicker from "react-datetime-picker";
 import "react-datetime-picker/dist/DateTimePicker.css";
@@ -5,20 +6,24 @@ import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
-import Styles from '../assets/css/home.module.css'
+import Styles from '../assets/css/home.module.css';
 
-const DateAndTimePicker = () => {
+const DateAndTimePicker = ({ onDateTimeChange }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [value, setValue] = useState(new Date());
 
+  // Handles the "Now" button click
   const handleNowClick = () => {
     setShowPicker(true);
   };
 
+  // Handles date and time changes
   const handleDateTimeChange = (newValue) => {
     setValue(newValue);
-    // You can choose whether to close the picker or leave it open
-    // setShowPicker(false); // Optionally close the picker here
+    if (onDateTimeChange) {
+      // Send the selected value to the parent component
+      onDateTimeChange(newValue);
+    }
   };
 
   return (
@@ -33,13 +38,16 @@ const DateAndTimePicker = () => {
           Now
         </p>
       </div>
+
       {showPicker && (
         <div>
-          <p className={Styles.homepickupChooseTimeText}>Choose a date & time that suits you!</p>
+          <p className={Styles.homepickupChooseTimeText}>
+            Choose a date & time that suits you!
+          </p>
           <DateTimePicker
             onChange={handleDateTimeChange}
             value={value}
-            format="dd/MM/yy HH:mm a"
+            format="dd/MM/yy HH:mm a" // Custom format
           />
         </div>
       )}

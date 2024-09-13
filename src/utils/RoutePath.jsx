@@ -5,7 +5,7 @@ const enterpriseRoute = [
     },
     {
       title: "Past orders",
-      path: "/enterprise/pastorders",
+      path: "/enterprise/past-order",
     },
     {
       title: "Message",
@@ -19,7 +19,7 @@ const enterpriseRoute = [
     },
     {
       title: "Past orders",
-      path: "/cosumser/pastorder",
+      path: "/consumer/past-order",
     },
     {
       title: "Message",
@@ -33,7 +33,7 @@ const enterpriseRoute = [
     },
     {
       title: "Past orders",
-      path: "/deliveryboy/pastorders",
+      path: "/deliveryboy/past-order",
     },
     {
       title: "Message",

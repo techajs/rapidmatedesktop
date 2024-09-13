@@ -111,11 +111,11 @@ function PickupVehicleDimensionsModal({ show, handleClose, vehicle }) {
           )}
         </div>
       </Modal.Body>
-      <Modal.Footer>
+      {/* <Modal.Footer>
         <div>
           <button className={Styles.VehicleDimensionsModalSubmitBtn}>Ok</button>
         </div>
-      </Modal.Footer>
+      </Modal.Footer> */}
     </Modal>
   );
 }
