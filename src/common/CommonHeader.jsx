@@ -113,7 +113,7 @@ const CommonHeader = ({ userData }) => {
                 <Dropdown.Menu>
                   <Dropdown.Item
                     as={Link}
-                    to="#"
+                    to={`/${baseUrl}/setting`}
                     className={Styles.pickupHeaderAccountTextsActions}
                   >
                     <FontAwesomeIcon

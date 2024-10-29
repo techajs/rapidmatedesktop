@@ -2,56 +2,99 @@ import React, { useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
 import { UseFetch } from "../../utils/UseFetch";
 
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import "react-phone-input-2/lib/style.css";
+import PhoneInput from "react-phone-input-2";
+
+// Set validation rules using yup
+const FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const SUPPORTED_FORMATS = ["image/jpeg", "image/png"];
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters long"),
+  lastname: yup
+    .string()
+    .required("Last name is required")
+    .min(2, "Last name must be at least 2 characters long"),
+  company: yup.string(),
+  packageId: yup
+    .string()
+    .required("Package id is required")
+    .min(5, "Last name must be at least 5 characters long"),
+  pickupnote: yup.string(),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Please enter a valid email"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number should contain only digits")
+    .min(8, "Phone number must be at least 8 digits"),
+  file: yup
+    .mixed()
+    .required("A file is required")
+    .test("fileSize", "File size is too large", (value) => {
+      return value && value[0] && value[0].size <= FILE_SIZE;
+    })
+    .test("fileType", "Unsupported file type", (value) => {
+      return value && value[0] && SUPPORTED_FORMATS.includes(value[0].type);
+    }),
+});
+
 const AddPickupDetails = () => {
-  const {user} = UseFetch();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    company: "",
-    email: "",
-    phoneNumber: "",
-    packageId: "",
-    pickupNotes: "",
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = UseFetch();
+  const { order } = location.state || {};
 
-  const [errors, setErrors] = useState({});
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required";
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = "Phone number is required";
-    if (!/^\d+$/.test(formData.phoneNumber))
-      newErrors.phoneNumber = "Phone number is invalid";
-    if (!formData.packageId.trim())
-      newErrors.packageId = "Package ID is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const [selectedOption, setSelectedOption] = useState("Myself");
+  const handleRadioChange = (event) => {
+    const seletedValue = event.target.value;
+    setSelectedOption(seletedValue);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const defaultFirstName = user?.userDetails?.first_name || "";
+  const defaultLastName = user?.userDetails?.last_name || "";
+  const defaultEmail = user?.userDetails?.email || "";
+  const defaultPhone = user?.userDetails?.phone.replace("+", "") || "";
+  const [imagePreview, setImagePreview] = useState(null);
+  
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({ resolver: yupResolver(schema) });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      // Proceed to the next step or submit the form
-      console.log("Form submitted successfully");
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file)); // Set image preview URL
+      setValue("file", [file]); // Pass the file array to the form
     }
+  };
+  const onSubmit = (data) => {
+  
+    setValue('imageView',imagePreview)
+    setValue('selectedOption',selectedOption)
+    // console.log('data => ',data)
+    navigate("/consumer/order-preview", {
+      state: {
+        order: order,
+        orderCustomerDetails: data,
+      },
+    });
   };
 
   return (
@@ -85,230 +128,316 @@ const AddPickupDetails = () => {
                     Personal details
                   </p>
                 </div>
-                <Form onSubmit={handleSubmit}>
-                  <div className={`row ${Styles.manageRow}`}>
-                    <div className="col-md-12">
-                      <div className={Styles.addPickupDetailRadioCard}>
-                        {["Myself", "Other"].map((label, index) => (
-                          <div key={`radio-${index}`} className="mb-3">
-                            <Form.Check
-                              type="radio"
-                              id={`radio-${index}`}
-                              name="custom-radio-group"
-                              label={label}
-                              defaultChecked={label === "Myself"}
-                              className={Styles.addPickupDetailRadioBtn}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          First name*
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="text"
-                          placeholder="Type here.."
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          isInvalid={!!errors.firstName}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {errors.firstName}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </div>
 
-                    <div className="col-md-6">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput2"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Last name
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="text"
-                          placeholder="Type here.."
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Group>
-                    </div>
-
-                    <div className="col-md-12">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput3"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Company
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="text"
-                          placeholder="Type here.."
-                          name="company"
-                          value={formData.company}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput4"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Email*
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="email"
-                          placeholder="Type here.."
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          isInvalid={!!errors.email}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {errors.email}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                      <Form.Group className="mb-1" controlId="formPlaintext1">
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Phone number*
-                        </Form.Label>
-                        <div className={Styles.pickupSignupContainer}>
-                          <Form.Select
-                            className={Styles.selectNumberByCountry}
-                            aria-label="Default select example"
-                            name="countryCode"
-                            // You can add a state for countryCode if needed
-                            onChange={handleInputChange}
-                          >
-                            <option value="+33">+33</option>
-                            <option value="+91">+91</option>
-                            <option value="+11">+11</option>
-                          </Form.Select>
-                          <Form.Control
-                            className={`password-field ${Styles.signupUserName}`}
-                            type="text"
-                            placeholder="0 00 00 00 00"
-                            name="phoneNumber"
-                            value={formData.phoneNumber}
-                            onChange={handleInputChange}
-                            isInvalid={!!errors.phoneNumber}
+                <div className={`row ${Styles.manageRow}`}>
+                  <div className="col-md-12">
+                    <div className={Styles.addPickupDetailRadioCard}>
+                      {["Myself", "Other"].map((label, index) => (
+                        <div key={`radio-${index}`} className="mb-3">
+                          <input
+                            type="radio"
+                            id={`radio-${index}`}
+                            name="custom-radio-group"
+                            value={label}
+                            checked={selectedOption === label}
+                            onChange={handleRadioChange}
+                            className={Styles.addPickupDetailRadioBtn}
                           />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.phoneNumber}
-                          </Form.Control.Feedback>
+                          <label
+                            htmlFor={`radio-${index}`}
+                            style={{ paddingLeft: "8px" }}
+                          >
+                            {label}
+                          </label>
                         </div>
-                      </Form.Group>
+                      ))}
                     </div>
                   </div>
-                  <p className={Styles.pickupPersonalDetails}>
-                    Package details
-                  </p>
 
-                  <div className={`row ${Styles.manageRow}`}>
-                    <div className="col-md-12">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput5"
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="name"
+                        className={Styles.addPickupDetailFormLabels}
                       >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Package photo
-                        </Form.Label>
-                        <div>
-                          <div className={Styles.addPickupUploadPhoto}>
-                            <FontAwesomeIcon icon={faPaperclip} />
-                            <p className={Styles.addPickupDragText}>
-                              Drag or click to attach a photo
-                            </p>
+                        First name:
+                      </label>
+                      <Controller
+                        name="name"
+                        control={control}
+                        defaultValue={
+                          selectedOption === "Myself" ? defaultFirstName : " "
+                        }
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="First name"
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.name && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="lastname"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Last name:
+                      </label>
+                      <Controller
+                        name="lastname"
+                        control={control}
+                        defaultValue={
+                          selectedOption === "Myself" ? defaultLastName : " "
+                        }
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Last name"
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.lastname && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.lastname.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="col-md-12">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="company"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Company :
+                      </label>
+                      <Controller
+                        name="company"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Company"
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.company && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.company.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="email"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Email:
+                      </label>
+                      <Controller
+                        name="email"
+                        control={control}
+                        defaultValue={
+                          selectedOption === "Myself" ? defaultEmail : " "
+                        }
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Email"
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.email && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="phoneNumber"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Phone Number:
+                      </label>
+                      <Controller
+                        name="phoneNumber"
+                        control={control}
+                        defaultValue={
+                          selectedOption === "Myself" ? defaultPhone : " "
+                        }
+                        render={({ field: { onChange, value } }) => (
+                          <PhoneInput
+                            country={"fr"}
+                            value={value}
+                            // onlyCountries={["fr", "in"]}
+                            countryCodeEditable={false}
+                            onChange={onChange}
+                            inputStyle={{
+                              width: "100%",
+                              paddingLeft: "42px",
+                            }}
+                            dropdownStyle={{ borderColor: "#ccc" }}
+                            enableSearch
+                            searchPlaceholder="Search country"
+                            specialLabel=""
+                          />
+                        )}
+                      />
+                      {errors.phoneNumber && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.phoneNumber.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <p className={Styles.pickupPersonalDetails}>Package details</p>
+
+                <div className={`row ${Styles.manageRow}`}>
+                  <div className="col-md-12">
+                    <label
+                      htmlFor="file"
+                      className={Styles.addPickupDetailFormLabels}
+                    >
+                      Package photo
+                    </label>
+
+                    <div>
+                      <div className={Styles.addPickupUploadPhoto}>
+                        <FontAwesomeIcon icon={faPaperclip} />
+                        <p className={Styles.addPickupDragText}>
+                          Drag or click to attach a photo
+                        </p>
+                        <Controller
+                          name="file"
+                          control={control}
+                          defaultValue=""
+                          render={({ field: { onChange, ref } }) => (
                             <input
+                              ref={ref} // Ensure correct ref assignment
                               type="file"
-                              accept="image/*"
                               className={Styles.addPickupFileInput}
-                              onChange={(e) => console.log(e.target.files[0])}
+                              style={{ width: "100%", padding: "5px" }}
+                              onChange={(e) => {
+                                // Pass the selected files to the react-hook-form
+                                onChange(e.target.files);
+                                handleImageChange(e);
+                              }}
                             />
-                          </div>
+                          )}
+                        />
+                      </div>
+                      {imagePreview && (
+                        <div className="mt-2">
+                          <p>Image Preview:</p>
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            style={{
+                              width: "150px",
+                              height: "150px",
+                              objectFit: "cover",
+                            }}
+                          />
                         </div>
-                      </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput6"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
+                      )}
+                      {errors.file && (
+                        <p
+                          style={{
+                            color: "red",
+                            fontSize: "13px",
+                            textAlign: "center",
+                          }}
                         >
-                          Package ID*
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="text"
-                          placeholder="Type here.."
-                          name="packageId"
-                          value={formData.packageId}
-                          onChange={handleInputChange}
-                          isInvalid={!!errors.packageId}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {errors.packageId}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                      <Form.Group
-                        className="mb-1"
-                        controlId="exampleForm.ControlInput7"
-                      >
-                        <Form.Label
-                          className={Styles.addPickupDetailFormLabels}
-                        >
-                          Pickup notes
-                        </Form.Label>
-                        <Form.Control
-                          className={Styles.addPickupDetailsInputs}
-                          type="text"
-                          placeholder="Type here.."
-                          name="pickupNotes"
-                          value={formData.pickupNotes}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Group>
+                          {errors.file.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="packageId"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Package ID
+                      </label>
+                      <Controller
+                        name="packageId"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Package Id ..."
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.packageId && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.packageId.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                      <label
+                        htmlFor="pickupnote"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Pickup notes
+                      </label>
+                      <Controller
+                        name="pickupnote"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Type here..."
+                            style={{ width: "100%", padding: "5px" }}
+                          />
+                        )}
+                      />
+                      {errors.pickupnote && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.pickupnote.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`row ${Styles.manageRow}`}>
                   <div className="col-md-12">
                     <div className={Styles.addPickupDetailsBtnCard}>
                       <Link
@@ -319,14 +448,15 @@ const AddPickupDetails = () => {
                         Back
                       </Link>
                       <button
-                       onClick={handleInputChange}
+                        type="submit"
+                        onClick={handleSubmit(onSubmit)}
                         className={Styles.addPickupDetailsNextBtn}
                       >
                         Next
                       </button>
                     </div>
                   </div>
-                </Form>
+                </div>
               </div>
             </div>
           </div>

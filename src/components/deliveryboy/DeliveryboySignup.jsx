@@ -27,88 +27,139 @@ import {
   getStateList,
   signUpUser,
 } from "../../data_manager/dataManage";
+import { useTranslation } from "react-i18next";
+
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import "react-phone-input-2/lib/style.css";
+import PhoneInput from "react-phone-input-2";
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("First is required")
+    .min(2, "First name must be at least 2 characters long"),
+  lastname: yup.string(),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Please enter a valid email"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters long"),
+  confirmPassword: yup
+    .string()
+    .required("Confirm password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number should contain only digits")
+    .min(8, "Phone number must be at least 8 digits"),
+  country: yup
+    .object({
+      value: yup.string().required("Country is required"),
+    })
+    .required("Country is required"),
+  city: yup
+    .object({
+      value: yup.string().required("ambérieu-e is required"),
+    })
+    .required("ambérieu-e is required"),
+  state: yup
+    .object({
+      value: yup.string().required("Ain is required"),
+    })
+    .required("Ain is required"),
+  company: yup.string().required("Company name is required"),
+  siret: yup.string().required("Siret number is required"),
+  comments: yup.string().required("Please describe your projects"),
+  industry: yup
+    .object({
+      value: yup.string().required("Industry is required"),
+    })
+    .required("Industry is required"),
+  deliveries: yup
+    .string()
+    .required("Delivery Deliveries per month is required")
+    .matches(/^\d+$/, "Delivery should contain only digits"),
+  terms: yup
+    .boolean()
+    .oneOf([true], "You must accept the terms and conditions"),
+  termss: yup
+    .boolean()
+    .oneOf([true], "You must accept the terms and conditions"),
+});
 const DeliveryboySignup = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const checkboxTypes = ["checkbox"];
-  const [errors, setErrors] = useState({});
-  const [masterCountryList, setMasterCountryList] = useState(null);
-  const [masterStateList, setMasterStateList] = useState(null);
-  const [masterCityList, setMasterCityList] = useState(null);
   const [ermessage, setErmessage] = useState("");
   const [hitButton, setHitButton] = useState(false);
   const [failedError, setFailedError] = useState(false);
+  const [masterCountryList, setMasterCountryList] = useState([]);
+  const [masterStateList, setMasterStateList] = useState([]);
+  const [masterCityList, setMasterCityList] = useState([]);
+
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    code: "+33",
-    number: "",
-    country: "",
-    state: "",
-    city: "",
-    dropdownCountryValue: "",
-    dropdownStateValue: "",
-    dropdownCityValue: "",
-    siret: "",
-    termone: "",
-  });
+
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-    const validationErrors = validateDeliveryboyForm(formData);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    // console.log(formData);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
+  const onSubmit = (data) => {
+    setHitButton(true);
     let params = {
       info: {
-        userName: formData.email,
-        email: formData.email,
-        phoneNumber: formData.code + formData.number,
-        password: formData.password,
+        userName: data.email,
+        email: data.email,
+        phoneNumber: "+" + data.phoneNumber,
+        password: data.password,
         userrole: "DELIVERY_BOY",
-        firstName: formData.name,
-        lastName: formData.lastName,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        siretNo: formData.siret,
-        termone: formData.termone,
+        firstName: data.name,
+        lastName: data.lastname,
+        city: data.city.value,
+        state: data.state.value,
+        country: data.country.value,
+        siretNo: data.siret,
+        termone: data.terms === true ? 1 : 0,
       },
     };
-   
-    setHitButton(true);
+
     signUpUser(
       params,
       (successResponse) => {
         if (successResponse[0]._success) {
+          console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               setErmessage(successResponse[0]._response.name);
               setFailedError(true);
               setHitButton(false);
-            } else if (successResponse[0]._httpsStatusCode == 200) {
+            } else {
+              setHitButton(false);
               navigate("/signup-verify", {
                 state: {
                   user: {
-                    email: formData.email,
-                    phoneNumber: formData.number,
-                    password: formData.password,
+                    email: email,
+                    phoneNumber: number,
+                    password: password,
                   },
                 },
               });
@@ -129,122 +180,66 @@ const DeliveryboySignup = () => {
       }
     );
   };
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setErrors({ ...errors, [name]: "" });
-    if (name === "termone") {
-      const term = e.target.checked ? 1 : 0;
-      setFormData({ ...formData, [name]: term });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-  //get country value and set state
-  const handleCountryChange = (selectedCountry) => {
-    setFormData({
-      ...formData,
-      ["dropdownCountryValue"]: selectedCountry,
-      ["country"]: selectedCountry.value,
-      ["state"]: "",
-      ["city"]: "",
-      ["dropdownCityValue"]: "",
-      ["dropdownStateValue"]: "",
-    });
-    const filteredStates = masterStateList
-      .filter((state) => state.country_id === selectedCountry.value)
-      .map((state) => ({ label: state.state_name, value: state.id }));
-    setStateList(filteredStates);
-    setErrors({ ...errors, ["dropdownCountryValue"]: "" });
-  };
-  const handleStateChange = (selectedState) => {
-    setErrors({ ...errors, ["dropdownStateValue"]: "" });
-    setFormData({
-      ...formData,
-      ["dropdownStateValue"]: selectedState,
-      ["state"]: selectedState.value,
-      ["city"]: "",
-      ["dropdownCityValue"]: "",
-    });
-    const filteredCities = masterCityList
-      .filter((city) => city.state_id === selectedState.value)
-      .map((city) => ({ label: city.city_name, value: city.id }));
-    setCityList(filteredCities);
-  };
-  const handleCityChange = (selectedCity) => {
-    setErrors({ ...errors, ["dropdownCityValue"]: "" });
-    setFormData({
-      ...formData,
-      ["dropdownCityValue"]: selectedCity,
-      ["city"]: selectedCity.value,
-    });
-  };
   useEffect(() => {
-    let param = {};
-    getCountryList(
-      param,
-      (successResponse) => {
-        if (successResponse[0]._success) {
-          if (successResponse[0]._response) {
-            if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage(successResponse[0]._response.name);
-            } else {
-              setMasterCountryList(successResponse[0]._response);
-              var formattedCountryList = [];
-              successResponse[0]._response.forEach((element) => {
-                formattedCountryList.push({
-                  label: element.country_name,
-                  value: element.id,
-                });
-              });
-              setCountryList(formattedCountryList);
-            }
-          }
-        }
-      },
-      (errorResponse) => {
-        console.log("errorResponse", errorResponse[0]._errors.message);
-        setErmessage(errorResponse[0]._errors.message);
+    // Fetch Country List
+    getCountryList({}, (successResponse) => {
+      if (successResponse[0]._success) {
+        const countries = successResponse[0]._response.map((country) => ({
+          label: country.country_name,
+          value: country.id,
+        }));
+        setCountryList(countries);
+        setMasterCountryList(successResponse[0]._response);
       }
-    );
+    });
 
-    getStateList(
-      (param = {}),
-      (successResponse) => {
-        if (successResponse[0]._success) {
-          if (successResponse[0]._response) {
-            if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage(successResponse[0]._response.name);
-            } else {
-              setMasterStateList(successResponse[0]._response);
-            }
-          }
-        }
-      },
-      (errorResponse) => {
-        console.log("errorResponse", errorResponse[0]._errors.message);
-        setErmessage(errorResponse[0]._errors.message);
+    // Fetch State List
+    getStateList({}, (successResponse) => {
+      if (successResponse[0]._success) {
+        setMasterStateList(successResponse[0]._response);
       }
-    );
+    });
 
-    getCityList(
-      null,
-      (successResponse) => {
-        if (successResponse[0]._success) {
-          if (successResponse[0]._response) {
-            if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage(successResponse[0]._response.name);
-            } else {
-              setMasterCityList(successResponse[0]._response);
-            }
-          }
-        }
-      },
-      (errorResponse) => {
-        console.log("errorResponse", errorResponse[0]._errors.message);
-        setErmessage(errorResponse[0]._errors.message);
+    // Fetch City List
+    getCityList({}, (successResponse) => {
+      if (successResponse[0]._success) {
+        setMasterCityList(successResponse[0]._response);
       }
-    );
+    });
   }, []);
+  // Handle country change
+  const handleCountryChange = (selectedOption) => {
+    setSelectedCountry(selectedOption);
+    setSelectedState(null); // Reset state selection
+    setSelectedCity(null); // Reset city selection
+
+    // Filter states based on selected country
+    const filteredStates = masterStateList.filter(
+      (state) => state.country_id === selectedOption.value
+    );
+    const formattedStateList = filteredStates.map((state) => ({
+      label: state.state_name,
+      value: state.id,
+    }));
+    setStateList(formattedStateList);
+    setCityList([]); // Clear city list
+  };
+
+  // Handle state change
+  const handleStateChange = (selectedOption) => {
+    setSelectedState(selectedOption);
+    setSelectedCity(null); // Reset city selection
+
+    // Filter cities based on selected state
+    const filteredCities = masterCityList.filter(
+      (city) => city.state_id === selectedOption.value
+    );
+    const formattedCityList = filteredCities.map((city) => ({
+      label: city.city_name,
+      value: city.id,
+    }));
+    setCityList(formattedCityList);
+  };
 
   return (
     <>
@@ -271,317 +266,378 @@ const DeliveryboySignup = () => {
                   </div>
                 </div>
                 <div>
-                  <Form>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext1">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faUser}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="First Name"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </Form.Group>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faUser}
+                          />
+                          <Controller
+                            name="name"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="First name"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                        </div>
                         {errors.name && (
                           <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
                           >
-                            {errors.name}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext2">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faUser}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="Last Name"
-                              name="lastName"
-                              value={formData.lastName}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </Form.Group>
-                      </div>
-
-                      <div className="col-md-12">
-                        <Form.Group className="mb-3" controlId="formPlaintext3">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faEnvelope}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="Email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.email && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.email}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext4">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faLock}
-                            />
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Password"
-                              name="password"
-                              value={formData.password}
-                              onChange={handleInputChange}
-                            />
-                            <FontAwesomeIcon
-                              icon={showPassword ? faEye : faEyeSlash}
-                              onClick={togglePasswordVisibility}
-                              className={Styles.signupPasswordEyeIcon}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.password && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.password}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext5">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faLock}
-                            />
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type={showConfirmPassword ? "text" : "password"}
-                              placeholder="Confirm password"
-                              name="confirmPassword"
-                              value={formData.confirmPassword}
-                              onChange={handleInputChange}
-                            />
-                            <FontAwesomeIcon
-                              icon={showConfirmPassword ? faEye : faEyeSlash}
-                              onClick={toggleConfirmPasswordVisibility}
-                              className={Styles.signupPasswordEyeIcon}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.confirmPassword && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.confirmPassword}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3">
-                          <div className={Styles.pickupSignupContainer}>
-                            <Form.Select
-                              className={Styles.selectNumberByCountry}
-                              aria-label="Default select example"
-                              name="code"
-                              value={formData.code}
-                              onChange={handleInputChange}
-                            >
-                              <option value="+33">+33</option>
-                              <option value="+91">+91</option>
-                            </Form.Select>
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type="text"
-                              placeholder="0 00 00 00 00"
-                              name="number"
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.number && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.number}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext">
-                          <Select
-                            value={formData.dropdownCountryValue}
-                            onChange={handleCountryChange}
-                            options={countryList}
-                            placeholder="Select a country"
-                            isSearchable
-                            className={
-                              !!errors.dropdownCountryValue ? "is-invalid" : ""
-                            }
-                          />
-                        </Form.Group>
-                        {errors.dropdownCountryValue && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.dropdownCountryValue}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext7">
-                          <Select
-                            value={formData.dropdownStateValue}
-                            name="state"
-                            options={stateList}
-                            placeholder="Ain"
-                            isSearchable={true}
-                            onChange={handleStateChange}
-                            className={
-                              !!errors.dropdownStateValue ? "is-invalid" : ""
-                            }
-                          />
-                        </Form.Group>
-                        {errors.dropdownStateValue && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.dropdownStateValue}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext8">
-                          <Select
-                            value={formData.dropdownCityValue}
-                            name="city"
-                            options={cityList}
-                            placeholder="ambérieu-e..."
-                            isSearchable={true}
-                            onChange={handleCityChange}
-                            className={
-                              !!errors.dropdownCityValue ? "is-invalid" : ""
-                            }
-                          />
-                        </Form.Group>
-                        {errors.dropdownCityValue && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.dropdownCityValue}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-12">
-                        <Form.Group className="mb-3" controlId="formPlaintext9">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faLocationDot}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="Siret"
-                              name="siret"
-                              value={formData.siret}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.siret && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.siret}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-12">
-                        {checkboxTypes.map((type) => (
-                          <div
-                            key={`default-${type}`}
-                            className={`mb-3 ${Styles.deliveryBoySignupCheckboxCard}`}
-                          >
-                            <Form.Check
-                              type={type}
-                              id={`default-${type}`}
-                              label={null}
-                              className={Styles.DeliveryboySignupCustomcheckbox}
-                              name="termone"
-                              value={formData.termone}
-                              onChange={handleInputChange}
-                              isInvalid={!!errors.termone}
-                            />
-                            <p className={Styles.checkText}>
-                              We collect this data for the purposes of
-                              processing your application to become a courier.
-                              By clicking this box, you acknowledge that you
-                              have read and understood the{" "}
-                              <Link
-                                className={Styles.deliverySignupPolicyCheck}
-                                to="#"
-                              >
-                                Privacy Policy
-                              </Link>
-                            </p>
-                          </div>
-                        ))}
-                        {errors.termone && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.termone}
+                            {errors.name.message}
                           </p>
                         )}
                       </div>
                     </div>
-                  </Form>
-
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faUser}
+                          />
+                          <Controller
+                            name="lastname"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="Last name"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                        </div>
+                        {errors.lastname && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.lastname.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-12">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faEnvelope}
+                          />
+                          <Controller
+                            name="email"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="Email"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                        </div>
+                        {errors.email && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faLock}
+                          />
+                          <Controller
+                            name="password"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password..."
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                          <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            onClick={togglePasswordVisibility}
+                            className={Styles.signupPasswordEyeIcon}
+                          />
+                        </div>
+                        {errors.password && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.password.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faLock}
+                          />
+                          <Controller
+                            name="confirmPassword"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Confirm your password"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                          <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            onClick={togglePasswordVisibility}
+                            className={Styles.signupPasswordEyeIcon}
+                          />
+                        </div>
+                        {errors.confirmPassword && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.confirmPassword.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="phoneNumber"
+                          control={control}
+                          defaultValue=""
+                          render={({ field: { onChange, value } }) => (
+                            <PhoneInput
+                              country={"fr"}
+                              value={value}
+                              countryCodeEditable={false}
+                              onChange={onChange}
+                              inputStyle={{
+                                width: "100%",
+                                paddingLeft: "42px",
+                              }}
+                              dropdownStyle={{ borderColor: "#ccc" }}
+                              enableSearch
+                              searchPlaceholder="Search country"
+                              specialLabel=""
+                            />
+                          )}
+                        />
+                        {errors.phoneNumber && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.phoneNumber.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="country"
+                          control={control}
+                          defaultValue={null}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={countryList}
+                              onChange={(option) => {
+                                field.onChange(option);
+                                handleCountryChange(option);
+                              }}
+                              placeholder="Select your country"
+                              styles={customSelectStyles}
+                            />
+                          )}
+                        />
+                        {errors.country && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.country.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="state"
+                          control={control}
+                          defaultValue={null}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={stateList}
+                              placeholder="Select your Ain"
+                              onChange={(option) => {
+                                field.onChange(option);
+                                handleStateChange(option);
+                              }}
+                              isDisabled={!selectedCountry}
+                              styles={customSelectStyles}
+                              isSearchable={true}
+                            />
+                          )}
+                        />
+                        {errors.state && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.state.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="city"
+                          control={control}
+                          defaultValue={null}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={cityList}
+                              placeholder="Select your ambérieu-e..."
+                              styles={customSelectStyles}
+                              isDisabled={!selectedState}
+                              isSearchable={true}
+                            />
+                          )}
+                        />
+                        {errors.city && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.city.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-12">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faBuilding}
+                          />
+                          <Controller
+                            name="siret"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="Siret no..."
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                        </div>
+                        {errors.siret && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.siret.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-12">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <Controller
+                            name="terms"
+                            control={control}
+                            defaultValue={false}
+                            render={({ field }) => (
+                              <label
+                                style={{
+                                  fontSize: "18px",
+                                  marginBottom: "10px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: " center",
+                                  fontSize: "11px",
+                                }}
+                                htmlFor="terms"
+                              >
+                                <input
+                                  type="checkbox"
+                                  {...field}
+                                  style={{ marginRight: "10px" }}
+                                  className={
+                                    Styles.deliveryBoySignupCheckboxCard
+                                  }
+                                />
+                                <div>
+                                  We collect this data for the purposes of
+                                  processing your application to become a
+                                  courier. By clicking this box, you acknowledge
+                                  that you have read and understood the {" "}
+                                  <Link className={Styles.deliverySignupPolicyCheck} to="#">Privacy Policy</Link>
+                                </div>
+                              </label>
+                            )}
+                          />
+                        </div>
+                        {errors.terms && (
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
+                            {errors.terms.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     {failedError && (
                       <div className={Styles.checkText}>
@@ -592,7 +648,7 @@ const DeliveryboySignup = () => {
                       to="#"
                       className={Styles.pickupSignupContinueBtn}
                       type="button"
-                      onClick={submitHandler}
+                      onClick={handleSubmit(onSubmit)}
                       disabled={hitButton}
                     >
                       {hitButton ? "Loading ..." : "Continue"}
@@ -634,4 +690,18 @@ const DeliveryboySignup = () => {
   );
 };
 
+const customSelectStyles = {
+  control: (styles) => ({
+    ...styles,
+    backgroundColor: "#fff",
+    width: "100%",
+    fontSize: "13px",
+  }),
+  option: (styles, { isFocused, isSelected }) => ({
+    ...styles,
+    backgroundColor: isSelected ? "#ffc72b" : isFocused ? "#f8f9fa" : "#fff",
+    color: "#333",
+    fontSize: "14px",
+  }),
+};
 export default DeliveryboySignup;

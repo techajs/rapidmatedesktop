@@ -24,12 +24,17 @@ import SingupVerify from "./SingupVerify"
 import EnterprisePlanning from "../components/enterprise/EnterprisePlanning"
 import EnterprisesNewSchedule from "../components/enterprise/EnterprisesNewSchedule"
 import AddPickupDetails from "../components/consumer/AddPickupDetails"
-import OrderView from "../components/consumer/OrderView"
+import OrderView from "./OrderView"
 import PaymentView from "./PaymentView"
 import AddVehicle from "../components/deliveryboy/AddVehicle"
 import AddWorkType from "../components/deliveryboy/AddWorkType"
 import PastOrder from "../components/consumer/Pastorder"
 import OrderDetail from "../components/consumer/OrderDetail"
+import ConsumerSetting from "../components/consumer/account/Setting"
+import PickupAddressBook from "../components/consumer/account/PickupAddressBook"
+import PickupNotificationSettings from "../components/consumer/account/PickupNotificationSettings"
+import PickupPaymentMethods from "../components/consumer/account/PickupPaymentMethods"
+import PickupChangePassword from "../components/consumer/account/PickupChangePassword"
 export {
     Home,
     HomeHeader,
@@ -63,4 +68,9 @@ export {
     AddWorkType,
     PastOrder,
     OrderDetail,
+    ConsumerSetting,
+    PickupAddressBook,
+    PickupNotificationSettings,
+    PickupPaymentMethods,
+    PickupChangePassword
 }

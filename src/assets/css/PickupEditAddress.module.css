@@ -5,6 +5,8 @@
     --white-color: #fff;
     --gradiantbg-color: linear-gradient(
       0deg,
+
+      
       rgba(255, 255, 255, 1) 0%,
       rgba(255, 242, 206, 1) 100%
     );
@@ -22,7 +24,7 @@
     font-family: "Montserrat", sans-serif;
   }
 
-  .modalPickup-EditAddress-header{
+  .modalPickupEditAddressHeader{
     display: flex;
     justify-content: space-between;
     padding: 10px;
@@ -31,7 +33,7 @@
     align-items: center;
   }
 
-  .pickupEdit-addressDeleteBtn{
+  .pickupEditAddressDeleteBtn{
     font-size: 14px;
     font-weight: 500;
     background-color: transparent;
@@ -42,7 +44,7 @@
     margin-right: 20px;
   }
 
-  .pickupEdit-addressSaveBtn{
+  .pickupEditAddressSaveBtn{
     font-size: 14px;
     font-weight: 500;
     background-color: var(--primary-color);
@@ -52,13 +54,13 @@
     border-radius: 6px;
   }
 
-  .enterpriseAddNewAd-UploadIconimg{
+  .enterpriseAddNewAdUploadIconimg{
     width: 105px;
     height: 105px;
     border-radius: 100%;
   }
 
-  .enterpriseAddNewAd-LargeIconimg{
+  .enterpriseAddNewAdLargeIconimg{
     width: 100%;
     height: 100px;
   }

@@ -1,5 +1,5 @@
-import React from "react";
-import Styles from "../../assets/css/home.module.css";
+import React, { useState } from "react";
+import Styles from "../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,15 +9,55 @@ import {
   faGlobe,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
-import Truck from "../../assets/images/Truck.png";
-import { Link } from "react-router-dom";
-import SidebarImg from "../../assets/images/Pickup-Order-preview-Banner.png";
-import { UseFetch } from "../../utils/UseFetch";
-import CommonHeader from "../../common/CommonHeader";
+import Truck from "../assets/images/Truck.png";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import SidebarImg from "../assets/images/Pickup-Order-preview-Banner.png";
+import { UseFetch } from "../utils/UseFetch";
+import CommonHeader from "../common/CommonHeader";
+import getImage from "../components/consumer/common/GetImage";
+import { uploadDocumentsApi } from "../data_manager/dataManage";
 
 function OrderView() {
+  const navigate=useNavigate()
+  const location = useLocation();
+  const { order, orderCustomerDetails } = location.state || {};
+  const [loading,setLoading]=useState(false)
+  const [packageImageId, setPackageImageId] = useState(null);
+  const [imageView,setImageView]=useState(URL.createObjectURL(orderCustomerDetails?.file[0]) || null)
   const checkboxTypes = ["checkbox"];
-  const {user} = UseFetch();
+  const { user } = UseFetch();
+  console.log(URL.createObjectURL(orderCustomerDetails?.file[0]))
+  const submitHandler = (e)=>{
+    e.preventDefault()
+    // let photo = {
+    //   uri: URL.createObjectURL(orderCustomerDetails?.file[0]),
+    //   type: orderCustomerDetails?.file[0]?.type,
+    //   name: orderCustomerDetails?.file[0]?.name,
+    // };
+    // const formdata = new FormData();
+    // formdata.append('file', photo);
+    // setLoading(true);
+    // uploadDocumentsApi(
+    //   formdata,
+    //   successResponse => {
+    //     setLoading(false);
+    //     setPackageImageId(JSON.parse(successResponse).id);
+    //   },
+    //   errorResponse => {
+    //     setLoading(false);
+    //   },
+    // );
+    navigate('/consumer/payment',{
+      state: {
+        order,
+        orderCustomerDetails,
+      },
+    })
+  }
+   
+  
+  console.log(orderCustomerDetails?.file[0])
+
   return (
     <>
       <CommonHeader userData={user} />
@@ -50,7 +90,7 @@ function OrderView() {
                       icon={faLocationDot}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                      3891 Ranchview , California 62639
+                      {order?.pickupLocation}
                     </p>
                   </div>
 
@@ -62,7 +102,7 @@ function OrderView() {
                       icon={faLocationCrosshairs}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                      1901 Thornridge Cir. Shiloh, California
+                      {order?.dropoffLocation}
                     </p>
                   </div>
                 </div>
@@ -74,16 +114,16 @@ function OrderView() {
                   <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
                     <div>
                       <h5 className={Styles.pickupOrderPreviewVehicleType}>
-                        Semi Truck
+                        {order?.selectedVehicleDetails?.vehicle_type}
                       </h5>
                       <p className={Styles.pickupOrderPreviewCompanyName}>
-                        20000 liters max capacity
+                        {order?.selectedVehicleDetails?.vehicle_type_desc}
                       </p>
                     </div>
                     <div>
                       <img
                         className={Styles.PickupOrderPreviewTruckImage}
-                        src={Truck}
+                        src={getImage(order?.selectedVehicleDetails)}
                         alt="icon"
                       />
                     </div>
@@ -94,21 +134,36 @@ function OrderView() {
                   <p className={Styles.pickupOrderPreviewVehicleDetailsText}>
                     Pickup details
                   </p>
-                  <div>
-                    <h5 className={Styles.pickupOrderPreviewVehicleType}>
-                      Adam Smith
-                    </h5>
-                    <p className={Styles.pickupOrderPreviewCompanyName}>Adam Inc.</p>
+                  <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
+                    <div>
+                      <h5 className={Styles.pickupOrderPreviewVehicleType}>
+                        {orderCustomerDetails?.name +
+                          " " +
+                          orderCustomerDetails?.lastname}
+                      </h5>
+                      <p className={Styles.pickupOrderPreviewCompanyName}>
+                        {orderCustomerDetails?.company}
+                      </p>
+                    </div>
+                    <div>
+                      <img
+                        className={Styles.PickupOrderPreviewTruckImage}
+                        src={imageView}
+                        alt="icon"
+                      />
+                    </div>
                   </div>
 
-                  <div className={Styles.pickupOrderPreviewAdminDetailsMainCard}>
+                  <div
+                    className={Styles.pickupOrderPreviewAdminDetailsMainCard}
+                  >
                     <div className={Styles.pickupOrderPreviewAdminDetailsCard}>
                       <FontAwesomeIcon
                         className={Styles.pickupOrderglobeIcon}
                         icon={faGlobe}
                       />
                       <p className={Styles.pickupOrderAdminEmail}>
-                        adaminc@email.com
+                        {orderCustomerDetails?.email}
                       </p>
                     </div>
 
@@ -118,15 +173,13 @@ function OrderView() {
                         icon={faPhone}
                       />
                       <p className={Styles.pickupOrderAdminEmail}>
-                        +33 1 23 45 67 89
+                        {"+" + orderCustomerDetails?.phoneNumber}
                       </p>
                     </div>
                   </div>
 
                   <p className={Styles.pickupOrderPreviewPickupNotes}>
-                    Lorem ipsum dolor sit amet consectetur. Ornare faucibus ac
-                    ultricies sed penatibus. Integer sit sagit tis tempor cursus
-                    amet. Nunc cursus cras fermen tum elit pulvinar amet.
+                    {orderCustomerDetails?.pickupnote}
                   </p>
                 </div>
 
@@ -136,23 +189,29 @@ function OrderView() {
                   </p>
                   <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
                     <div>
-                      <h5 className={Styles.pickupOrderPreviewVehicleType}>€34</h5>
+                      <h5 className={Styles.pickupOrderPreviewVehicleType}>
+                        € {order?.selectedVehiclePrice}
+                      </h5>
                       <div className={Styles.pickupOrderPreviewCompanyName}>
                         <div className={Styles.pickupOrderNormalDetailsCard}>
                           <p className={Styles.pickupOrderPreviewNormalDetails}>
-                            2.6 km
+                            {order?.distance}
                           </p>
-                          <p className={`${Styles.pickupOrderPreviewNormalDetails} ${Styles.pickupPreviewB}`}>
-                            Semi truck
+                          <p
+                            className={`${Styles.pickupOrderPreviewNormalDetails} ${Styles.pickupPreviewB}`}
+                          >
+                            {order?.selectedVehicleDetails?.vehicle_type}
                           </p>
                           <p className={Styles.pickupOrderPreviewNormalDetails}>
-                            23 minutes
+                            {order?.duration}
                           </p>
                         </div>
                       </div>
                     </div>
                     <div>
-                      <h1 className={Styles.PickupOrderEuroTextBig}>€</h1>
+                      <h1 className={Styles.PickupOrderEuroTextBig}>
+                        € {order?.selectedVehiclePrice}
+                      </h1>
                     </div>
                   </div>
                 </div>
@@ -179,9 +238,16 @@ function OrderView() {
                 </div>
 
                 <div className={Styles.addPickupDetailsBtnCard}>
-                  <Link className={Styles.addPickupDetailsCancelBTn} to='/consumer/pickup-details' style={{color:'#000'}}>Back</Link>
                   <Link
-                    to="/consumer/payment"
+                    className={Styles.addPickupDetailsCancelBTn}
+                    to="/consumer/pickup-details"
+                    style={{ color: "#000" }}
+                  >
+                    Back
+                  </Link>
+                  <Link
+                    to="#"
+                    onClick={submitHandler}
                     className={Styles.addPickupDetailsNextBtn}
                   >
                     Proceed to payment

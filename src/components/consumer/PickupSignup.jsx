@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faCheck } from "@fortawesome/free-solid-svg-icons";
+import Select from "react-select";
 import {
   faUser,
   faEnvelope,
@@ -15,22 +16,44 @@ import SignupBanner from "../../assets/images/Pickup-Signup-Banner.png";
 import { Link, useNavigate } from "react-router-dom";
 import { getCountryList, signUpUser } from "../../data_manager/dataManage";
 import { useTranslation } from "react-i18next";
-
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import "react-phone-input-2/lib/style.css";
+import PhoneInput from "react-phone-input-2";
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters long"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Please enter a valid email"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters long"),
+  confirmPassword: yup
+    .string()
+    .required("Confirm password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number should contain only digits")
+    .min(8, "Phone number must be at least 8 digits"),
+  country: yup
+    .object({
+      value: yup.string().required("Country is required"),
+    })
+    .required("Country is required"),
+});
 const PickupSignup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [password, setPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedAccountType, setSelectedAccountType] = useState("");
-  const [dropdownCountryValue, setDropdownCountryValue] = useState("75");
-  const [code, setCode] = useState("+33");
-  const [number, setNumber] = useState("");
-  const [dropdownValue, setDropdownValue] = useState("+33");
-  const [errors, setErrors] = useState({});
+  const [selectedAccountType, setSelectedAccountType] = useState("Individual");
   const [ermessage, setErmessage] = useState("");
   const [hitButton, setHitButton] = useState(false);
   const [failedError, setFailedError] = useState(false);
@@ -39,54 +62,6 @@ const PickupSignup = () => {
 
   const handleSelection = (type) => {
     setSelectedAccountType(type);
-  };
-  const validateForm = () => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^\+?\d{9,15}$/; // General phone pattern (9-15 digits)
-
-    let errors = {};
-
-    if (!name.trim()) {
-      errors.name = "Name is required";
-    }
-
-    if (!email.trim()) {
-      errors.email = "Email is required";
-    } else if (!emailPattern.test(email)) {
-      errors.email = "Email address is invalid";
-    }
-
-    if (!password) {
-      errors.password = "Password is required";
-    } else if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters long";
-    }
-
-    if (password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!selectedAccountType) {
-      errors.selectedAccountType = "Please select an account type";
-    }
-
-    if (!number.trim()) {
-      errors.number = "Number is required";
-    } else if (isNaN(number)) {
-      errors.number = "Number should be numeric";
-    } else if (dropdownCountryValue === "France" && number.length !== 9) {
-      errors.number = "French numbers should be exactly 9 digits long";
-    } else if (dropdownCountryValue === "India" && number.length !== 10) {
-      errors.number = "Indian numbers should be exactly 10 digits long";
-    } else if (!phonePattern.test(number)) {
-      errors.number = "Number is invalid";
-    }
-
-    if (!dropdownCountryValue) {
-      errors.dropdownCountryValue = "Please select a country";
-    }
-
-    return errors;
   };
 
   const togglePasswordVisibility = () => {
@@ -122,25 +97,20 @@ const PickupSignup = () => {
     );
   }, []);
 
-  const signUpHandler = async (e) => {
-    e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      // dispatch(loginFailed());
-      return;
-    }
+  const {control,handleSubmit,formState: { errors },} = useForm({resolver: yupResolver(schema),});
+  const onSubmit = (data) => {
+    // console.log("Form Data:", data);
     setHitButton(true);
     let params = {
       info: {
-        userName: email,
-        email: email,
-        phoneNumber: code + number,
-        password: password,
+        userName: data.email,
+        email: data.email,
+        phoneNumber: "+" + data.phoneNumber,
+        password: data.password,
         userrole: "CONSUMER",
-        firstName: name,
+        firstName: data.name,
         lastName: "",
-        country: dropdownCountryValue.toString(),
+        country: data.country?.value.toString(),
       },
     };
     signUpUser(
@@ -181,12 +151,7 @@ const PickupSignup = () => {
       }
     );
   };
-
-  const data = [
-    { label: "+33", value: "+33" },
-    { label: "+91", value: "+91" },
-  ];
-
+  
   return (
     <>
       <section className={Styles.profileChooseSec}>
@@ -212,261 +177,258 @@ const PickupSignup = () => {
                   </div>
                 </div>
                 <div>
-                  <Form>
-                    <div className="row">
-                      <div className="col-md-6">
-                        {errors.name && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.name}
-                          </p>
-                        )}
-                        <Form.Group className="mb-3" controlId="formPlaintext1">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faUser}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="Name"
-                              onChange={(e) => setName(e.target.value)}
-                              isInvalid={!!errors.name}
-                            />
-                          </div>
-                        </Form.Group>
-                      </div>
-
-                      <div className="col-md-6">
-                        {errors.email && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.email}
-                          </p>
-                        )}
-                        <Form.Group className="mb-3" controlId="formPlaintext2">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faEnvelope}
-                            />
-                            <Form.Control
-                              className={Styles.signupUserName}
-                              type="text"
-                              placeholder="Email"
-                              onChange={(e) => setEmail(e.target.value)}
-                            />
-                          </div>
-                        </Form.Group>
-                      </div>
-
-                      <div className="col-md-6">
-                        {errors.password && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.password}
-                          </p>
-                        )}
-                        <Form.Group className="mb-3" controlId="formPlaintext3">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faLock}
-                            />
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Password"
-                              onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <FontAwesomeIcon
-                              icon={showPassword ? faEye : faEyeSlash}
-                              onClick={togglePasswordVisibility}
-                              className={Styles.signupPasswordEyeIcon}
-                            />
-                          </div>
-                        </Form.Group>
-                      </div>
-
-                      <div className="col-md-6">
-                        {errors.confirmPassword && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.confirmPassword}
-                          </p>
-                        )}
-                        <Form.Group className="mb-3" controlId="formPlaintext4">
-                          <div className={Styles.pickupSignupContainer}>
-                            <FontAwesomeIcon
-                              className={Styles.pickupSignupFieldsIcons}
-                              icon={faLock}
-                            />
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Confirm password"
-                              onChange={(e) =>
-                                setConfirmPassword(e.target.value)
-                              }
-                            />
-                            <FontAwesomeIcon
-                              icon={showPassword ? faEye : faEyeSlash}
-                              onClick={togglePasswordVisibility}
-                              className={Styles.signupPasswordEyeIcon}
-                            />
-                          </div>
-                        </Form.Group>
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3">
-                          <div className={Styles.pickupSignupContainer}>
-                            <Form.Select
-                              className={Styles.selectNumberByCountry}
-                              aria-label="Default select example"
-                              onChange={(e) => setCode(e.target.value)}
-                            >
-                              {data?.map((numbercode, index) => (
-                                <option key={index} value={numbercode.value}>
-                                  {numbercode.label}
-                                </option>
-                              ))}
-                            </Form.Select>
-                            <Form.Control
-                              className={`password-field ${Styles.signupUserName}`}
-                              type="text"
-                              placeholder="0 00 00 00 00"
-                              onChange={(e) => setNumber(e.target.value)}
-                            />
-                          </div>
-                        </Form.Group>
-                        {errors.number && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.number}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <Form.Group className="mb-3" controlId="formPlaintext6">
-                          <Form.Select
-                            className={Styles.pickupSingupCountrySelect}
-                            aria-label="Default select example"
-                            value={dropdownCountryValue}
-                            onChange={(e) =>
-                              setDropdownCountryValue(e.target.value)
-                            }
-                          >
-                            <option disabled={true}>Country</option>
-                            {countryList.map((country, index) => (
-                              <option key={index} value={country.value}>
-                                {country.label}
-                              </option>
-                            ))}
-                          </Form.Select>
-                        </Form.Group>
-                        {errors.country && (
-                          <p
-                            className="text-danger lh-1"
-                            style={{ fontSize: "0.820em" }}
-                          >
-                            {errors.country}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="row">
-                      <p className={Styles.pickupSingupAccountType}>
-                        Create account as:
-                      </p>
-                      <div className="col-md-6">
-                        <div
-                          className={`${Styles.pickupSignupTypeOfAc} ${
-                            selectedAccountType === "Individual"
-                              ? Styles.selected
-                              : ""
-                          }`}
-                          onClick={() => handleSelection("Individual")}
-                        >
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
                           />
-                          <p className={Styles.acNamesType}>Individual</p>
-                          <div
-                            className={`${Styles.pickupSignupAcCircle} ${
-                              selectedAccountType === "Individual"
-                                ? Styles.selected
-                                : ""
-                            }`}
-                          >
-                            {selectedAccountType === "Individual" && (
-                              <FontAwesomeIcon
-                                className={Styles.selectedCheck}
-                                icon={faCheck}
+                          <Controller
+                            name="name"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="Name"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
                               />
                             )}
-                          </div>
+                          />
                         </div>
-                        <p
-                          className={`${Styles.chooseProfileSubheading} ${
-                            errors.selectedAccountType
-                              ? Styles.forgotPassword
-                              : ""
-                          } `}
-                        >
-                          {errors.selectedAccountType !== undefined &&
-                          errors.selectedAccountType !== null
-                            ? errors.selectedAccountType
-                            : ""}
-                        </p>
+                        {errors.name && (
+                          <p style={{ color: "red", fontSize: "13px" }}>{errors.name.message}</p>
+                        )}
                       </div>
-
-                      <div className="col-md-6">
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faEnvelope}
+                          />
+                          <Controller
+                            name="email"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type="text"
+                                placeholder="Email"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                        </div>
+                        {errors.email && (
+                          <p style={{ color: "red", fontSize: "13px" }}>{errors.email.message}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faLock}
+                          />
+                          <Controller
+                            name="password"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password..."
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                          <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            onClick={togglePasswordVisibility}
+                            className={Styles.signupPasswordEyeIcon}
+                          />
+                        </div>
+                        {errors.password && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.password.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <div className={Styles.pickupSignupContainer}>
+                          <FontAwesomeIcon
+                            className={Styles.pickupSignupFieldsIcons}
+                            icon={faLock}
+                          />
+                          <Controller
+                            name="confirmPassword"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                              <input
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Confirm your password"
+                                style={{ width: "100%", padding: "5px" }}
+                                className={Styles.signupUserName}
+                              />
+                            )}
+                          />
+                          <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            onClick={togglePasswordVisibility}
+                            className={Styles.signupPasswordEyeIcon}
+                          />
+                        </div>
+                        {errors.confirmPassword && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.confirmPassword.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="phoneNumber"
+                          control={control}
+                          defaultValue=""
+                          render={({ field: { onChange, value } }) => (
+                            <PhoneInput
+                              country={"fr"}
+                              value={value}
+                              countryCodeEditable={false}
+                              onChange={onChange}
+                              inputStyle={{
+                                width: "100%",
+                                paddingLeft: "42px",
+                              }}
+                              dropdownStyle={{ borderColor: "#ccc" }}
+                              enableSearch
+                              searchPlaceholder="Search country"
+                              specialLabel=""
+                            />
+                          )}
+                        />
+                        {errors.phoneNumber && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.phoneNumber.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <Controller
+                          name="country"
+                          control={control}
+                          defaultValue={null}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={countryList}
+                              placeholder="Select your country"
+                              styles={customSelectStyles}
+                            />
+                          )}
+                        />
+                        {errors.country && (
+                          <p style={{ color: "red", fontSize: "13px" }}>{errors.country.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <p className={Styles.pickupSingupAccountType}>
+                      Create account as:
+                    </p>
+                    <div className="col-md-6">
+                      <div
+                        className={`${Styles.pickupSignupTypeOfAc} ${
+                          selectedAccountType === "Individual"
+                            ? Styles.selected
+                            : ""
+                        }`}
+                        onClick={() => handleSelection("Individual")}
+                      >
+                        <FontAwesomeIcon
+                          className={Styles.pickupSignupFieldsIcons}
+                          icon={faUser}
+                        />
+                        <p className={Styles.acNamesType}>Individual</p>
                         <div
-                          className={`${Styles.pickupSignupTypeOfAc} ${
+                          className={`${Styles.pickupSignupAcCircle} ${
+                            selectedAccountType === "Individual"
+                              ? Styles.selected
+                              : ""
+                          }`}
+                        >
+                          {selectedAccountType === "Individual" && (
+                            <FontAwesomeIcon
+                              className={Styles.selectedCheck}
+                              icon={faCheck}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <p
+                        className={`${Styles.chooseProfileSubheading} ${
+                          errors.selectedAccountType
+                            ? Styles.forgotPassword
+                            : ""
+                        } `}
+                      >
+                        {errors.selectedAccountType !== undefined &&
+                        errors.selectedAccountType !== null
+                          ? errors.selectedAccountType
+                          : ""}
+                      </p>
+                    </div>
+
+                    <div className="col-md-6">
+                      <div
+                        className={`${Styles.pickupSignupTypeOfAc} ${
+                          selectedAccountType === "Company"
+                            ? Styles.selected
+                            : ""
+                        }`}
+                        onClick={() => handleSelection("Company")}
+                      >
+                        <FontAwesomeIcon
+                          className={Styles.pickupSignupFieldsIcons}
+                          icon={faBuilding}
+                        />
+                        <p className={Styles.acNamesType}>Company</p>
+                        <div
+                          className={`${Styles.pickupSignupAcCircle} ${
                             selectedAccountType === "Company"
                               ? Styles.selected
                               : ""
                           }`}
-                          onClick={() => handleSelection("Company")}
                         >
-                          <FontAwesomeIcon
-                            className={Styles.pickupSignupFieldsIcons}
-                            icon={faBuilding}
-                          />
-                          <p className={Styles.acNamesType}>Company</p>
-                          <div
-                            className={`${Styles.pickupSignupAcCircle} ${
-                              selectedAccountType === "Company"
-                                ? Styles.selected
-                                : ""
-                            }`}
-                          >
-                            {selectedAccountType === "Company" && (
-                              <FontAwesomeIcon
-                                className={Styles.selectedCheck}
-                                icon={faCheck}
-                              />
-                            )}
-                          </div>
+                          {selectedAccountType === "Company" && (
+                            <FontAwesomeIcon
+                              className={Styles.selectedCheck}
+                              icon={faCheck}
+                            />
+                          )}
                         </div>
                       </div>
                     </div>
-                  </Form>
+                  </div>
                   <div>
                     {failedError && (
                       <div className={Styles.checkText}>
@@ -478,7 +440,7 @@ const PickupSignup = () => {
                       to="#"
                       className={`mt-5 ${Styles.pickupSignupContinueBtn}`}
                       type="button"
-                      onClick={signUpHandler}
+                      onClick={handleSubmit(onSubmit)}
                       disabled={hitButton}
                     >
                       {hitButton ? "Loading ..." : t("continue")}
@@ -520,4 +482,16 @@ const PickupSignup = () => {
   );
 };
 
+const customSelectStyles = {
+  control: (styles) => ({
+    ...styles,
+    backgroundColor: "#fff",
+    width: "100%",
+  }),
+  option: (styles, { isFocused, isSelected }) => ({
+    ...styles,
+    backgroundColor: isSelected ? "#ffc72b" : isFocused ? "#f8f9fa" : "#fff",
+    color: "#333",
+  }),
+};
 export default PickupSignup;

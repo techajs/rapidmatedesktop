@@ -20,18 +20,6 @@ import { commonDataList } from "../redux/commonDataSlice";
 import { UseFetch } from "../utils/UseFetch";
 const Login = () => {
   const {lookup}=UseFetch()
-  console.log(lookup)
-  // useEffect(()=>{
-  //   async function removIds(){
-  //     await localforage.removeItem("tokenInfo");
-  //     await localforage.removeItem("refTokenInfo");
-  //   await localforage.removeItem("userInfo");
-  //   const checkData=await localforage.getItem('userInfo')
-  //   console.log(checkData)
-  //   console.log('removed')
-  //   }
-  //   removIds()
-  // },[])
   const { loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,9 +28,7 @@ const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fcmToken, setFcmToken] = useState(
-    "fZocJojiRpiGx1GUQI6SaP:APA91bGwmEW0DZcpLu1lu9188IMe00eLBU43K19txbxlOp3I-Tqa2w2slmjPOztNFdeC3kgA5e4kcy0sUn0w0-dNVC7rAM-59NWK4PtjDd_-b_U4gM5bhQvqiL1m2KK6U7uhwZQwoBkL"
-  );
+  const [fcmToken, setFcmToken] = useState('');
   const [errors, setErrors] = useState({});
   const [iserror, setIserror] = useState(false);
   const [ermessage, setErmessage] = useState("");
@@ -93,11 +79,13 @@ const Login = () => {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               setErmessage("Username or password is incorrect");
               setIserror(true);
+              dispatch(loginFailed());
             } else if (
               successResponse[0]._response.name == "UserNotConfirmedException"
             ) {
               setErmessage("Delivery Boy Verfication Pending");
               setIserror(true);
+              dispatch(loginFailed());
             } else {
               const dataRes =successResponse[0]._response.user?.idToken?.payload;
               const userData = {
@@ -124,17 +112,20 @@ const Login = () => {
               } else {
                 setErmessage("Login failed due to missing token or user data.");
                 setIserror(true);
+                dispatch(loginFailed());
               }
             }
           }
         } else {
           setErmessage("Invalid credentials");
           setIserror(true);
+          dispatch(loginFailed());
         }
       },
       (errorResponse) => {
         setErmessage(errorResponse[0]._errors.message);
         setIserror(true);
+        dispatch(loginFailed());
       }
     );
   };

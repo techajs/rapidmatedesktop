@@ -46,13 +46,8 @@ function ConsumerDashboard() {
   useEffect(() => {
     setLoading(true);
     const getAllVehiclesType = () => {
-      getAllVehicleTypes(
-        null,
-        (successResponse) => {
-          if (successResponse[0]._success) {
-            setLoading(false);
-            setVehicleTypeList(successResponse[0]._response);
-          }
+      getAllVehicleTypes(null,(successResponse) => {
+        if (successResponse[0]._success){setLoading(false);setVehicleTypeList(successResponse[0]._response);}
         },
         (errorResponse) => {
           setLoading(false);
@@ -109,6 +104,7 @@ function ConsumerDashboard() {
   }
 
   const calculateRoute = async () => {
+   
     // Calculate route between pickup and dropoff locations
     if (pickupLocation && dropoffLocation) {
       const directionService = new google.maps.DirectionsService();
@@ -120,6 +116,9 @@ function ConsumerDashboard() {
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
+
+      console.log(results)
+     
     }
   };
 
@@ -141,7 +140,12 @@ function ConsumerDashboard() {
       selectedVehiclePrice,
     };
 
-    console.log('Payload:', payload);
+    // console.log('Payload:', payload);
+    navigate("/consumer/pickup-details",{
+      state:{
+        order:payload
+      },
+    });
     // Here you would typically send the payload to your backend
   };
 
@@ -168,6 +172,7 @@ function ConsumerDashboard() {
 
     calculateRoute();
   };
+  
   return (
     <section className={Styles.requestPickupSec}>
       <div className={`row ${Styles.manageRow}`}>
