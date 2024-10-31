@@ -6,7 +6,6 @@ import {
   faMagnifyingGlass,
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
-import Package from "../../assets/images/Package.png";
 import { Link, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
 import { UseFetch } from "../../utils/UseFetch";

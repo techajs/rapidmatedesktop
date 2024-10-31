@@ -599,7 +599,6 @@ const DeliveryboySignup = () => {
                             render={({ field }) => (
                               <label
                                 style={{
-                                  fontSize: "18px",
                                   marginBottom: "10px",
                                   display: "flex",
                                   alignItems: "center",
