@@ -5,7 +5,7 @@ import {
   faLocationDot,
   faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
-import Package from "../../assets/images/package.png";
+import Package from "../../assets/images/Package.png";
 import { formatDate } from "../../utils/Constants";
 
 function CardComponent({ orderList = [], locationList = [],msg=''}) {
