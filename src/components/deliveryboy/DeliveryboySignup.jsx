@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock,
-  faCheck,
-  faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faUser,
@@ -15,12 +12,9 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import Styles from "../../assets/css/home.module.css";
 import Logo from "../../assets/images/Logo-icon.png";
-import Flag from "../../assets/images/numberFlag.png";
 import Banner from "../../assets/images/Deliveryboy-Signup-Banner.png";
 import { Link, useNavigate } from "react-router-dom";
 import Select from "react-select";
-import localforage from "localforage";
-import { validateDeliveryboyForm } from "../../utils/Validation";
 import {
   getCityList,
   getCountryList,

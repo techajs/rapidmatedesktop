@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import Styles from "../../assets/css/home.module.css";
 import Logo from "../../assets/images/Logo-icon.png";
 import Calender from "../../assets/images/Calender-Icon.png";
-import Location from "../../assets/images/Location-Icon.png";
-import Both from "../../assets/images/Calender-Both.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { UseFetch } from "../../utils/UseFetch";

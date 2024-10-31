@@ -1,6 +1,6 @@
 import React from "react";
 import Styles from "../../assets/css/home.module.css";
-import Enterprise from "../../assets/images/Company-enterprise-profile.png";
+import Enterprise from "../../assets/images/Company-Enterprise-Profile.png";
 function CompanyItemCart({ companyList = [], msg = "" }) {
   return (
     <>
