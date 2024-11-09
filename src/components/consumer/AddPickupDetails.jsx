@@ -21,7 +21,7 @@ const schema = yup.object().shape({
   name: yup
     .string()
     .required("Name is required")
-    .min(2, "Name must be at least 2 characters long"),
+    .min(3, "Name must be at least 3 characters long"),
   lastname: yup
     .string()
     .required("Last name is required")
@@ -30,7 +30,7 @@ const schema = yup.object().shape({
   packageId: yup
     .string()
     .required("Package id is required")
-    .min(5, "Last name must be at least 5 characters long"),
+    .min(3, "Package id must be at least 3 characters long"),
   pickupnote: yup.string(),
   email: yup
     .string()
@@ -69,7 +69,7 @@ const AddPickupDetails = () => {
   const defaultEmail = user?.userDetails?.email || "";
   const defaultPhone = user?.userDetails?.phone.replace("+", "") || "";
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   const {
     control,
     handleSubmit,
@@ -85,9 +85,8 @@ const AddPickupDetails = () => {
     }
   };
   const onSubmit = (data) => {
-  
-    setValue('imageView',imagePreview)
-    setValue('selectedOption',selectedOption)
+    setValue("imageView", imagePreview);
+    setValue("selectedOption", selectedOption);
     // console.log('data => ',data)
     navigate("/consumer/order-preview", {
       state: {
@@ -326,7 +325,22 @@ const AddPickupDetails = () => {
                       Package photo
                     </label>
 
-                    <div>
+                    {imagePreview ? (
+                      // Show only the package preview if an image has been uploaded
+                      <div className="mt-2">
+                        <p>Image Preview:</p>
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          style={{
+                            width: "auto",
+                            height: "150px",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      // Show the upload UI when no image has been uploaded
                       <div className={Styles.addPickupUploadPhoto}>
                         <FontAwesomeIcon icon={faPaperclip} />
                         <p className={Styles.addPickupDragText}>
@@ -351,32 +365,19 @@ const AddPickupDetails = () => {
                           )}
                         />
                       </div>
-                      {imagePreview && (
-                        <div className="mt-2">
-                          <p>Image Preview:</p>
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            style={{
-                              width: "150px",
-                              height: "150px",
-                              objectFit: "cover",
-                            }}
-                          />
-                        </div>
-                      )}
-                      {errors.file && (
-                        <p
-                          style={{
-                            color: "red",
-                            fontSize: "13px",
-                            textAlign: "center",
-                          }}
-                        >
-                          {errors.file.message}
-                        </p>
-                      )}
-                    </div>
+                    )}
+
+                    {errors.file && (
+                      <p
+                        style={{
+                          color: "red",
+                          fontSize: "13px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {errors.file.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="col-md-6">

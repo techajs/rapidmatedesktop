@@ -175,8 +175,8 @@
   }
   
   .modalVehicleImage {
-    width: 250px;
-    height: 250px;
+    width: auto;
+    height: 200px;
     object-fit: cover;
   }
 
@@ -194,7 +194,7 @@
     margin: 0px 140px 0px 0px;
   }
 
-  .bicycleImage {
+  /* .bicycleImage {
     width: 215px;
     height: 215px;
   }
@@ -232,4 +232,4 @@
   .otherImage{
     width: 157px;
     height: 150px;
-  }
+  } */

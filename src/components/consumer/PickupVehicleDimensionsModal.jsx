@@ -36,31 +36,7 @@ function PickupVehicleDimensionsModal({ show, handleClose, vehicle }) {
     }
   };
 
-  const getVehicleImageClass = (name) => {
-    switch (name) {
-      case "Bicycle":
-        return "bicycleImage";
-      case "Scooter":
-        return "scooterImage";
-      case "Car":
-        return "carImage";
-      case "Partner":
-        return "partnerImage";
-      case "Van":
-        return "vanImage";
-      case "Pickup":
-        return "pickupImage";
-      case "Truck":
-        return "truckImage";
-      case "Other":
-        return "otherImage";
-      default:
-        return "";
-    }
-  };
-
   const vehicleImage = getVehicleImage(vehicle?.vehicle_type);
-  const vehicleImageClass = getVehicleImageClass(vehicle?.vehicle_type);
 
   return (
     <Modal show={show} onHide={handleClose} centered>
@@ -81,7 +57,7 @@ function PickupVehicleDimensionsModal({ show, handleClose, vehicle }) {
               <img
                 src={vehicleImage}
                 alt={`${vehicle?.vehicle_type} Image`}
-                className={`${Styles.modalVehicleImage} ${Styles[vehicleImageClass]}`}
+                className={Styles.modalVehicleImage}
               />
             )}
           </div>
