@@ -1,6 +1,5 @@
 import React from "react";
 import Styles from "../assets/css/HomeHeader.module.css"; // Updated to import as a module
-import Form from "react-bootstrap/Form";
 import Logo from "../assets/images/Logo-icon.png";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -31,7 +30,19 @@ const HomeHeader = () => {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link>Product</Link>
+            <Link to="/restaurants">Restaurants</Link>
+          </li>
+          <li>
+            <Link to="/grocery">Grocery</Link>
+          </li>
+          <li>
+            <Link to="/pharmacy">Pharmacy</Link>
+          </li>
+          <li>
+            <Link to="/gifts">Gifts</Link>
+          </li>
+          <li>
+            <Link to="/ecommerce">E-commerce</Link>
           </li>
           <li>
             <Link>FAQ</Link>
@@ -40,7 +51,10 @@ const HomeHeader = () => {
             <Link>Blog</Link>
           </li>
           <li>
-            <Link>About Us</Link>
+            <Link to="/about-us">About Us</Link>
+          </li>
+          <li>
+            <Link to="/contact-us">Contact</Link>
           </li>
           <div className={Styles.loginNavList}>
             

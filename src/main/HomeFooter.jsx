@@ -16,8 +16,8 @@ const HomeFooter = () => {
       <section className={Styles.HomeFooterSec}>
         <div className="container">
           <div className="row">
-            <div className={Styles.HomeFooterLogoCard}>
-              <img className={Styles.ControlHomeFooterLogoImg} src={LogoFooter} alt="logo" />
+            <div className={Styles.HomeFooterlogotitleCard}>
+              <img className={Styles.HomeFooterlogoImg} src={LogoFooter} alt="logo" />
               <h4 className={Styles.HomeFooterCompanyName}>Rapidmate</h4>
             </div>
             <div className="col-md-3">

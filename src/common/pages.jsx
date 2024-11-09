@@ -1,6 +1,19 @@
 import Home from "../main/Home"
 import HomeHeader from "../main/HomeHeader"
 import HomeBannerCard from "../main/HomeBannerCard"
+import ContactUs from "../main/ContactUs"
+import Restaurants from "../main/Restaurants"
+import Grocery from "../main/Grocery"
+import Pharmacy from "../main/Pharmacy"
+import Gifts from "../main/Gifts"
+import Ecommerce from "../main/Ecommerce"
+import AboutUs from "../main/AboutUs"
+import HomeOnDemandCard from "../main/HomeOnDemandCard"
+import HomeTrackOrderCard from "../main/HomeTrackOrderCard"
+import HomeChooseDeliveryVehicleCard from "../main/HomeChooseDeliveryVehicleCard"
+import HomeSecurePaymentCard from "../main/HomeSecurePaymentCard"
+import HomeTalkToTeam from "../main/HomeTalkToTeam"
+import HomeEcoFriendlyFleetCard from "../main/HomeEcoFriendlyFleetCard"
 import ServicesTypesCard from "../main/ServicesTypesCard"
 import HomeAboutus from "../main/HomeAboutus"
 import CompanyAchivments from "../main/CompanyAchivments"
@@ -39,6 +52,19 @@ export {
     Home,
     HomeHeader,
     HomeBannerCard,
+    ContactUs,
+    Restaurants,
+    Grocery,
+    Pharmacy,
+    Gifts,
+    Ecommerce,
+    AboutUs,
+    HomeOnDemandCard,
+    HomeTalkToTeam,
+    HomeTrackOrderCard,
+    HomeChooseDeliveryVehicleCard,
+    HomeSecurePaymentCard,
+    HomeEcoFriendlyFleetCard,
     ServicesTypesCard,
     HomeAboutus,
     CompanyAchivments,
@@ -72,5 +98,5 @@ export {
     PickupAddressBook,
     PickupNotificationSettings,
     PickupPaymentMethods,
-    PickupChangePassword
+    PickupChangePassword,
 }

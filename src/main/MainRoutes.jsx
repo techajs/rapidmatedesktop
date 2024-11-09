@@ -21,7 +21,14 @@ import {
     PickupAddressBook,
     PickupNotificationSettings,
     PickupPaymentMethods,
-    PickupChangePassword
+    PickupChangePassword,
+    ContactUs,
+    Restaurants,
+    Grocery,
+    Pharmacy,
+    Gifts,
+    Ecommerce,
+    AboutUs
 } from "../common/pages"
 import {Navigate, Route, BrowserRouter as Router, Routes} from 'react-router-dom'
 import ProtectedRoute from '../utils/ProtectedRoute'; 
@@ -41,6 +48,13 @@ function MainRoutes() {
             <Route path="/enterprises-signup" element={<EnterpriseSignup />} />
             <Route path="/deliveryboy-signup" element={<DeliveryboySignup />} />
             <Route path="/signup-verify" element={<SingupVerify />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/restaurants" element={<Restaurants />} />
+            <Route path="/grocery" element={<Grocery />} />
+            <Route path="/pharmacy" element={<Pharmacy />} />
+            <Route path="/gifts" element={<Gifts />} />
+            <Route path="/ecommerce" element={<Ecommerce />} />
+            <Route path="/about-us" element={<AboutUs />} />
             <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
             {/* auth route */}
             <Route path={`/${baseUrl}/dashboard`} element={<ProtectedRoute requiredRole={userRole}><CommonDashboard/></ProtectedRoute>} />

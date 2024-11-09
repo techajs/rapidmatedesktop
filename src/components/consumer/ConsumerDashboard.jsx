@@ -20,7 +20,9 @@ import PickupVehicleDimensionsModal from "./PickupVehicleDimensionsModal";
 import LocationInput from "../consumer/common/LocationInput"
 import DateTimePicker from "./common/DateTimePicker";
 import VehicleSelection from "./common/VehicleSelection"
+
 const libraries = ['places'];
+
 function ConsumerDashboard() {
   const navigate = useNavigate();
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -47,7 +49,10 @@ function ConsumerDashboard() {
     setLoading(true);
     const getAllVehiclesType = () => {
       getAllVehicleTypes(null,(successResponse) => {
-        if (successResponse[0]._success){setLoading(false);setVehicleTypeList(successResponse[0]._response);}
+        if (successResponse[0]._success){
+          setLoading(false);
+          setVehicleTypeList(successResponse[0]._response);
+        }
         },
         (errorResponse) => {
           setLoading(false);
@@ -76,24 +81,30 @@ function ConsumerDashboard() {
         }
       );
     }
-    
   }, []);
+  
+  useEffect(() => {
+    if (pickupLocation && dropoffLocation) {
+      calculateRoute();
+    }
+  }, [pickupLocation, dropoffLocation]); // Recalculate route when either location changes
+
   useEffect(() => {
     const getDistancePrice = () => {
-      const distanceValue=distance.replace(' km', '')
+      const distanceValue = distance.replace(' km', '');
       getDistancePriceList(
         distanceValue,
         (successResponse) => {
-          // console.log(successResponse[0]._response);
           setDistancePriceList(successResponse[0]._response);
         },
         (errorResponse) => {
-          console.log("errorResponse==>", "" + errorResponse[0]);
+          console.log("Error fetching distance price:", errorResponse[0]);
         }
       );
     };
     getDistancePrice();
   }, [duration]);
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: MAPS_API_KEY,
     libraries: libraries,
@@ -104,21 +115,17 @@ function ConsumerDashboard() {
   }
 
   const calculateRoute = async () => {
-   
-    // Calculate route between pickup and dropoff locations
     if (pickupLocation && dropoffLocation) {
-      const directionService = new google.maps.DirectionsService();
-      const results = await directionService.route({
+      const directionsService = new google.maps.DirectionsService();
+      const results = await directionsService.route({
         origin: pickupLocation,
         destination: dropoffLocation,
         travelMode: google.maps.TravelMode.DRIVING,
       });
+
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
-
-      console.log(results)
-     
     }
   };
 
@@ -140,39 +147,21 @@ function ConsumerDashboard() {
       selectedVehiclePrice,
     };
 
-    // console.log('Payload:', payload);
-    navigate("/consumer/pickup-details",{
-      state:{
-        order:payload
-      },
+    navigate("/consumer/pickup-details", {
+      state: { order: payload },
     });
-    // Here you would typically send the payload to your backend
   };
 
   const getPriceUsingVehicleType = (vehicleTypeId) => {
     const result = distancePriceList.find((priceList) => priceList.vehicle_type_id === vehicleTypeId);
     return result?.total_price || 0;
   };
+
   const openModal = (vehicle) => {
     setVehicleDetail(vehicle);
     setShowModal(true);
   };
-  const handleMapClick = (event, type) => {
-    const { latLng } = event;
-    const location = {
-      lat: latLng.lat(),
-      lng: latLng.lng(),
-    };
 
-    if (type === 'pickup') {
-      setPickupLocation(location);
-    } else if (type === 'dropoff') {
-      setDropoffLocation(location);
-    }
-
-    calculateRoute();
-  };
-  
   return (
     <section className={Styles.requestPickupSec}>
       <div className={`row ${Styles.manageRow}`}>
@@ -185,8 +174,8 @@ function ConsumerDashboard() {
               calculateRoute={calculateRoute}
             />
 
-            <DateTimePicker setDate={setDate} setTime={setTime}/>
-            {/* Vehicle Selection Component */}
+            <DateTimePicker setDate={setDate} setTime={setTime} />
+
             <VehicleSelection
               vehicleTypeList={vehicleTypeList}
               selectedVehicle={selectedVehicle}
@@ -197,7 +186,6 @@ function ConsumerDashboard() {
               getPriceUsingVehicleType={getPriceUsingVehicleType}
               openModal={openModal}
               dropoffLocation={dropoffLocation}
-              
             />
           </div>
 
@@ -212,13 +200,8 @@ function ConsumerDashboard() {
             }}
           >
             <button onClick={handleContinue} className={Styles.goToOrderDetails}>
-              <p className={Styles.pickuphomeContinueBt}>
-                Continue to order details
-              </p>
-              <FontAwesomeIcon
-                className="pickupHome-rightArrow-icon"
-                icon={faArrowRight}
-              />
+              <p className={Styles.pickuphomeContinueBt}>Continue to order details</p>
+              <FontAwesomeIcon className="pickupHome-rightArrow-icon" icon={faArrowRight} />
             </button>
           </div>
         </div>
@@ -238,7 +221,7 @@ function ConsumerDashboard() {
                   zIndex: 1,
                   fontSize: "16px",
                   backgroundColor: "#fbfaf5",
-                  width: "170px",
+                  width: "auto",
                   height: "90px",
                   padding: 12,
                   boxShadow: "0 -2px 5px rgba(0,0,0,0.1)",
@@ -262,18 +245,15 @@ function ConsumerDashboard() {
             }}
             onLoad={(map) => setMap(map)}
           >
-             {pickupLocation && (
-              <Marker position={pickupLocation} label="Pickup" />
-            )}
-            {dropoffLocation && (
-              <Marker position={dropoffLocation} label="Dropoff" />
-            )}
-            {currentLocation && <Marker position={currentLocation}/>}
+            {pickupLocation && <Marker position={pickupLocation} label="Pickup" />}
+            {dropoffLocation && <Marker position={dropoffLocation} label="Dropoff" />}
+            {currentLocation && <Marker position={currentLocation} />}
             {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
           </GoogleMap>
         </div>
       </div>
-      {/* ------------ Modal is Here -----------  */}
+
+      {/* Modal */}
       <PickupVehicleDimensionsModal
         show={showModal}
         handleClose={() => setShowModal(false)}
