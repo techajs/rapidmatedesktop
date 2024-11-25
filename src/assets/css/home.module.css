@@ -3893,6 +3893,12 @@ a {
   background-color: var(--mainbg-color);
 }
 
+.enterpriseScheduleApprovedSec{
+  background-image: url(../images/Celebration-Bg.png);
+  height: 90vh;
+  padding: 20px 0px;
+}
+
 .enterpriseNewScheduleTitleCard {
   padding: 60px 80px;
   background: var(--gradiantbg-color);
@@ -4044,45 +4050,8 @@ a {
   margin: 20px 0px 30px;
 }
 
-.enterpriseSelectServiceCycle {
-  width: 32px;
-  height: 34px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServiceScooter {
-  width: 27px;
-  height: 29px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServiceCar {
-  width: 41px;
-  height: 17px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServiceVan {
-  width: 48px;
-  height: 22px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServicePickup {
-  width: 42px;
-  height: 27px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServiceTruck {
-  width: 57px;
-  height: 24px;
-  margin-left: auto;
-}
-
-.enterpriseSelectServiceOther {
-  width: 30px;
-  height: 30px;
+.enterpriseVehilces{
+  height: 40px;
   margin-left: auto;
 }
 

@@ -21,6 +21,7 @@ import { UseFetch } from "../utils/UseFetch";
 const Login = () => {
   const {lookup}=UseFetch()
   const { loading } = useSelector((state) => state.auth);
+  // console.log("loading--------", loading)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();

@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const HomeHeader = () => {
-  const { isAuthenticated, role } = useSelector((state) =>state.auth );
-  const baseUrl=role?.toLowerCase().replace(/_/g, '');
+  const { isAuthenticated, role } = useSelector((state) => state.auth);
+  const baseUrl = role?.toLowerCase().replace(/_/g, "");
 
   return (
     <div className={Styles.homeHeader}>
@@ -56,14 +56,28 @@ const HomeHeader = () => {
           <li>
             <Link to="/contact-us">Contact</Link>
           </li>
-          <div className={Styles.loginNavList}>
-            
-            <li>
-            {!isAuthenticated && !role ? (<Link to={`/login`}>Login</Link>) : (<Link to={`/${baseUrl}/dashboard`}>Dashboard</Link>)}
-            </li>
-            <li>
-              <Link className={Styles.homeHeaderSignupLink} to="/profile-choose">Sign Up</Link>
-            </li>
+          <div>
+            <ul className={Styles.loginNavList}>
+              {!isAuthenticated && !role ? (
+                <>
+                  <li>
+                    <Link to="/login">Login</Link>
+                  </li>
+                  <li>
+                    <Link
+                      className={Styles.homeHeaderSignupLink}
+                      to="/profile-choose"
+                    >
+                      Sign Up
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link to={`/${baseUrl}/dashboard`}>Dashboard</Link>
+                </li>
+              )}
+            </ul>
           </div>
         </ul>
       </nav>
