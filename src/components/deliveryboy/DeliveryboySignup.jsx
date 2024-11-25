@@ -118,6 +118,7 @@ const DeliveryboySignup = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = (data) => {
+    console.log("data-----------------", data)
     setHitButton(true);
     let params = {
       info: {

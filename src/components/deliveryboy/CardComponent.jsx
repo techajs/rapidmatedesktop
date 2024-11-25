@@ -29,7 +29,7 @@ function CardComponent({ orderList = [], locationList = [],msg=''}) {
                   />
                 </div>
                 <p className={Styles.enterpriseHomePickupTimeinfo}>
-                  Pickup in {formatDate(item.delivery_date).date +' '+ formatDate(item.delivery_date).time || "N/A"}
+                  Pickup in {formatDate(order.delivery_date).date +' '+ formatDate(order.delivery_date).time || "N/A"}
                 </p>
               </div>
               <div className={Styles.enterpriseHomeAddressFromCard}>

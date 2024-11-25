@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Styles from "../assets/css/PasswordModal.module.css";
 import Logo from "../assets/images/Logo-icon.png";
@@ -9,9 +9,11 @@ import { authenticateUser, signUpVerifyApi } from "../data_manager/dataManage";
 import { loginStart, loginSuccess } from "../redux/authSlice";
 import { getLookup } from "../utils/UseFetch";
 
-function SingupVerify() {
+const SingupVerify = () => {
+  const userRole = useSelector((state) => state.auth.role);
+  const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
   const location = useLocation();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const { user } = location.state || {};
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
@@ -29,9 +31,8 @@ function SingupVerify() {
     } else if (hasEmptyValues) {
       setErrors("Some OTP values are missing.");
     } else {
-        
-            const otpString = otp.join("");
-       
+      const otpString = otp.join("");
+
       setErrors("");
       let params = {
         info: {
@@ -40,7 +41,7 @@ function SingupVerify() {
           role: role,
         },
       };
-  
+
       signUpVerifyApi(
         params,
         (successResponse) => {
@@ -54,7 +55,7 @@ function SingupVerify() {
               },
             };
             if (user.password == "") {
-              navigate('/login')
+              navigate("/login");
             } else {
               authenticateUser(
                 loginParams,
@@ -83,8 +84,8 @@ function SingupVerify() {
                       dispatch(
                         loginSuccess({ role: userRole, user: userData })
                       );
-                      const objData=getLookup()
-                      dispatch(commonDataList(objData))
+                      const objData = getLookup();
+                      // dispatch(commonDataList(objData));
                       navigateBasedOnRole(
                         successResponse[0]._response.user_profile[0].role
                       );
@@ -96,28 +97,32 @@ function SingupVerify() {
                   }
                 },
                 (errorResponse) => {
-                  navigate('/login')
+                  navigate("/login");
                 }
               );
             }
           }
         },
         (errorResponse) => {
-            let err=''
-            if(errorResponse.errors){
-            err=errorResponse.errors.msg[0].msg
-            }else{
-            err=errorResponse[0]._errors.message
-            }
-            setErrors(err);
+          let err = "";
+          if (errorResponse.errors) {
+            err = errorResponse.errors.msg[0].msg;
+          } else {
+            err = errorResponse[0]._errors.message;
+          }
+          setErrors(err);
         }
       );
     }
   };
 
-  const navigateBasedOnRole = (role) => {
-    const baseUrl=role?.toLowerCase().replace(/_/g, '');
-    navigate('/thanks')
+  const navigateBasedOnRole = async () => {
+    const roleName = await localforage.getItem("roleName");
+    if (roleName === "CONSUMER") {
+      navigate("/" + baseUrl + "/dashboard");
+    } else {
+      navigate("/thanks");
+    }
   };
   useEffect(() => {
     const getRole = async () => {
@@ -126,11 +131,10 @@ function SingupVerify() {
     };
     getRole();
     if (user === undefined || user === "") {
-      navigate('/login')
+      navigate("/login");
     }
   }, []);
 
- 
   const handleInputChange = (index, event) => {
     const value = event.target.value;
     if (!isNaN(value) && value.length <= 1) {
@@ -185,15 +189,15 @@ function SingupVerify() {
             Resend Code
           </button> */}
         </ResendCodeContainer>
-        <SubmitButton disabled={false}  onClick={handleOtpSubmit} type="button">
-        {loading ? "Loading..." : 'Submit'}
+        <SubmitButton disabled={false} onClick={handleOtpSubmit} type="button">
+          {loading ? "Loading..." : "Submit"}
         </SubmitButton>
 
         {error && <p className={Styles.errorColor}>{error}</p>}
       </MainContent>
     </PageContainer>
   );
-}
+};
 
 const PageContainer = styled.div`
   display: flex;

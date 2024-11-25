@@ -128,9 +128,9 @@ const PickupSignup = () => {
               navigate("/signup-verify", {
                 state: {
                   user: {
-                    email: email,
-                    phoneNumber: number,
-                    password: password,
+                    email: data.email,
+                    phoneNumber: data.phoneNumber,
+                    password: data.password,
                   },
                 },
               });
