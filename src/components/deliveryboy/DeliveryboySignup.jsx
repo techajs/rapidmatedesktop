@@ -66,22 +66,8 @@ const schema = yup.object().shape({
       value: yup.string().required("Ain is required"),
     })
     .required("Ain is required"),
-  company: yup.string().required("Company name is required"),
   siret: yup.string().required("Siret number is required"),
-  comments: yup.string().required("Please describe your projects"),
-  industry: yup
-    .object({
-      value: yup.string().required("Industry is required"),
-    })
-    .required("Industry is required"),
-  deliveries: yup
-    .string()
-    .required("Delivery Deliveries per month is required")
-    .matches(/^\d+$/, "Delivery should contain only digits"),
   terms: yup
-    .boolean()
-    .oneOf([true], "You must accept the terms and conditions"),
-  termss: yup
     .boolean()
     .oneOf([true], "You must accept the terms and conditions"),
 });
@@ -118,7 +104,7 @@ const DeliveryboySignup = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = (data) => {
-    console.log("data-----------------", data)
+    // console.log("data-----------------", data)
     setHitButton(true);
     let params = {
       info: {
@@ -136,12 +122,11 @@ const DeliveryboySignup = () => {
         termone: data.terms === true ? 1 : 0,
       },
     };
-
+    
     signUpUser(
       params,
       (successResponse) => {
         if (successResponse[0]._success) {
-          console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               setErmessage(successResponse[0]._response.name);
@@ -152,9 +137,9 @@ const DeliveryboySignup = () => {
               navigate("/signup-verify", {
                 state: {
                   user: {
-                    email: email,
-                    phoneNumber: number,
-                    password: password,
+                    email: data.email,
+                    phoneNumber: data.number,
+                    password: data.password,
                   },
                 },
               });
@@ -174,6 +159,7 @@ const DeliveryboySignup = () => {
         setHitButton(false);
       }
     );
+
   };
   useEffect(() => {
     // Fetch Country List
@@ -418,7 +404,7 @@ const DeliveryboySignup = () => {
                           />
                           <FontAwesomeIcon
                             icon={showPassword ? faEye : faEyeSlash}
-                            onClick={togglePasswordVisibility}
+                            onClick={toggleConfirmPasswordVisibility}
                             className={Styles.signupPasswordEyeIcon}
                           />
                         </div>

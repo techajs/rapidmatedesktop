@@ -1,3 +1,5 @@
+import { uploadDocumentsApi } from "../data_manager/dataManage";
+
 export const HTTPMethod = {
   POST: 'post',
   GET: 'get',
@@ -84,3 +86,19 @@ export const formatDate = (dateString) => {
   return res;
 };
 
+
+export const uploadImage = async (formData) => {
+  return new Promise((resolve, reject) => {
+    uploadDocumentsApi(
+      formData,
+      successResponse => {
+        console.log('print_data ==> successResponseuploadDocumentsApi', JSON.parse(successResponse).id);
+        resolve(JSON.parse(successResponse).id);
+      },
+      errorResponse => {
+        console.log('print_data ==> errorResponseuploadDocumentsApi', errorResponse);
+        reject(errorResponse);
+      }
+    );
+  });
+};
