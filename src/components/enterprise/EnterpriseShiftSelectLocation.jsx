@@ -1,14 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
-import Track from "../../assets/images/Track-Order-img.png";
-import Calender from "../../assets/images/Calender-withBg.png";
+import ShiftCalender from "../../assets/images/CreateShift-Calender.png";
+import Track from "../../assets/images/Track-Order-CreateShift.png";
+import Package from "../../assets/images/One-TimePackage-big.png";
 import Home from "../../assets/images/home-icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import Styles from "../../assets/css/home.module.css";
 
-const EnterpriseMultipleDeliverySelectLocation = () => {
+const EnterpriseShiftSelectLocation = () => {
   const company = [
     {
       name: "North Street Franchise",
@@ -60,18 +61,18 @@ const EnterpriseMultipleDeliverySelectLocation = () => {
               <div className={Styles.enterpriseNewScheduleTitleCard}>
                 <div>
                   <h4 className={Styles.enterpriseNewScheduleText}>
-                    Multiple deliveries
+                  Create shift
                   </h4>
                   <img
-                    className={Styles.enterpriseOneTimeTrackImg}
+                    className={Styles.enterpriseCreateShiftTrackImg}
                     src={Track}
                     alt="img"
                   />
                 </div>
                 <div>
                   <img
-                    className={Styles.enterpriseMultipleCalenderImg}
-                    src={Calender}
+                    className={Styles.enterpriseCreateShiftImg}
+                    src={ShiftCalender}
                     alt="Img"
                   />
                 </div>
@@ -88,7 +89,7 @@ const EnterpriseMultipleDeliverySelectLocation = () => {
                   {company.map((company, index) => (
                     <Link
                       key={index}
-                      to="/enterprises-multiple-deliveries-serviceselect"
+                      to="/enterprise-shift-selectservice"
                     >
                       <div className={Styles.enterpriseOneTimeCompanyLocCard}>
                         <img
@@ -123,4 +124,4 @@ const EnterpriseMultipleDeliverySelectLocation = () => {
   );
 };
 
-export default EnterpriseMultipleDeliverySelectLocation;
+export default EnterpriseShiftSelectLocation;

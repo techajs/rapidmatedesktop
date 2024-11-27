@@ -29,19 +29,15 @@ const EnterpriseScheduleApproved = () => {
                   </div>
                   <div>
                     <h4 className={Styles.deliveryboyThankyouSignupText}>
-                      Thank you for signing up
+                      Schedule request approved
                     </h4>
                     <p className={Styles.deliveryboyThankyouSignupDiscription}>
-                      We are reviewing your request and we will update you about
-                      it shortly.
+                      Congratulations, your request for new delivery schedule is
+                      approved.
                     </p>
 
                     <div className={Styles.deliveryboyThankyouSignupBtnCard}>
-                      <Link
-                        to=""
-                        className={Styles.pickupSignupContinueBtn}
-                        type="button"
-                      >
+                      <Link to="" className={Styles.pickupSignupContinueBtn}>
                         Ok
                       </Link>
                     </div>

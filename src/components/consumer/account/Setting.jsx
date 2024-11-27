@@ -19,16 +19,16 @@ function Setting() {
             <div className="col-md-12">
               <div className={Styles.pickupAccountUserHeaderCard}>
                 <img
-                    className={Styles.pickupAccountUserProfile}
-                    src={API.viewImageUrl + user?.userDetails?.profile_pic}
-                    alt="Profile"
-                  />
+                  className={Styles.pickupAccountUserProfile}
+                  src={API.viewImageUrl + user?.userDetails?.profile_pic}
+                  alt="Profile"
+                />
                 <div>
                   <h5 className={Styles.pickupAccountHeaderUserName}>
                     {user?.userDetails?.first_name}
                   </h5>
                   <p className={Styles.pickupAccountHeaderUserEmail}>
-                  {user?.userDetails?.email}
+                    {user?.userDetails?.email}
                   </p>
                 </div>
               </div>
@@ -70,6 +70,25 @@ function Setting() {
                     }`}
                   >
                     Payment methods
+                  </Link>
+                </div>
+
+                <div
+                  className={`${Styles.pickupAccountSideNavBtns} ${
+                    currentPath.includes("pickup-payment-methods")
+                      ? Styles.active
+                      : ""
+                  }`}
+                >
+                  <Link
+                    to="enterprise-manage-company-locations"
+                    className={`${Styles.pickupAccountNavLinkText} ${
+                      currentPath.includes("enterprise-manage-company-locations")
+                        ? Styles.activeLink
+                        : ""
+                    }`}
+                  >
+                    Manage company locations
                   </Link>
                 </div>
 

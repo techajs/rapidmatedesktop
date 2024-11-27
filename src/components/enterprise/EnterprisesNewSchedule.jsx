@@ -89,7 +89,7 @@ function EnterprisesNewSchedule() {
                   </Link>
 
                   <Link
-                    to="/enterprises-createshift-selectlocation"
+                    to="/enterprise-shift-selectlocation"
                     className={Styles.enterpriseNewScheduleLinkCard}
                   >
                     <img

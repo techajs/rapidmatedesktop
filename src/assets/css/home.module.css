@@ -1546,7 +1546,7 @@ a {
   justify-content: center;
   border: 1px dashed #d8d8d8;
   border-radius: 8px;
-  padding: 50px 0px;
+  padding: 30px 0px;
   background-color: var(--white-color);
   position: relative;
 }
@@ -3811,8 +3811,8 @@ a {
   margin: 15px 0px;
 }
 
-.enterprisePlanningCalenderMain .reactCalendar {
-  width: 100%;
+.react-calendar {
+  width: 100% !important;
   line-height: 4rem;
   border: none;
 }
@@ -4084,13 +4084,17 @@ a {
 }
 
 .enterpriseSelectServiceLoc {
-  display: flex;
-  align-items: center;
+  background-color: var(--white-color);
   box-shadow: #00000005 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   padding: 10px 15px 10px 15px;
   width: 100%;
   margin: 15px 0px;
   border-radius: 8px;
+}
+
+.enterpriseMultipleSelectLoc{
+  display: flex;
+  align-items: center;
 }
 
 .enterpriseSelectServiceLocMainCard {

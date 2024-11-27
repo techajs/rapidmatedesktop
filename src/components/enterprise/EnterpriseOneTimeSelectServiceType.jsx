@@ -256,8 +256,8 @@ const EnterpriseOneTimeSelectServiceType = () => {
                 </h4>
                 <div className="row">
                   <div className="col-md-6">
-                    <div>
-                      <div className={Styles.enterpriseSelectServiceLoc}>
+                    <div className={Styles.enterpriseSelectServiceLoc}>
+                      <div style={{ display: "flex", alignItems: "center" }}>
                         <FontAwesomeIcon
                           className={Styles.pickupHomelocationicon}
                           icon={faLocationDot}
@@ -279,22 +279,24 @@ const EnterpriseOneTimeSelectServiceType = () => {
                   </div>
                   <div className="col-md-6">
                     <div className={Styles.enterpriseSelectServiceLoc}>
-                      <FontAwesomeIcon
-                        className={Styles.pickupHomelocationicon}
-                        icon={faLocationCrosshairs}
-                      />
-                      <ReactGoogleAutocomplete
-                        className={Styles.homeMapPlaceSearch}
-                        apiKey={MAPS_API_KEY}
-                        placeholder="Enter drop-off address"
-                        onPlaceSelected={(place) => {
-                          console.log(place);
-                        }}
-                      />
-                      <FontAwesomeIcon
-                        className={Styles.pickupHomerightArrowicon}
-                        icon={faArrowRight}
-                      />
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <FontAwesomeIcon
+                          className={Styles.pickupHomelocationicon}
+                          icon={faLocationCrosshairs}
+                        />
+                        <ReactGoogleAutocomplete
+                          className={Styles.homeMapPlaceSearch}
+                          apiKey={MAPS_API_KEY}
+                          placeholder="Enter drop-off address"
+                          onPlaceSelected={(place) => {
+                            console.log(place);
+                          }}
+                        />
+                        <FontAwesomeIcon
+                          className={Styles.pickupHomerightArrowicon}
+                          icon={faArrowRight}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -410,7 +412,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <Form.Group className="mb-2" controlId="formPlaintext1">
+                    <Form.Group className="mb-3" controlId="formPlaintext1">
                       <Form.Label
                         className={Styles.deliveryboyLabelVehicleInfo}
                       >
@@ -425,7 +427,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <Form.Group className="mb-2" controlId="formPlaintext1">
+                    <Form.Group className="mb-3" controlId="formPlaintext1">
                       <Form.Label
                         className={Styles.deliveryboyLabelVehicleInfo}
                       >
@@ -657,7 +659,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
                 </div>
                 <div className={Styles.enterpriseSelectServiceNextBtnCard}>
                   <Link
-                    to="/enterprises-schedule-approved"
+                    to="/enterprise-order-preview"
                     className={Styles.enterpriseSelectServiceNextBtn}
                   >
                     Next

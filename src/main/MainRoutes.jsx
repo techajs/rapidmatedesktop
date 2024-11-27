@@ -45,6 +45,12 @@ import EnterpriseOneTimeSelectServiceType from "../components/enterprise/Enterpr
 import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseScheduleApproved";
 import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
 import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
+import EnterpriseOrderPreview from "../components/enterprise/common/EnterpriseOrderPreview";
+import EnterpriseShiftSelectLocation from "../components/enterprise/EnterpriseShiftSelectLocation";
+import EnterpriseShiftSelectService from "../components/enterprise/EnterpriseShiftSelectService";
+import EnterpriseCreateShiftAvailablity from "../components/enterprise/EnterpriseCreateShiftAvailablity";
+import EnterpriseCreateShiftRequestApproved from "../components/enterprise/EnterpriseCreateShiftRequestApproved";
+import EnterpriseManageCompanyLocations from "../components/enterprise/setting/EnterpriseManageCompanyLocations";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -112,6 +118,26 @@ function MainRoutes() {
           path="/enterprises-multiple-deliveries-serviceselect"
           element={<EnterpriseMultipleDeliveriesSelectService />}
         />
+        <Route
+          path="/enterprise-order-preview"
+          element={<EnterpriseOrderPreview />}
+        />
+        <Route
+          path="/enterprise-shift-selectlocation"
+          element={<EnterpriseShiftSelectLocation />}
+        />
+        <Route
+          path="/enterprise-shift-selectservice"
+          element={<EnterpriseShiftSelectService />}
+        />
+        <Route
+          path="/enterprises-createshift-availability"
+          element={<EnterpriseCreateShiftAvailablity />}
+        />
+        <Route
+          path="/enterprises-createshift-requestapproved"
+          element={<EnterpriseCreateShiftRequestApproved />}
+        />
         {/* end here */}
         {/* consumer */}
         <Route
@@ -175,6 +201,10 @@ function MainRoutes() {
           <Route
             path="pickup-change-password"
             element={<PickupChangePassword />}
+          />
+          <Route
+            path="enterprise-manage-company-locations"
+            element={<EnterpriseManageCompanyLocations />}
           />
         </Route>
         {/*deliveryboy*/}
