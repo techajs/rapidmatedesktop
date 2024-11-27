@@ -39,12 +39,14 @@ import {
 import ProtectedRoute from "../utils/ProtectedRoute";
 import { useSelector } from "react-redux";
 import ThankPage from "../common/ThankPage";
+import RequestPending from "../common/RequestPending";
 import { elements } from "chart.js";
 import EnterpriseOneTimeSelectLocation from "../components/enterprise/EnterpriseOneTimeSelectLocation";
 import EnterpriseOneTimeSelectServiceType from "../components/enterprise/EnterpriseOneTimeSelectServiceType";
 import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseScheduleApproved";
 import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
 import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
+import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -66,6 +68,7 @@ function MainRoutes() {
         <Route path="/ecommerce" element={<Ecommerce />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
+        <Route path="/request-pending" element={<RequestPending baseUrl={baseUrl} />} />
         {/* auth route */}
         <Route
           path={`/${baseUrl}/dashboard`}
@@ -175,6 +178,10 @@ function MainRoutes() {
           <Route
             path="pickup-change-password"
             element={<PickupChangePassword />}
+          />
+          <Route
+            path="delivery-profile-type"
+            element={<DeliveryboyProfile />}
           />
         </Route>
         {/*deliveryboy*/}

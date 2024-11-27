@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Styles from "../../../assets/css/home.module.css";
 import { Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,10 +11,30 @@ import WalletLogo from "../../../assets/images/Wallet-Logo.png";
 import PayPal from "../../../assets/images/PayPal-Logo.png";
 import MasterCard from "../../../assets/images/MasterCard-Logo.png";
 import PickupAddPaymentMethodsModal from "./PickupAddPaymentMethodsModal";
+import { useSelector } from "react-redux";
+import { getConsumerWallet } from "../../../data_manager/dataManage";
 
 const PickupPaymentMethods = () => {
+  const user = useSelector((state) => state?.auth?.user.userDetails);
   const [showAddModal, setShowAddModal] = useState(false); // State for add modal
-
+  const [walletAmount, setWalletAmount] = useState("0.00");
+  const [loading,setLoading]=useState(false)
+  
+  useEffect(() => {
+    setLoading(true);
+    getConsumerWallet(
+      user.ext_id,
+      successResponse => {
+        setLoading(false);
+        console.log('successResponse==>', JSON.stringify(successResponse));
+        setWalletAmount(successResponse[0]._response?.balance.toFixed(2));
+      },
+      errorResonse => {
+        setLoading(false);
+       
+      },
+    );
+  }, []);
   const openAddModal = () => {
     setShowAddModal(true);
   };
@@ -44,14 +64,15 @@ const PickupPaymentMethods = () => {
 
               <div className={Styles.paymentMethodWalletBalanceCard}>
                 <p className={Styles.paymentMethodWalletBalance}>
-                  $<b>250</b>.85
+                € {walletAmount ? walletAmount : 0.00}
                 </p>
                 <p className={Styles.paymentMethodWalletText}>Wallet balance</p>
               </div>
 
               <div className={Styles.paymentMethodWalletActionBtn}>
                 <button className={Styles.paymentMethodWithdrawBtn}>Withdraw</button>
-                <button className={Styles.paymentMethodWithdrawBtn}>Add funds</button>
+                {user?.role !=="DELIVERY_BOY" && <button className={Styles.paymentMethodWithdrawBtn}>Add funds</button>}
+                
               </div>
             </div>
 
@@ -59,21 +80,10 @@ const PickupPaymentMethods = () => {
               <p className={Styles.paymentMethodCardsText}>Cards</p>
 
               <div className={Styles.paymentMethodAddedCards}>
-                <img
-                  className={Styles.paymentMethodCardsLogos}
-                  src={PayPal}
-                  alt="PayPal"
-                />
-                <div>
-                  <p className={Styles.paymentMethodCardName}>PayPal</p>
-                  <p className={Styles.paymentmethodUserEmail}>username@email.com</p>
-                </div>
-                <button className={Styles.paymentMethodEditBtn}>
-                  <FontAwesomeIcon icon={faPen} />
-                </button>
+                <p className={Styles.paymentmethodUserEmail} style={{textAlign:'center',width:"100%"}}>Data not found.</p>
               </div>
 
-              <div className={Styles.paymentMethodAddedCards}>
+              {/* <div className={Styles.paymentMethodAddedCards}>
                 <img
                   className={Styles.paymentMethodMastercardsLogos}
                   src={MasterCard}
@@ -86,7 +96,7 @@ const PickupPaymentMethods = () => {
                 <button className={Styles.paymentMethodEditBtn}>
                   <FontAwesomeIcon icon={faPen} />
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

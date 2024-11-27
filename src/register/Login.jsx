@@ -3,21 +3,19 @@ import Styles from "../assets/css/home.module.css";
 import Loginbanner from "../assets/images/Login-banner.png";
 import Logo from "../assets/images/Logo-icon.png";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import ForgotPasswordEmailModal from "./ForgotPasswordEmailModal";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { userLoginData } from "../redux/userSlice";
 import { loginSuccess, loginStart, loginFailed } from "../redux/authSlice";
-import { adminLoginData } from "../redux/adminSlice";
-import axios from "axios";
 import { authenticateUser, getLookupData } from "../data_manager/dataManage";
 import localforage from "localforage";
 import { commonDataList } from "../redux/commonDataSlice";
 import { UseFetch } from "../utils/UseFetch";
+import { ToastContainer } from "react-toastify";
+import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 const Login = () => {
   const {lookup}=UseFetch()
   const { loading } = useSelector((state) => state.auth);
@@ -32,7 +30,6 @@ const Login = () => {
   const [fcmToken, setFcmToken] = useState('');
   const [errors, setErrors] = useState({});
   const [iserror, setIserror] = useState(false);
-  const [ermessage, setErmessage] = useState("");
   const checkboxTypes = ["checkbox"];
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
@@ -78,14 +75,12 @@ const Login = () => {
         if (successResponse[0]._success) {
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage("Username or password is incorrect");
-              setIserror(true);
+              showErrorToast("Username or password is incorrect");
               dispatch(loginFailed());
             } else if (
               successResponse[0]._response.name == "UserNotConfirmedException"
             ) {
-              setErmessage("Delivery Boy Verfication Pending");
-              setIserror(true);
+              showErrorToast("Delivery Boy Verfication Pending");
               dispatch(loginFailed());
             } else {
               const dataRes =successResponse[0]._response.user?.idToken?.payload;
@@ -109,23 +104,27 @@ const Login = () => {
                 // localforage.setItem(2, refreshToken);
                 dispatch(loginSuccess({role:userRole, user: userData }));
                 dispatch(commonDataList(lookup))
+                showSuccessToast('Login successful! Welcome back!')
                 navigateBasedOnRole(successResponse[0]._response.user_profile[0].role);
               } else {
-                setErmessage("Login failed due to missing token or user data.");
-                setIserror(true);
+                showErrorToast("Login failed due to missing token or user data.")
                 dispatch(loginFailed());
               }
             }
           }
         } else {
-          setErmessage("Invalid credentials");
-          setIserror(true);
+          showErrorToast("Invalid credentials")
           dispatch(loginFailed());
         }
       },
       (errorResponse) => {
-        setErmessage(errorResponse[0]._errors.message);
-        setIserror(true);
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
+        }
+        showErrorToast(err)
         dispatch(loginFailed());
       }
     );
@@ -133,7 +132,10 @@ const Login = () => {
 
   const navigateBasedOnRole = (role) => {
     const baseUrl=role?.toLowerCase().replace(/_/g, '');
-    navigate("/"+baseUrl+"/dashboard")
+    setTimeout(()=>{
+      navigate("/"+baseUrl+"/dashboard")
+    },2000)
+    
   };
   return (
     <>
@@ -214,24 +216,6 @@ const Login = () => {
                   >
                     {loading ? "Logging in..." : t("sign_in")}
                   </Link>
-                  {iserror && (
-                    <div>
-                      <Form>
-                        {checkboxTypes.map((type) => (
-                          <div
-                            key={`default-${type}`}
-                            className={`mb-3 ${Styles.checkboxCard}`}
-                          >
-                            <p className={Styles.checkText}>
-                              <p className={Styles.termsCheck} to="#">
-                                {ermessage}
-                              </p>
-                            </p>
-                          </div>
-                        ))}
-                      </Form>
-                    </div>
-                  )}
                   {/* <div>
                     <Form>
                       {checkboxTypes.map((type) => (
@@ -277,6 +261,7 @@ const Login = () => {
             handleClose={handleCloseModal}
           />
         </div>
+        <ToastContainer />
       </section>
     </>
   );

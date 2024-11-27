@@ -3,7 +3,6 @@ import {axiosCall} from '../api_manager/ApiManager';
 import {API, HTTPMethod} from '../utils/Constants';
 
 export const authenticateUser = (params, successCallback, errorCallback) => {
-  // console.log('print_data===>loginUser', params, API.loginAuthenticateUrl);
   axiosCall(
     API.loginAuthenticateUrl,
     HTTPMethod.POST,
@@ -18,14 +17,12 @@ export const authenticateUser = (params, successCallback, errorCallback) => {
 };
 
 export const signUpUser = (params, successCallback, errorCallback) => {
-  // console.log('print_data===>signUpUser', params, API.signUpUrl);
   axiosCall(
     API.signUpUrl,
     HTTPMethod.POST,
     params,
     response => {
       successCallback(response);
-      // console.log('print_data===>signUpUser', response);
     },
     errorResponse => {
       errorCallback(errorResponse);
@@ -369,11 +366,6 @@ export const getAllocatedDeliveryBoy = (
   successCallback,
   errorCallback,
 ) => {
-  // console.log(
-  //   'getAllocatedDeliveryBoy',
-  //   params,
-  //   API.getAllocatedDeliveryBoy + params.orderNumber,
-  // );
   axiosCall(
     API.getAllocatedDeliveryBoy + params.orderNumber,
     HTTPMethod.GET,
@@ -718,6 +710,122 @@ export const checkPromoCode = (params, successCallback, errorCallback) => {
     API.checkPromoCodeUrl,
     HTTPMethod.POST,
     params,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const changeUserPassword = (param, successCallback, errorCallback) => {
+  axiosCall(
+    API.changePasswordUrl,
+    HTTPMethod.POST,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const getEnterpriseAddressBookList = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.getEnterpriseAddressListUrl + param,
+    HTTPMethod.GET,
+    {},
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const updateAddressBookforDeliveryBoy = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.addressBookUpdateDeliveryBoyUrl,
+    HTTPMethod.PUT,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+export const createEnterpriseAddressBook = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.createEnterpriseAddressUrl,
+    HTTPMethod.POST,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+export const updateAddressBookforEnterprise = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.addressBookUpdateEnterpriseUrl,
+    HTTPMethod.PUT,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const deleteAddressBookforEnterprise = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.addressBookDeleteEnterpriseUrl + param.id,
+    HTTPMethod.DELETE,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const getConsumerWallet = (param, successCallback, errorCallback) => {
+  axiosCall(
+    API.consumerWalletUrl + param,
+    HTTPMethod.GET,
+    {},
     response => {
       successCallback(response);
     },

@@ -66,6 +66,13 @@ export const API = {
   cancelOrderUrl: BASE_URL + 'order/cancel',
   deliveryBoyPlanningSetupDateList: BASE_URL + 'order/deliveryboy/plan/list',
   checkPromoCodeUrl: 'promocode/check',
+  changePasswordUrl: BASE_URL + 'authuser/changepassword',
+  getEnterpriseAddressListUrl: BASE_URL + 'enterprise/address/list/',
+  addressBookUpdateDeliveryBoyUrl: BASE_URL + 'daddressbook/update',
+  createEnterpriseAddressUrl: BASE_URL + 'enterprise/address/create',
+  addressBookUpdateEnterpriseUrl: BASE_URL + 'enterprise/address/update',
+  addressBookDeleteEnterpriseUrl: BASE_URL + 'enterprise/address/delete/',
+  consumerWalletUrl: BASE_URL + 'consumer/wallet/balance/',
 };
 
 export const formatDate = (dateString) => {

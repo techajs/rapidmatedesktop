@@ -3,23 +3,158 @@ import { Form } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";
-import Styles from "../../../assets/css/PickupEditAddress.module.css";
-import homeStyle from "../../../assets/css/home.module.css";
-
-function PickupEditAddressModal({ show, handleClose }) {
-  const handleSaveChanges = () => {
-    // Implement save changes logic here, if needed
-    handleClose();
+import modalCss from "../../../assets/css/PickupEditAddress.module.css";
+import Styles from "../../../assets/css/home.module.css";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import "react-phone-input-2/lib/style.css";
+import PhoneInput from "react-phone-input-2";
+import { showErrorToast, showSuccessToast } from "../../../utils/Toastify";
+import { updateAddressBookforConsumer, updateAddressBookforDeliveryBoy, updateAddressBookforEnterprise } from "../../../data_manager/dataManage";
+const schema = yup.object().shape({
+  address: yup
+    .string()
+    .required("Address is required")
+    .min(10, "Address must be at least 6 characters long"),
+  firstName: yup
+    .string()
+    .required("First name is required")
+    .min(4, "First Name must be at least 6 characters long"),
+  lastName: yup.string(),
+  company: yup.string(),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number should contain only digits")
+    .min(8, "Phone number must be at least 8 digits"),
+  email: yup.string(),
+});
+function PickupEditAddressModal({
+  show,
+  handleClose,
+  addressData,
+  role,
+  extId,
+}) {
+  const [loading, setLoading] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
+  const onSubmit = (data) => {
+    if (role == "CONSUMER") {
+      let consumerParams = {
+        id: addressData.id,
+        consumer_ext_id: extId,
+        address: data?.address,
+        first_name: data?.firstName,
+        last_name: data?.lastName || addressData?.last_name,
+        company_name: data?.company || addressData?.company_name,
+        phone: data?.phoneNumber || addressData?.phone,
+        email: data?.email || addressData?.email,
+      };
+      updateAddressBookforConsumer(
+        consumerParams,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            showSuccessToast("Address updated successfully");
+            handleClose();
+            setLoading(false);
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+          handleClose();
+          let err = "";
+          if (errorResponse.errors) {
+            err = errorResponse.errors.msg[0].msg;
+          } else {
+            err = errorResponse[0]._errors.message;
+          }
+          showErrorToast(err);
+        }
+      );
+    } else if (role == "DELIVERY_BOY") {
+      let deliveryboyParams = {
+        id: addressData.id,
+        delivery_boy_ext_id: extId,
+        address: data?.address,
+        first_name: data?.firstName,
+        last_name: data?.lastName || addressData?.last_name,
+        company_name: data?.company || addressData?.company_name,
+        phone: data?.phoneNumber || addressData?.phone,
+        email: data?.email || addressData?.email,
+      };
+      updateAddressBookforDeliveryBoy(
+        deliveryboyParams,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            showSuccessToast("Address updated successfully");
+            handleClose();
+            setLoading(false);
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+          handleClose();
+          let err = "";
+          if (errorResponse.errors) {
+            err = errorResponse.errors.msg[0].msg;
+          } else {
+            err = errorResponse[0]._errors.message;
+          }
+          showErrorToast(err);
+        }
+      );
+    } else if (role == "ENTERPRISE") {
+      let enterpriseParams = {
+        id: addressData.id,
+        enterprise_ext_id: extId,
+        address: data?.address,
+        first_name: data?.firstName,
+        last_name: data?.lastName || addressData?.last_name,
+        company_name: data?.company || addressData?.company_name,
+        phone: data?.phoneNumber || addressData?.phone,
+        email: data?.email || addressData?.email,
+      };
+      updateAddressBookforEnterprise(
+        enterpriseParams,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            showSuccessToast("Address updated successfully");
+            handleClose();
+            setLoading(false);
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+          handleClose();
+          let err = "";
+          if (errorResponse.errors) {
+            err = errorResponse.errors.msg[0].msg;
+          } else {
+            err = errorResponse[0]._errors.message;
+          }
+          showErrorToast(err);
+        }
+      );
+    } else {
+      showErrorToast("Unable to update data. Please try again later.");
+    }
   };
 
   return (
     <>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header>
-          <div className={Styles.modalPickupEditAddressHeader}>
-            <p className={Styles.vehicleDimensionsTextHead}>Edit address</p>
+          <div className={modalCss.modalPickupEditAddressHeader}>
+            <p className={modalCss.vehicleDimensionsTextHead}>
+              Edit Address
+            </p>
             <FontAwesomeIcon
-              className={Styles.modalCloseHeaderBtn}
+              className={modalCss.modalCloseHeaderBtn}
               icon={faTimes}
               onClick={handleClose}
             />
@@ -27,130 +162,207 @@ function PickupEditAddressModal({ show, handleClose }) {
         </Modal.Header>
         <Modal.Body>
           <div>
+            <div className="mb-3">
+              <label
+                htmlFor="address"
+                className={Styles.addPickupDetailFormLabels}
+              >
+                Address
+              </label>
+              <div className={Styles.pickupSignupContainer}>
+                <Controller
+                  name="address"
+                  control={control}
+                  defaultValue={addressData?.address}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      placeholder="Type here..."
+                      style={{ width: "100%", padding: "5px" }}
+                      className={Styles.signupUserName}
+                    />
+                  )}
+                />
+              </div>
+              {errors.address && (
+                <p style={{ color: "red", fontSize: "13px" }}>
+                  {errors.address.message}
+                </p>
+              )}
+            </div>
             <div className="row">
-              <div className="col-md-12">
-                <div>
-                  <Form.Group
-                    className="mb-1"
-                    controlId="exampleForm.ControlInput1"
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label
+                    htmlFor="firstName"
+                    className={Styles.addPickupDetailFormLabels}
                   >
-                    <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                      Address
-                    </Form.Label>
-                    <Form.Control
-                      className={homeStyle.addPickupDetailsInputs}
-                      type="text"
-                      placeholder="Type here.."
-                    />
-                  </Form.Group>
-                </div>
+                    First Name
+                  </label>
 
-                <div className="row">
-                  <div className="col-md-6">
-                    <Form.Group
-                      className="mb-1"
-                      controlId="exampleForm.ControlInput2"
-                    >
-                      <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                        First name*
-                      </Form.Label>
-                      <Form.Control
-                        className={homeStyle.addPickupDetailsInputs}
-                        type="text"
-                        placeholder="Type here.."
-                      />
-                    </Form.Group>
+                  <div className={Styles.pickupSignupContainer}>
+                    <Controller
+                      name="firstName"
+                      control={control}
+                      defaultValue={addressData?.first_name}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="text"
+                          placeholder="Type here..."
+                          style={{ width: "100%", padding: "5px" }}
+                          className={Styles.signupUserName}
+                        />
+                      )}
+                    />
                   </div>
+                  {errors.firstName && (
+                    <p style={{ color: "red", fontSize: "13px" }}>
+                      {errors.firstName?.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label
+                    htmlFor="lastName"
+                    className={Styles.addPickupDetailFormLabels}
+                  >
+                    Last Name
+                  </label>
 
-                  <div className="col-md-6">
-                    <Form.Group
-                      className="mb-1"
-                      controlId="exampleForm.ControlInput3"
-                    >
-                      <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                        Last name
-                      </Form.Label>
-                      <Form.Control
-                        className={homeStyle.addPickupDetailsInputs}
-                        type="text"
-                        placeholder="Type here.."
-                      />
-                    </Form.Group>
+                  <div className={Styles.pickupSignupContainer}>
+                    <Controller
+                      name="lastName"
+                      control={control}
+                      defaultValue={addressData?.last_name}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type={"text"}
+                          placeholder="Type here..."
+                          style={{ width: "100%", padding: "5px" }}
+                          className={Styles.signupUserName}
+                        />
+                      )}
+                    />
                   </div>
+                  {errors.lastName && (
+                    <p style={{ color: "red", fontSize: "13px" }}>
+                      {errors.lastName.message}
+                    </p>
+                  )}
                 </div>
-
-                <div className="col-md-12">
-                  <Form.Group
-                    className="mb-1"
-                    controlId="exampleForm.ControlInput4"
-                  >
-                    <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                      Company
-                    </Form.Label>
-                    <Form.Control
-                      className={homeStyle.addPickupDetailsInputs}
-                      type="text"
-                      placeholder="Type here.."
-                    />
-                  </Form.Group>
-                </div>
-
-                <div className="col-md-12">
-                  <Form.Group className="mb-1" controlId="formPlaintext">
-                    <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                      Phone number
-                    </Form.Label>
-                    <div className={homeStyle.pickupSignupContainer}>
-                      <Form.Select
-                        className={homeStyle.selectNumberByCountry}
-                        aria-label="Default select example"
-                      >
-                        <option value="1">+33</option>
-                        <option value="2">+91</option>
-                        <option value="3">+11</option>
-                      </Form.Select>
-                      <Form.Control
-                        className={`password-field ${homeStyle.signupUserName}`}
-                        type="text"
-                        placeholder="0 00 00 00 00"
+              </div>
+            </div>
+            <div className="col-md-12">
+              <div className="mb-3">
+                <label
+                  htmlFor="company"
+                  className={Styles.addPickupDetailFormLabels}
+                >
+                  Company
+                </label>
+                <div className={Styles.pickupSignupContainer}>
+                  <Controller
+                    name="company"
+                    control={control}
+                    defaultValue={addressData?.company_name}
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        type={"text"}
+                        placeholder="Type here..."
+                        style={{ width: "100%", padding: "5px" }}
+                        className={Styles.signupUserName}
                       />
-                    </div>
-                  </Form.Group>
+                    )}
+                  />
                 </div>
-
-                <div className="col-md-12">
-                  <Form.Group
-                    className="mb-1"
-                    controlId="exampleForm.ControlInput5"
-                  >
-                    <Form.Label className={homeStyle.addPickupDetailFormLabels}>
-                      Email
-                    </Form.Label>
-                    <Form.Control
-                      className={homeStyle.addPickupDetailsInputs}
-                      type="email"
-                      placeholder="Type here.."
+                {errors.company && (
+                  <p style={{ color: "red", fontSize: "13px" }}>
+                    {errors.company.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="col-md-12">
+              <div className="mb-3">
+                <Controller
+                  name="phoneNumber"
+                  control={control}
+                  defaultValue={addressData?.phone}
+                  render={({ field: { onChange, value } }) => (
+                    <PhoneInput
+                      country={"fr"}
+                      value={value}
+                      countryCodeEditable={false}
+                      onChange={onChange}
+                      inputStyle={{
+                        width: "100%",
+                        paddingLeft: "42px",
+                      }}
+                      dropdownStyle={{ borderColor: "#ccc" }}
+                      enableSearch
+                      searchPlaceholder="Search country"
+                      specialLabel=""
                     />
-                  </Form.Group>
-                </div>
+                  )}
+                />
+                {errors.phoneNumber && (
+                  <p style={{ color: "red", fontSize: "13px" }}>
+                    {errors.phoneNumber.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-                <div className="col-md-12">
-                  <Form.Group
-                    className="mb-2"
-                    controlId="exampleForm.ControlTextarea1"
-                  >
-                    <Form.Label className={homeStyle.addPickupDetailFormLabels}>Example textarea</Form.Label>
-                    <Form.Control className={Styles.addPickupDetailsInputs} as="textarea" placeholder="Type here.." rows={3} />
-                  </Form.Group>
+            <div className="col-md-12">
+              <div className="mb-3">
+                <label
+                  htmlFor="email"
+                  className={Styles.addPickupDetailFormLabels}
+                >
+                  Email
+                </label>
+                <div className={Styles.pickupSignupContainer}>
+                  <Controller
+                    name="email"
+                    control={control}
+                    defaultValue={addressData?.email}
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        type={"text"}
+                        placeholder="Type here..."
+                        style={{ width: "100%", padding: "5px" }}
+                        className={Styles.signupUserName}
+                      />
+                    )}
+                  />
                 </div>
+                {errors.email && (
+                  <p style={{ color: "red", fontSize: "13px" }}>
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </Modal.Body>
         <Modal.Footer>
           <div>
-              <button className={Styles.pickupEditAddressDeleteBtn}>Delete</button>
-              <button className={Styles.pickupEditAddressSaveBtn} onClick={handleSaveChanges}>Save</button>
+            <button className={Styles.pickupEditAddressDeleteBtn}>
+              Delete
+            </button>
+            <button
+              className={modalCss.pickupEditAddressSaveBtn}
+              onClick={handleSubmit(onSubmit)}
+            >
+              Save
+            </button>
           </div>
         </Modal.Footer>
       </Modal>

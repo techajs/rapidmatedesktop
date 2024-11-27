@@ -28,6 +28,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
+import { ToastContainer } from "react-toastify";
+import { showErrorToast } from "../../utils/Toastify";
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -76,9 +78,7 @@ const DeliveryboySignup = () => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [ermessage, setErmessage] = useState("");
   const [hitButton, setHitButton] = useState(false);
-  const [failedError, setFailedError] = useState(false);
   const [masterCountryList, setMasterCountryList] = useState([]);
   const [masterStateList, setMasterStateList] = useState([]);
   const [masterCityList, setMasterCityList] = useState([]);
@@ -129,8 +129,7 @@ const DeliveryboySignup = () => {
         if (successResponse[0]._success) {
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage(successResponse[0]._response.name);
-              setFailedError(true);
+              showErrorToast(successResponse[0]._response.name);
               setHitButton(false);
             } else {
               setHitButton(false);
@@ -154,8 +153,7 @@ const DeliveryboySignup = () => {
         } else {
           err = errorResponse[0]._errors.message;
         }
-        setErmessage(err);
-        setFailedError(true);
+        showErrorToast(err)
         setHitButton(false);
       }
     );
@@ -619,11 +617,6 @@ const DeliveryboySignup = () => {
                     </div>
                   </div>
                   <div>
-                    {failedError && (
-                      <div className={Styles.checkText}>
-                        <p className={Styles.termsCheck}>{ermessage}</p>
-                      </div>
-                    )}
                     <Link
                       to="#"
                       className={Styles.pickupSignupContinueBtn}
@@ -665,6 +658,7 @@ const DeliveryboySignup = () => {
             </div>
           </div>
         </div>
+        <ToastContainer />
       </section>
     </>
   );

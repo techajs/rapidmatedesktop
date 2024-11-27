@@ -21,6 +21,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
+import { ToastContainer } from "react-toastify";
+import { showErrorToast } from "../../utils/Toastify";
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -120,8 +122,9 @@ const PickupSignup = () => {
           console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
-              setErmessage(successResponse[0]._response.name);
-              setFailedError(true);
+              showErrorToast(successResponse[0]._response.name);
+              setErmessage(false)
+              setFailedError(false)
               setHitButton(false);
             } else {
               setHitButton(false);
@@ -145,8 +148,9 @@ const PickupSignup = () => {
         } else {
           err = errorResponse[0]._errors.message;
         }
-        setErmessage(err);
-        setFailedError(true);
+        showErrorToast(err)
+        setErmessage(false)
+        setFailedError(false)
         setHitButton(false);
       }
     );
@@ -477,6 +481,8 @@ const PickupSignup = () => {
             </div>
           </div>
         </div>
+        <ToastContainer />
+
       </section>
     </>
   );

@@ -31,9 +31,15 @@ const authSlice = createSlice({
       state.role = null;
       state.loading = false;
     },
+    updateUserDetails(state, action) {
+      if (state.user && state.user.userDetails) {
+        console.log("test usdfs ",action.payload.userDetails)
+        state.user.userDetails = action.payload.userDetails;
+      }
+    },
   },
 });
 
-export const { loginStart, loginSuccess,logout,loginFailed } = authSlice.actions;
+export const { loginStart, loginSuccess,logout,loginFailed ,updateUserDetails} = authSlice.actions;
 
 export default authSlice.reducer;

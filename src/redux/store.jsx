@@ -2,12 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import localforage from "localforage";
 import { combineReducers } from 'redux';
-import userSlice from "./userSlice";
-import enterpriseDataSlice from "./enterpriseDataSlice";
-import consumerDataSlice from "./consumerDataSlice";
-import deliveryboyDataSlice from "./deliveryboyDataSlice";
+
 import commonDataSlice from "./commonDataSlice";
-import adminSlice from "./adminSlice";
 import authSlice from './authSlice';
 
 // Persist configuration

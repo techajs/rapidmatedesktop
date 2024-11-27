@@ -3,13 +3,22 @@ import Styles from "../../../assets/css/home.module.css";
 import { UseFetch } from "../../../utils/UseFetch";
 import CommonHeader from "../../../common/CommonHeader";
 import UserProfile from "../../../assets/images/PickupUser-Profile.jpeg";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { API } from "../../../utils/Constants";
-
+import { useDispatch } from "react-redux";
+import { logout } from "../../../redux/authSlice";
+import localforage from "localforage";
 function Setting() {
   const { user } = UseFetch();
   const location = useLocation();
   const currentPath = location.pathname;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const LogoutHandler = () => {
+    dispatch(logout());
+    localforage.clear();
+    navigate("/login");
+  };
   return (
     <>
       <CommonHeader userData={user} />
@@ -19,16 +28,19 @@ function Setting() {
             <div className="col-md-12">
               <div className={Styles.pickupAccountUserHeaderCard}>
                 <img
-                    className={Styles.pickupAccountUserProfile}
-                    src={API.viewImageUrl + user?.userDetails?.profile_pic}
-                    alt="Profile"
-                  />
+                  className={Styles.pickupAccountUserProfile}
+                  src={
+                    API.viewImageUrl +
+                    user?.userDetails?.profile_pic?.replace(/\.png$/, "")
+                  }
+                  alt="Profile"
+                />
                 <div>
                   <h5 className={Styles.pickupAccountHeaderUserName}>
                     {user?.userDetails?.first_name}
                   </h5>
                   <p className={Styles.pickupAccountHeaderUserEmail}>
-                  {user?.userDetails?.email}
+                    {user?.userDetails?.email}
                   </p>
                 </div>
               </div>
@@ -53,6 +65,24 @@ function Setting() {
                     Address book
                   </Link>
                 </div>
+                {/* <div
+                  className={`${Styles.pickupAccountSideNavBtns} ${
+                    currentPath.includes("delivery-profile-type")
+                      ? Styles.active
+                      : ""
+                  }`}
+                >
+                  <Link
+                    to="delivery-profile-type"
+                    className={`${Styles.pickupAccountNavLinkText} ${
+                      currentPath.includes("delivery-profile-type")
+                        ? Styles.activeLink
+                        : ""
+                    }`}
+                  >
+                    Delivery Preferance
+                  </Link>
+                </div> */}
 
                 <div
                   className={`${Styles.pickupAccountSideNavBtns} ${
@@ -69,26 +99,30 @@ function Setting() {
                         : ""
                     }`}
                   >
-                    Payment methods
+                    Wallets
                   </Link>
                 </div>
 
-                <div
-                  className={`${Styles.pickupAccountSideNavBtns} ${
-                    currentPath.includes("billing-details") ? Styles.active : ""
-                  }`}
-                >
-                  <Link
-                    to="#"
-                    className={`${Styles.pickupAccountNavLinkText} ${
+                {user?.userDetails?.role !== "DELIVERY_BOY" && (
+                  <div
+                    className={`${Styles.pickupAccountSideNavBtns} ${
                       currentPath.includes("billing-details")
-                        ? Styles.activeLink
+                        ? Styles.active
                         : ""
                     }`}
                   >
-                    Billing details
-                  </Link>
-                </div>
+                    <Link
+                      to="#"
+                      className={`${Styles.pickupAccountNavLinkText} ${
+                        currentPath.includes("billing-details")
+                          ? Styles.activeLink
+                          : ""
+                      }`}
+                    >
+                      Billing details
+                    </Link>
+                  </div>
+                )}
 
                 <div
                   className={`${Styles.pickupAccountSideNavBtns} ${
@@ -146,12 +180,14 @@ function Setting() {
                   className={`${Styles.pickupAccountSideNavBtns} ${
                     currentPath.includes("logout") ? Styles.active : ""
                   }`}
+                  onClick={LogoutHandler}
                 >
                   <Link
-                    to="logout"
+                    to="#"
                     className={`${Styles.pickupAccountNavLinkText} ${
                       currentPath.includes("logout") ? Styles.activeLink : ""
                     }`}
+                    onClick={LogoutHandler}
                   >
                     Logout
                   </Link>

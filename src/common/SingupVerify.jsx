@@ -120,7 +120,9 @@ const SingupVerify = () => {
     const roleName = await localforage.getItem("roleName");
     if (roleName === "CONSUMER") {
       navigate("/" + baseUrl + "/dashboard");
-    } else {
+    } else if('DELIVERY_BOY') {
+      navigate("/add-vehicle");
+    }else{
       navigate("/thanks");
     }
   };

@@ -8,20 +8,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { UseFetch } from "../../utils/UseFetch";
 import { updateUserProfile } from "../../data_manager/dataManage";
-import { loginSuccess } from "../../redux/authSlice";
+import {logout } from "../../redux/authSlice";
+import localforage from "localforage";
 function AddWorkType() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { lookup,user } = UseFetch();
-  const [workType, setWorkType] = useState(user?.userDetails?.work_type_id || null);
+  const { lookup, user } = UseFetch();
+  const [workType, setWorkType] = useState(
+    user?.userDetails?.work_type_id || null
+  );
   const { isAuthenticated, role } = useSelector((state) => state.auth);
   const baseUrl = role?.toLowerCase().replace(/_/g, "");
   const handleCardClick = (workTypeId) => {
     setWorkType(workTypeId);
   };
 
-  const continueHandler=(e)=>{
-    e.preventDefault()
+  const continueHandler = (e) => {
+    e.preventDefault();
     let profileParams = {
       ext_id: user.userDetails.ext_id,
       work_type_id: workType,
@@ -29,19 +32,16 @@ function AddWorkType() {
     updateUserProfile(
       user.userDetails.role,
       profileParams,
-      successResponse => {
-        const userData = {
-          userInfo:user.userInfo,
-          userDetails:{...user.userDetails, work_type_id: workType},
-        };
-        dispatch(loginSuccess({role:user.userDetails.role, user: userData }));
-        navigate('/deliveryboy/dashboard')
+      (successResponse) => {
+        dispatch(logout());
+        localforage.clear();
+        navigate("/thanks");
       },
-      errorResponse => {
-        console.log('updateUserProfile', errorResponse);
-      },
+      (errorResponse) => {
+        console.log("updateUserProfile", errorResponse);
+      }
     );
-  }
+  };
   return (
     <section className={Styles.profileChooseSec}>
       <div className="container">

@@ -105,7 +105,7 @@ const CommonHeader = ({ userData }) => {
                 >
                   <img
                     className={Styles.pickupHeaderProfileImg}
-                    src={API.viewImageUrl + userDetails?.profile_pic}
+                    src={API.viewImageUrl + userDetails?.profile_pic?.replace(/\.png$/, "")}
                     alt="Profile"
                   />
                 </Dropdown.Toggle>
@@ -122,7 +122,7 @@ const CommonHeader = ({ userData }) => {
                     />{" "}
                     Account
                   </Dropdown.Item>
-                  <Dropdown.Item
+                  {/* <Dropdown.Item
                     className={Styles.pickupHeaderAccountTextsActions}
                   >
                     <FontAwesomeIcon
@@ -130,7 +130,7 @@ const CommonHeader = ({ userData }) => {
                       icon={faGear}
                     />{" "}
                     Settings
-                  </Dropdown.Item>
+                  </Dropdown.Item> */}
                   <Dropdown.Item
                     className={Styles.pickupHeaderAccountTextsActions}
                     onClick={handleLogout}
