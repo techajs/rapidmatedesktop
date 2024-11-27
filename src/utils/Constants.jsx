@@ -68,7 +68,6 @@ export const API = {
   checkPromoCodeUrl: 'promocode/check',
   changePasswordUrl: BASE_URL + 'authuser/changepassword',
   getEnterpriseAddressListUrl: BASE_URL + 'enterprise/address/list/',
-  addressBookUpdateDeliveryBoyUrl: BASE_URL + 'daddressbook/update',
   createEnterpriseAddressUrl: BASE_URL + 'enterprise/address/create',
   addressBookUpdateEnterpriseUrl: BASE_URL + 'enterprise/address/update',
   addressBookDeleteEnterpriseUrl: BASE_URL + 'enterprise/address/delete/',
