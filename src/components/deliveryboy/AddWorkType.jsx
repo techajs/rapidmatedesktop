@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { UseFetch } from "../../utils/UseFetch";
 import { updateUserProfile } from "../../data_manager/dataManage";
-import {logout } from "../../redux/authSlice";
+import {logout, updateUserDetails } from "../../redux/authSlice";
 import localforage from "localforage";
 function AddWorkType() {
   const dispatch = useDispatch();
@@ -33,6 +33,11 @@ function AddWorkType() {
       user.userDetails.role,
       profileParams,
       (successResponse) => {
+        const userDetailsData = {
+          ...user.userDetails,
+          vehicleAdd: false,
+        };
+        dispatch(updateUserDetails({userDetails:userDetailsData}))
         dispatch(logout());
         localforage.clear();
         navigate("/thanks");

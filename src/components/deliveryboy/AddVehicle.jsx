@@ -164,7 +164,7 @@ function AddVehicle() {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               // successResponse[0]._response.name
             } else if (successResponse[0]._httpsStatusCode == 200) {
-              navigate("/add-work-type");
+              navigate("/deliveryboy/add-work-type");
             }
           }
         }

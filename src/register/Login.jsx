@@ -84,6 +84,8 @@ const Login = () => {
               dispatch(loginFailed());
             } else {
               const dataRes =successResponse[0]._response.user?.idToken?.payload;
+              let userDetail=successResponse[0]._response.user_profile[0];
+              userDetail.vehicleAdd=true;
               const userData = {
                 userInfo: {
                   username: dataRes["cognito:username"],
@@ -93,7 +95,9 @@ const Login = () => {
                   auth_time: dataRes.auth_time,
                   exp: dataRes.exp,
                 },
-                userDetails: successResponse[0]._response.user_profile[0],
+                
+
+                userDetails: userDetail,
               };
               const getToken = successResponse[0]._response?.token;
               const userRole=successResponse[0]._response.user_profile[0].role

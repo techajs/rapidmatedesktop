@@ -50,6 +50,7 @@ function RenderItem({ status = "",locationList=[],orderList=[]}) {
                     <h4 className={Styles.pickupHistoryDeliveredText}>
                       Delivery On {formatDate(item.delivery_date).date} at{" "}
                       {formatDate(item.delivery_date).time}
+                      {/* {item?.order_status} */}
                     </h4>
                   </div>
 
