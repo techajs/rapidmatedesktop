@@ -8,10 +8,10 @@ import OneTime from "../../assets/images/One-TimePackage.png";
 import Calender from "../../assets/images/Calender-withBg.png";
 import CalenderClock from "../../assets/images/Calender-Clock.png";
 import CommonHeader from '../../common/CommonHeader';
-import { UseFetch } from '../../utils/UseFetch';
+import { useSelector } from 'react-redux';
 
 function EnterprisesNewSchedule() {
-  const {user} =UseFetch()
+  const user = useSelector((state)=>state.auth.user)
   return (
     <>
     <CommonHeader userData={user}/>

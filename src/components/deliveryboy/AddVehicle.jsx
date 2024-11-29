@@ -21,7 +21,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { uploadImage } from "../../utils/Constants";
-import { UseFetch } from "../../utils/UseFetch";
 const schema = yup.object().shape({
   vehicleNo: yup
     .string()
@@ -38,7 +37,7 @@ const schema = yup.object().shape({
 });
 function AddVehicle() {
   const navigate = useNavigate();
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const { isAuthenticated, role } = useSelector((state) => state.auth);
   const baseUrl = role?.toLowerCase().replace(/_/g, "");
@@ -110,35 +109,7 @@ function AddVehicle() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = async (data) => {
-    
-    // if (data.reg_doc) {
-    //   const regDocFormData = new FormData();
-    //   regDocFormData.append("file", data.reg_doc);
-    //   const regDocResponse = await uploadImage(regDocFormData);
-    //   params.reg_doc = regDocResponse;
-    // }
-    // if (data.driving_license) {
-    //   const drivingLicenseFormData = new FormData();
-    //   drivingLicenseFormData.append("file", data.driving_license);
-    //   const drivingLicenseResponse = await uploadImage(drivingLicenseFormData);
-    //   console.log("response => ", drivingLicenseResponse);
-    //   params.driving_license = drivingLicenseResponse;
-    // }
-    // if (data.insurance) {
-    //   const insuranceFormData = new FormData();
-    //   insuranceFormData.append("file", data.insurance);
-    //   const insuranceResponse = await uploadImage(insuranceFormData);
-    //   console.log("insurance", insuranceResponse);
-    //   params.insurance = insuranceResponse;
-    // }
-    // if (data.passport) {
-    //   const passportFormData = new FormData();
-    //   passportFormData.append("file", data.passport);
-    //   const passportResponse = await uploadImage(passportFormData);
-    //   console.log("passport", passportResponse);
-    //   params.passport = passportResponse;
-    // }
-
+    console.log(data)
     let params = {
       delivery_boy_ext_id: user?.userDetails?.ext_id,
       vehicle_type_id: data?.vehicelTypeId || vehicleId,
@@ -146,12 +117,33 @@ function AddVehicle() {
       modal: data.modal,
       make: data.make,
       variant: data.variant,
-      driving_license: "92a73483fcf94334a955e4c949f45adc",
-      insurance: "47ba77209f434530bd325da2640cf6ca",
-      passport: "22648b3041e944f1ac5e1b689da39ca6",
-      reg_doc: "269e7572b7da4f45b38f3e43024a43b5"
     };
-    console.log("Form submittedasdf:", params);
+    if (data.reg_doc) {
+      const regDocFormData = new FormData();
+      regDocFormData.append("file", data.reg_doc);
+      const regDocResponse = await uploadImage(regDocFormData);
+      params.reg_doc = regDocResponse;
+    }
+    if (data.driving_license) {
+      const drivingLicenseFormData = new FormData();
+      drivingLicenseFormData.append("file", data.driving_license);
+      const drivingLicenseResponse = await uploadImage(drivingLicenseFormData);
+      params.driving_license = drivingLicenseResponse;
+    }
+    if (data.insurance) {
+      const insuranceFormData = new FormData();
+      insuranceFormData.append("file", data.insurance);
+      const insuranceResponse = await uploadImage(insuranceFormData);
+      console.log("insurance", insuranceResponse);
+      params.insurance = insuranceResponse;
+    }
+    if (data.passport) {
+      const passportFormData = new FormData();
+      passportFormData.append("file", data.passport);
+      const passportResponse = await uploadImage(passportFormData);
+      console.log("passport", passportResponse);
+      params.passport = passportResponse;
+    }
 
     addVehicleApi(
       params,

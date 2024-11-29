@@ -33,7 +33,6 @@ const authSlice = createSlice({
     },
     updateUserDetails(state, action) {
       if (state.user && state.user.userDetails) {
-        console.log("test usdfs ",action.payload.userDetails)
         state.user.userDetails = action.payload.userDetails;
       }
     },

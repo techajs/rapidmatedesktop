@@ -9,7 +9,6 @@ import {
   faPen,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { UseFetch } from "../../../utils/UseFetch";
 import {
   getConsumerAddressBookList,
   getDeliveryBoyAddressBookList,
@@ -18,9 +17,10 @@ import {
 } from "../../../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import DeleteModal from "./DeleteModal";
+import { useSelector } from "react-redux";
 
 function PickupAddressBook() {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);

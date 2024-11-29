@@ -72,6 +72,8 @@ export const API = {
   addressBookUpdateEnterpriseUrl: BASE_URL + 'enterprise/address/update',
   addressBookDeleteEnterpriseUrl: BASE_URL + 'enterprise/address/delete/',
   consumerWalletUrl: BASE_URL + 'consumer/wallet/balance/',
+  enterpriseDashboardUrl: BASE_URL + 'enterprise/dashboard/',
+  enterpriseOrdersUrl: "/enterprise/order/getbyext/",
 };
 
 export const formatDate = (dateString) => {
@@ -98,11 +100,9 @@ export const uploadImage = async (formData) => {
     uploadDocumentsApi(
       formData,
       successResponse => {
-        console.log('print_data ==> successResponseuploadDocumentsApi', JSON.parse(successResponse).id);
         resolve(JSON.parse(successResponse).id);
       },
       errorResponse => {
-        console.log('print_data ==> errorResponseuploadDocumentsApi', errorResponse);
         reject(errorResponse);
       }
     );

@@ -834,3 +834,36 @@ export const getConsumerWallet = (param, successCallback, errorCallback) => {
     },
   );
 };
+
+export const getEnterpriseDashboardInfo = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.enterpriseDashboardUrl + param,
+    HTTPMethod.GET,
+    {},
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
+export const getEnterpriseOrders = (param, successCallback, errorCallback) => {
+  var url = API.enterpriseOrdersUrl + param;
+  axiosCall(
+    url,
+    HTTPMethod.GET,
+    null,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};

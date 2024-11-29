@@ -1,15 +1,14 @@
 import React from "react";
 import Styles from "../../../assets/css/home.module.css";
-import { UseFetch } from "../../../utils/UseFetch";
 import CommonHeader from "../../../common/CommonHeader";
 import UserProfile from "../../../assets/images/PickupUser-Profile.jpeg";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { API } from "../../../utils/Constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/authSlice";
 import localforage from "localforage";
 function Setting() {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const location = useLocation();
   const currentPath = location.pathname;
   const dispatch = useDispatch();

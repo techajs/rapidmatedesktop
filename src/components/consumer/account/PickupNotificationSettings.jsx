@@ -3,16 +3,13 @@ import Styles from "../../../assets/css/home.module.css";
 import { Form } from "react-bootstrap";
 import { showErrorToast, showSuccessToast } from "../../../utils/Toastify";
 import { updateUserProfile } from "../../../data_manager/dataManage";
-import { UseFetch } from "../../../utils/UseFetch";
 import { ToastContainer } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserDetails } from "../../../redux/authSlice";
 
 const PickupNotificationSettings = () => {
   const dispatch = useDispatch();
-
   const user = useSelector((state) => state.auth.user);
-  console.log("user detail ",user)
   const [isPushNotificationChecked, setIsPushNotificationChecked] =useState(user?.userDetails?.enable_push_notification == 1 ? true : false);
   const [isPromotionalEmailChecked, setIsPromotionalEmailChecked] =useState(user?.userDetails?.enable_email_notification == 1 ? true : false);
 

@@ -7,8 +7,10 @@ import Home from "../../assets/images/home-icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import Styles from "../../assets/css/home.module.css";
+import { useSelector } from "react-redux";
 
 const EnterpriseMultipleDeliverySelectLocation = () => {
+  const user = useSelector((state)=>state.auth.user)
   const company = [
     {
       name: "North Street Franchise",
@@ -51,7 +53,7 @@ const EnterpriseMultipleDeliverySelectLocation = () => {
   return (
     <>
       {/* Header Start Here */}
-      <CommonHeader />
+      <CommonHeader userData={user}/>
       {/* Header End Here */}
       <section className={Styles.enterprisenewScheduleSec}>
         <div>

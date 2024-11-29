@@ -3,7 +3,6 @@ import {
   getConsumerViewOrdersList,
   getLocations,
 } from "../../../data_manager/dataManage";
-import { UseFetch } from "../../../utils/UseFetch";
 import Styles from "../../../assets/css/home.module.css";
 import Package from "../../../assets/images/Package.png";
 import NoDataImage from "../../../assets/images/NoOrder.png";
@@ -15,9 +14,10 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "../../../utils/Constants";
+import { useSelector } from "react-redux";
 
 function RenderItem({ status = "",locationList=[],orderList=[]}) {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const navigate = useNavigate();
   const getLocationAddress = (locationId) => {
     let result = locationList.filter((location) => location.id == locationId);

@@ -12,11 +12,10 @@ import Package from "../../assets/images/Package.png";
 import Styles from "../../assets/css/home.module.css";
 import CalenderEvent from './setting/CalenderEvent'
 import CommonHeader from '../../common/CommonHeader';
-import { UseFetch } from '../../utils/UseFetch';
-
+import { useSelector } from 'react-redux';
 
 function EnterprisePlanning() {
-  const user =UseFetch()
+  const user = useSelector((state)=>state.auth.user)
   return (
     <>
     <CommonHeader userData={user}/>

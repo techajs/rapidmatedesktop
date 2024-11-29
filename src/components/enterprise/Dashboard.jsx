@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import "react-calendar/dist/Calendar.css";
@@ -15,7 +15,7 @@ import AllBooking from "../../assets/images/All-booking.png";
 import Home from "../../assets/images/home-icon.png";
 import Package from "../../assets/images/Package.png";
 import Calender from "../../assets/images/Calender-withBg.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -35,13 +35,19 @@ ChartJS.register(
 );
 import EnterpriseHomeCalender from "./setting/EnterpriseHomeCalender";
 import { Bar } from "react-chartjs-2";
+import {
+  getEnterpriseDashboardInfo,
+  getEnterpriseOrders,
+} from "../../data_manager/dataManage";
+import { ToastContainer } from "react-toastify";
+import { showErrorToast } from "../../utils/Toastify";
+import { setBookings, setBranches } from "../../redux/enterpriseSlice";
 function CommonDashboard() {
-  const { user } = useSelector((state) => state.auth);
-  const [userData, setUserData] = useState(null);
-  const { userDetails } = { ...userData };
-  useEffect(() => {
-    setUserData(user);
-  }, [userData]);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const { bookings, branches } = useSelector((state) => state.enterprise);
+  const [laoding, setLoading] = useState(false);
+
   const data = {
     labels: ["January", "February", "March", "April", "May"], // X-axis labels
     datasets: [
@@ -93,29 +99,63 @@ function CommonDashboard() {
     },
   };
 
-  const companyloc = [
-    {
-      name: "North Street Franchise",
-      address: "North Street, ABC",
-      houresbooked: "05",
-      houresspent: "03",
-      booking: "03",
-    },
-    {
-      name: "South Street Franchise",
-      address: "South Street, DEF",
-      houresbooked: "08",
-      houresspent: "06",
-      booking: "04",
-    },
-    {
-      name: "West Street Franchise",
-      address: "West Street, GHI",
-      houresbooked: "12",
-      houresspent: "08",
-      booking: "07",
-    },
-  ];
+  const dropdownData2 = [{ label: "This week", value: "This week" }];
+
+  const getOrderList = () => {
+    getEnterpriseOrders(
+      user.userDetails.ext_id,
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._response.length > 0) {
+          console.log(successResponse[0]._response);
+        }
+      },
+      (errorResponse) => {
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
+        }
+        showErrorToast(err);
+        setLoading(false);
+      }
+    );
+  };
+
+  const getBookingList = () => {
+    setLoading(true);
+    getEnterpriseDashboardInfo(
+      user.userDetails.ext_id,
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._response.length > 0) {
+          dispatch(
+            setBookings(successResponse[0]._response[0]?.dashboard.bookings)
+          );
+          dispatch(
+            setBranches(successResponse[0]._response[0]?.dashboard.branch)
+          );
+        }
+      },
+      (errorResponse) => {
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
+        }
+        showErrorToast(err);
+        setLoading(false);
+      }
+    );
+  };
+  useEffect(() => {
+    if (!bookings || bookings === "") {
+      getBookingList();
+    }
+    getOrderList()
+  }, [user]);
 
   return (
     <>
@@ -127,7 +167,10 @@ function CommonDashboard() {
                 <p className={Styles.enterprisesHomeUserWelcomeText}>
                   Welcome{" "}
                   <b>
-                    {userDetails?.first_name + " " + userDetails?.last_name}!
+                    {user?.userDetails?.first_name +
+                      " " +
+                      user?.userDetails?.last_name}
+                    !
                   </b>
                 </p>
                 <p className={Styles.enterprisesHomeDashbordDiscription}>
@@ -146,7 +189,7 @@ function CommonDashboard() {
                         <h4
                           className={Styles.enterprisesHomeActiveBookingCount}
                         >
-                          08
+                          {bookings?.active}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -168,7 +211,7 @@ function CommonDashboard() {
                         <h4
                           className={Styles.enterprisesHomeActiveBookingCount}
                         >
-                          52
+                          {bookings?.scheduled}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -189,7 +232,7 @@ function CommonDashboard() {
                       </p>
                       <div className={Styles.enterpriseBookingCountCard}>
                         <h4 className="enterprisesHome-ActiveBookingCount">
-                          362
+                          {bookings?.all}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -268,8 +311,11 @@ function CommonDashboard() {
                 <p className={Styles.enterpriseCompanyLocationsText}>
                   Company locations
                 </p>
-                {companyloc.map((company, index) => (
-                  <div key={index} className={Styles.enterpriseHomeCompanyLocCard}>
+                {branches.map((company, index) => (
+                  <div
+                    key={index}
+                    className={Styles.enterpriseHomeCompanyLocCard}
+                  >
                     <img
                       className={Styles.enterpriseHomeHomeIcon}
                       src={Home}
@@ -277,7 +323,7 @@ function CommonDashboard() {
                     />
                     <div>
                       <h4 className={Styles.enterpriseHomeCompanyName}>
-                        {company.name}
+                        {company.branch_name}
                       </h4>
                       <div className={Styles.enterpriseHomeAddressCard}>
                         <FontAwesomeIcon
@@ -285,7 +331,8 @@ function CommonDashboard() {
                           icon={faLocationDot}
                         />
                         <p className={Styles.enterpriseHomeCompanyAddress}>
-                          {company.address}
+                          {company.address} {company?.city} {company?.state}{" "}
+                          {company?.postal_code} {company?.country}
                         </p>
                       </div>
                     </div>
@@ -295,19 +342,21 @@ function CommonDashboard() {
                         <p className={Styles.enterpriseHomeLocHsbooked}>
                           Hours booked
                         </p>
-                        <h4>{company.houresbooked}</h4>
+                        <h4>{company?.bookinghr || 0}</h4>
                       </div>
 
                       <div className={Styles.enterpriseHomeHrsBookedCard}>
                         <p className={Styles.enterpriseHomeLocHsbooked}>
                           Hours spent
                         </p>
-                        <h4>{company.houresspent}</h4>
+                        <h4>{company?.spenthr || 0}</h4>
                       </div>
 
                       <div className={Styles.enterpriseHomeHrsBookedCard}>
-                        <p className={Styles.enterpriseHomeLocHsbooked}>Bookings</p>
-                        <h4>{company.booking}</h4>
+                        <p className={Styles.enterpriseHomeLocHsbooked}>
+                          Bookings
+                        </p>
+                        <h4>{company?.bookings || 0}</h4>
                       </div>
                     </div>
                   </div>
@@ -325,7 +374,9 @@ function CommonDashboard() {
                       className={Styles.enterpriseHomeResturentCircle}
                       icon={faCircle}
                     />
-                    <p className={Styles.enerpriseHomeResturentText}>Restaurant</p>
+                    <p className={Styles.enerpriseHomeResturentText}>
+                      Restaurant
+                    </p>
                   </div>
 
                   <div className={Styles.enterpriseHomeResturntCard}>
@@ -333,7 +384,9 @@ function CommonDashboard() {
                       className={Styles.enterpriseHomeSupermarketsCircle}
                       icon={faCircle}
                     />
-                    <p className={Styles.enerpriseHomeResturentText}>Supermarkets</p>
+                    <p className={Styles.enerpriseHomeResturentText}>
+                      Supermarkets
+                    </p>
                   </div>
 
                   <div className={Styles.enterpriseHomeResturntCard}>
@@ -341,7 +394,9 @@ function CommonDashboard() {
                       className={Styles.enterpriseHomeEcommerceCircle}
                       icon={faCircle}
                     />
-                    <p className={Styles.enerpriseHomeResturentText}>E-Commerce</p>
+                    <p className={Styles.enerpriseHomeResturentText}>
+                      E-Commerce
+                    </p>
                   </div>
                 </div>
                 <div className={Styles.enterpriseHomeResturntCard}>
@@ -357,7 +412,9 @@ function CommonDashboard() {
                 <div>
                   <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
                     <div>
-                      <div className={Styles.enterpriseHomePackagedeliveryInfoCard}>
+                      <div
+                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
+                      >
                         <div className={Styles.enterpriseHomePackageImgCard}>
                           <img
                             className={Styles.enterpriseHomePackage}
@@ -409,7 +466,9 @@ function CommonDashboard() {
 
                   <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
                     <div>
-                      <div className={Styles.enterpriseHomePackagedeliveryInfoCard}>
+                      <div
+                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
+                      >
                         <div className={Styles.enterpriseHomePackageImgCard}>
                           <img
                             className={Styles.enterpriseHomePackage}
@@ -448,14 +507,18 @@ function CommonDashboard() {
                           Order ID: <span>98237469</span>
                         </p>
 
-                        <p className={Styles.enterpriseHomeOrderIdText}>Motor Bike</p>
+                        <p className={Styles.enterpriseHomeOrderIdText}>
+                          Motor Bike
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
                     <div>
-                      <div className={Styles.enterpriseHomePackagedeliveryInfoCard}>
+                      <div
+                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
+                      >
                         <div className={Styles.enterpriseHomePackageImgCard}>
                           <img
                             className={Styles.enterpriseHomePackage}
@@ -507,7 +570,9 @@ function CommonDashboard() {
 
                   <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
                     <div>
-                      <div className={Styles.enterpriseHomePackagedeliveryInfoCard}>
+                      <div
+                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
+                      >
                         <div className={Styles.enterpriseHomePackageImgCard}>
                           <img
                             className={Styles.enterpriseHomePackage}
@@ -561,6 +626,7 @@ function CommonDashboard() {
             </div>
           </div>
         </div>
+        <ToastContainer />
       </section>
     </>
   );

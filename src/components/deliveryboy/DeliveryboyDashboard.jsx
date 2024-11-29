@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { UseFetch } from "../../utils/UseFetch";
 import Styles from "../../assets/css/home.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +6,7 @@ import { Link } from "react-router-dom";
 import { getCompanyList, getDeliveryBoyViewOrdersList, getLocations } from "../../data_manager/dataManage";
 import CardComponent from "./CardComponent";
 import CompanyItemCart from "./CompanyItemCart";
+import { useSelector } from "react-redux";
 
 const Loader = () => (
   <div className="col-md-12">
@@ -17,7 +17,7 @@ const Loader = () => (
 );
 
 function DeliveryboyDashboard() {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const [orderList, setOrderList] = useState([]);
   const [recentOrderList, setRecentOrderList] = useState([]);
   const [locationList, setLocationList] = useState([]);

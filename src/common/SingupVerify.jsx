@@ -85,7 +85,6 @@ const SingupVerify = () => {
                         loginSuccess({ role: userRole, user: userData })
                       );
                       const objData = getLookup();
-                      // dispatch(commonDataList(objData));
                       navigateBasedOnRole(
                         successResponse[0]._response.user_profile[0].role
                       );

@@ -28,6 +28,7 @@ import { Form } from "react-bootstrap";
 import { MAPS_API_KEY } from "../../utils/Constants";
 import EnterpriseSelectServiceDatePicker from "./common/EnterpriseSelectServiceDatePicker";
 import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { useSelector } from "react-redux";
 
 const EnterpriseOneTimeSelectServiceType = () => {
   const [repeatOrder, setRepeatOrder] = useState(false);
@@ -35,7 +36,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedOption, setSelectedOption] = useState("Daily");
   const [imagePreview, setImagePreview] = useState(null);
-
+  const user = useSelector((state)=>state.auth.user)
   const handleSelect = (option) => {
     setSelectedOption(option);
   };
@@ -51,6 +52,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
   };
 
   const handleImageChange = (e) => {
+
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -100,7 +102,7 @@ const EnterpriseOneTimeSelectServiceType = () => {
   return (
     <>
       {/* Header Start Here  */}
-      <CommonHeader />
+      <CommonHeader userData={user}/>
       {/* Header End Here  */}
       <section className={Styles.enterprisenewScheduleSec}>
         <div>

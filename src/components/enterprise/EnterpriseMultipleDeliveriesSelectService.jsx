@@ -27,8 +27,10 @@ import { Link } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { MAPS_API_KEY } from "../../utils/Constants";
 import EnterpriseSelectServiceDatePicker from "./common/EnterpriseSelectServiceDatePicker";
+import { useSelector } from "react-redux";
 
 const EnterpriseMultipleDeliveriesSelectService = () => {
+  const user = useSelector((state)=>state.auth.user)
   const [repeatOrder, setRepeatOrder] = useState(false);
   const [selectedServiceType, setSelectedServiceType] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -98,7 +100,7 @@ const EnterpriseMultipleDeliveriesSelectService = () => {
   return (
     <>
       {/* Header Start Here  */}
-      <CommonHeader />
+      <CommonHeader userData={user}/>
       {/* Header End Here  */}
       <section className={Styles.enterprisenewScheduleSec}>
         <div>

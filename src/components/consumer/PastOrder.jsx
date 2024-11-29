@@ -8,13 +8,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
-import { UseFetch } from "../../utils/UseFetch";
 import RenderItem from "./common/RenderItem";
 import { getLocations } from "../../data_manager/dataManage";
 import { getOrderList } from "../../utils/getOrderList";
+import { useSelector } from "react-redux";
 
 const PastOrder = () => {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const navigate=useNavigate()
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTab, setSelectedTab] = useState("tab1");

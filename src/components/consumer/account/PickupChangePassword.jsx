@@ -10,9 +10,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { changeUserPassword } from "../../../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../../../utils/Toastify";
-import { UseFetch } from "../../../utils/UseFetch";
 import localforage from "localforage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/authSlice";
 const schema = yup.object().shape({
   currentPassword: yup
@@ -29,7 +28,7 @@ const schema = yup.object().shape({
     .oneOf([yup.ref("password")], "Passwords must match"),
 });
 const PickupChangePassword = () => {
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);

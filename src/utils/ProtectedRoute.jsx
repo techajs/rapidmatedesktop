@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { UseFetch } from './UseFetch';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { isAuthenticated, role } = useSelector((state) =>state.auth );

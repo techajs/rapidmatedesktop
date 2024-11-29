@@ -8,34 +8,39 @@ import {
   faLocationCrosshairs,
   faGlobe,
   faPhone,
+  faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import Truck from "../assets/images/Truck.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SidebarImg from "../assets/images/Pickup-Order-preview-Banner.png";
-import { UseFetch } from "../utils/UseFetch";
 import CommonHeader from "../common/CommonHeader";
 import getImage from "../components/consumer/common/GetImage";
 import { uploadDocumentsApi } from "../data_manager/dataManage";
+import { useSelector } from "react-redux";
 
 function OrderView() {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const location = useLocation();
-  const { order, orderCustomerDetails } = location.state || {};
-  const [loading,setLoading]=useState(false)
+  const { order, orderCustomerDetails, dropoffDetail } = location.state || {};
+  const [loading, setLoading] = useState(false);
   const [packageImageId, setPackageImageId] = useState(null);
-  const [imageView,setImageView]=useState(URL.createObjectURL(orderCustomerDetails?.file[0]) || null)
+  const [isAddressAdd, setIsAddressAdd] = useState(false);
+  const [imageView, setImageView] = useState(
+    URL.createObjectURL(orderCustomerDetails?.file[0]) || null
+  );
   const checkboxTypes = ["checkbox"];
-  const { user } = UseFetch();
-  console.log(URL.createObjectURL(orderCustomerDetails?.file[0]))
-  const submitHandler = (e)=>{
-    e.preventDefault()
+  const user = useSelector((state)=>state.auth.user)
+  const submitHandler = async (e) => {
+    e.preventDefault();
     // let photo = {
     //   uri: URL.createObjectURL(orderCustomerDetails?.file[0]),
     //   type: orderCustomerDetails?.file[0]?.type,
     //   name: orderCustomerDetails?.file[0]?.name,
     // };
-    // const formdata = new FormData();
-    // formdata.append('file', photo);
+    // const passportFormData = new FormData();
+    //   passportFormData.append("file", orderCustomerDetails?.file[0]);
+    //   const passportResponse = await uploadImage(passportFormData);
+    // formdata.append('file', orderCustomerDetails?.file[0]);
     // setLoading(true);
     // uploadDocumentsApi(
     //   formdata,
@@ -47,16 +52,20 @@ function OrderView() {
     //     setLoading(false);
     //   },
     // );
-    navigate('/consumer/payment',{
+    navigate("/consumer/payment", {
       state: {
         order,
         orderCustomerDetails,
+        dropoffDetail,
+        isAddressAdd,
       },
-    })
-  }
+    });
    
-  
-  console.log(orderCustomerDetails?.file[0])
+  };
+ const handleSaveAddress=(e)=>{
+  setIsAddressAdd(!isAddressAdd)
+ }
+  // console.log(dropoffDetail)
 
   return (
     <>
@@ -178,11 +187,66 @@ function OrderView() {
                     </div>
                   </div>
 
-                  <p className={Styles.pickupOrderPreviewPickupNotes}>
-                    {orderCustomerDetails?.pickupnote}
-                  </p>
+                  <div className={Styles.pickupOrderPreviewAdminDetailsCard}>
+                    <FontAwesomeIcon
+                      className={`${Styles.pickupOrderglobeIcon} me-2`}
+                      icon={faCommentDots}
+                    />
+                    <p className={Styles.pickupOrderPreviewPickupNotes}>
+                      {" "}{orderCustomerDetails?.pickupnote}
+                    </p>
+                  </div>
                 </div>
+                <div className={Styles.pickupOrderPreviewVehicleCard}>
+                  <p className={Styles.pickupOrderPreviewVehicleDetailsText}>
+                    Dropoff details
+                  </p>
+                  <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
+                    <div>
+                      <h5 className={Styles.pickupOrderPreviewVehicleType}>
+                        {dropoffDetail?.first_name +
+                          " " +
+                          dropoffDetail?.last_name}
+                      </h5>
+                      <p className={Styles.pickupOrderPreviewCompanyName}>
+                        {dropoffDetail?.company}
+                      </p>
+                    </div>
+                  </div>
 
+                  <div
+                    className={Styles.pickupOrderPreviewAdminDetailsMainCard}
+                  >
+                    <div className={Styles.pickupOrderPreviewAdminDetailsCard}>
+                      <FontAwesomeIcon
+                        className={Styles.pickupOrderglobeIcon}
+                        icon={faGlobe}
+                      />
+                      <p className={Styles.pickupOrderAdminEmail}>
+                        {dropoffDetail?.email}
+                      </p>
+                    </div>
+
+                    <div className={Styles.pickupOrderPreviewAdminDetailsCard}>
+                      <FontAwesomeIcon
+                        className={Styles.pickupOrderglobeIcon}
+                        icon={faPhone}
+                      />
+                      <p className={Styles.pickupOrderAdminEmail}>
+                        {"+" + dropoffDetail?.phone}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={Styles.pickupOrderPreviewAdminDetailsCard}>
+                    <FontAwesomeIcon
+                      className={`${Styles.pickupOrderglobeIcon} me-2`}
+                      icon={faCommentDots}
+                    />
+                    <p className={Styles.pickupOrderPreviewPickupNotes}>
+                      {" "}{dropoffDetail?.dropoff_note}
+                    </p>
+                  </div>
+                </div>
                 <div className={Styles.pickupOrderPreviewVehicleCard}>
                   <p className={Styles.pickupOrderPreviewVehicleDetailsText}>
                     Estimated cost
@@ -217,7 +281,7 @@ function OrderView() {
                 </div>
 
                 <div>
-                  <Form>
+              
                     {checkboxTypes.map((type) => (
                       <div
                         key={`default-${type}`}
@@ -226,15 +290,15 @@ function OrderView() {
                         <Form.Check
                           type={type}
                           id={`default-${type}`}
-                          label={null}
-                          className={Styles.saveAddresslaterCheckBox}
+                          label={"Save thes addresses for later"}
+                          checked={isAddressAdd}
+                          className={`${Styles.saveAddresslaterCheckBox}`}
+                          onClick={handleSaveAddress}
                         />
-                        <p className={Styles.checkText}>
-                          Save these addresses for later
-                        </p>
+                        
                       </div>
                     ))}
-                  </Form>
+                
                 </div>
 
                 <div className={Styles.addPickupDetailsBtnCard}>

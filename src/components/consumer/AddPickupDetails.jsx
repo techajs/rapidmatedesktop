@@ -6,7 +6,6 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
-import { UseFetch } from "../../utils/UseFetch";
 
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -15,15 +14,16 @@ import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
 import { showErrorToast } from "../../utils/Toastify";
 import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const AddPickupDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = UseFetch();
+  const user = useSelector((state)=>state.auth.user)
   const { order } = location.state || {};
 
   const [selectedOption, setSelectedOption] = useState("Myself");
-  const [selectCheckOption, setSelectedCheckOption] = useState();
+  const [selectCheckOption, setSelectedCheckOption] = useState("custom");
   const handleRadioChange = (event) => {
     const seletedValue = event.target.value;
     setSelectedOption(seletedValue);
@@ -65,45 +65,28 @@ const AddPickupDetails = () => {
       }),
     dropoffnote: yup.string(),
     dcompany: yup.string(),
-    dname: yup.string().when('selectCheckOption', {
-      is: (value) => value === 'custom',
-      then: (schema) =>
-        schema
-          .required("Name is required")
-          .min(3, "Name must be at least 3 characters long"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    dlastname: yup.string().when('selectCheckOption', {
-      is: (value) => value === 'custom',
-      then: (schema) =>
-        schema
-          .required("Last name is required")
-          .min(2, "Last name must be at least 2 characters long"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    demail: yup.string().when('selectCheckOption', {
-      is: (value) => value === 'custom',
-      then: (schema) =>
-        schema
-          .required("Email is required")
-          .email("Please enter a valid email"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    dphoneNumber: yup.string().when('selectCheckOption', {
-      is: (value) => value === 'custom',
-      then: (schema) =>
-        schema
-          .required("Phone number is required")
-          .matches(/^\d+$/, "Phone number should contain only digits")
-          .min(8, "Phone number must be at least 8 digits"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    
+    dname: yup
+      .string()
+      .required("Name is required")
+      .min(3, "Name must be at least 3 characters long"),
+    dlastname: yup
+      .string()
+      .required("Last name is required")
+      .min(2, "Last name must be at least 2 characters long"),
+    demail: yup
+      .string()
+      .required("Email is required")
+      .email("Please enter a valid email"),
+    dphoneNumber: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\d+$/, "Phone number should contain only digits")
+      .min(8, "Phone number must be at least 8 digits"),
   });
   const handleCheckboxChange = (event) => {
     const seletedValue = event.target.value;
     setSelectedCheckOption(seletedValue);
-    setValue("selectCheckOption",seletedValue);
+    setValue("selectCheckOption", seletedValue);
   };
 
   const defaultFirstName = user?.userDetails?.first_name || "";
@@ -117,7 +100,10 @@ const AddPickupDetails = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({ resolver: yupResolver(schema),defaultValues: {selectCheckOption: "",}});
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: { selectCheckOption: "" },
+  });
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -368,7 +354,6 @@ const AddPickupDetails = () => {
                       />
                       {errors.phoneNumber && (
                         <p style={{ color: "red", fontSize: "13px" }}>
-                          
                           {errors.phoneNumber.message}
                         </p>
                       )}
@@ -507,7 +492,7 @@ const AddPickupDetails = () => {
                     justifyContent: "space-start",
                   }}
                 >
-                  {["same of above", "custom"].map((label, index) => (
+                  {/* {["same of above", "custom"].map((label, index) => (
                     <div key={`radio-${index}`} className="mb-3 me-3">
                       <input
                         type="checkbox"
@@ -529,7 +514,7 @@ const AddPickupDetails = () => {
                         </p>
                       )}
                     </div>
-                  ))}
+                  ))} */}
                 </div>
                 {selectCheckOption == "custom" && (
                   <div className={`row ${Styles.manageRow}`}>
@@ -583,9 +568,9 @@ const AddPickupDetails = () => {
                             />
                           )}
                         />
-                        {errors.lastname && (
+                        {errors.dlastname && (
                           <p style={{ color: "red", fontSize: "13px" }}>
-                            {errors.lastname.message}
+                            {errors.dlastname.message}
                           </p>
                         )}
                       </div>
