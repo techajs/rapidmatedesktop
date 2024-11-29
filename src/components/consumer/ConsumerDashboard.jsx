@@ -20,6 +20,7 @@ import PickupVehicleDimensionsModal from "./PickupVehicleDimensionsModal";
 import LocationInput from "../consumer/common/LocationInput"
 import DateTimePicker from "./common/DateTimePicker";
 import VehicleSelection from "./common/VehicleSelection"
+import { ToastContainer } from "react-toastify";
 
 const libraries = ['places'];
 
@@ -259,6 +260,7 @@ function ConsumerDashboard() {
         handleClose={() => setShowModal(false)}
         vehicle={vehicleDetail}
       />
+      <ToastContainer />
     </section>
   );
 }

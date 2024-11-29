@@ -1392,7 +1392,7 @@ a {
 
 .homePickupVehicleCardMain {
   margin: 10px 0px;
-  height: 342px;
+  height: 550px;
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
@@ -1492,7 +1492,7 @@ a {
 
 .addpickupDetailSidecardboxIcon {
   width: 100%;
-  height: 93vh;
+  height: 100vh;
 }
 .addPickupFileInput {
   position: absolute;

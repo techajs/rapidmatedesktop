@@ -2,6 +2,7 @@ import React from "react";
 import Styles from "../../../assets/css/home.module.css";
 import Info from "../../../assets/images/info.png";
 import getImage from "./GetImage";
+import { showErrorToast } from "../../../utils/Toastify";
 
 const VehicleSelection = ({
   vehicleTypeList,
@@ -41,7 +42,7 @@ const VehicleSelection = ({
                     const price = getPriceUsingVehicleType(vehicle.id);
                     setSelectedVehiclePrice(price);
                   }else{
-                    alert('select input field first')
+                    showErrorToast('Please pickup and dropoff location.')
                   }
                 }}
               >

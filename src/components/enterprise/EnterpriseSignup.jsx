@@ -164,9 +164,9 @@ const EnterpriseSignup = () => {
               navigate("/signup-verify", {
                 state: {
                   user: {
-                    email: email,
-                    phoneNumber: number,
-                    password: password,
+                    email: data.email,
+                    phoneNumber: data.number,
+                    password: data.password,
                   },
                 },
               });

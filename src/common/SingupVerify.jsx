@@ -121,7 +121,7 @@ const SingupVerify = () => {
     if (roleName === "CONSUMER") {
       navigate("/" + baseUrl + "/dashboard");
     } else if('DELIVERY_BOY') {
-      navigate("/add-vehicle");
+      navigate("/deliveryboy/add-vehicle");
     }else{
       navigate("/thanks");
     }

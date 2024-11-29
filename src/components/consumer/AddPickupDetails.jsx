@@ -13,44 +13,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
-
-// Set validation rules using yup
-const FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const SUPPORTED_FORMATS = ["image/jpeg", "image/png"];
-const schema = yup.object().shape({
-  name: yup
-    .string()
-    .required("Name is required")
-    .min(3, "Name must be at least 3 characters long"),
-  lastname: yup
-    .string()
-    .required("Last name is required")
-    .min(2, "Last name must be at least 2 characters long"),
-  company: yup.string(),
-  packageId: yup
-    .string()
-    .required("Package id is required")
-    .min(3, "Package id must be at least 3 characters long"),
-  pickupnote: yup.string(),
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Please enter a valid email"),
-  phoneNumber: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\d+$/, "Phone number should contain only digits")
-    .min(8, "Phone number must be at least 8 digits"),
-  file: yup
-    .mixed()
-    .required("A file is required")
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value[0] && value[0].size <= FILE_SIZE;
-    })
-    .test("fileType", "Unsupported file type", (value) => {
-      return value && value[0] && SUPPORTED_FORMATS.includes(value[0].type);
-    }),
-});
+import { showErrorToast } from "../../utils/Toastify";
+import { ToastContainer } from "react-toastify";
 
 const AddPickupDetails = () => {
   const location = useLocation();
@@ -59,9 +23,87 @@ const AddPickupDetails = () => {
   const { order } = location.state || {};
 
   const [selectedOption, setSelectedOption] = useState("Myself");
+  const [selectCheckOption, setSelectedCheckOption] = useState();
   const handleRadioChange = (event) => {
     const seletedValue = event.target.value;
     setSelectedOption(seletedValue);
+  };
+  const FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "application/pdf"];
+  const schema = yup.object().shape({
+    name: yup
+      .string()
+      .required("Name is required")
+      .min(3, "Name must be at least 3 characters long"),
+    lastname: yup
+      .string()
+      .required("Last name is required")
+      .min(2, "Last name must be at least 2 characters long"),
+    company: yup.string(),
+    packageId: yup
+      .string()
+      .required("Package id is required")
+      .min(3, "Package id must be at least 3 characters long"),
+    pickupnote: yup.string(),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Please enter a valid email"),
+    phoneNumber: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\d+$/, "Phone number should contain only digits")
+      .min(8, "Phone number must be at least 8 digits"),
+    file: yup
+      .mixed()
+      .required("A file is required")
+      .test("fileSize", "File size is too large", (value) => {
+        return value && value[0] && value[0].size <= FILE_SIZE;
+      })
+      .test("fileType", "Unsupported file type", (value) => {
+        return value && value[0] && SUPPORTED_FORMATS.includes(value[0].type);
+      }),
+    dropoffnote: yup.string(),
+    dcompany: yup.string(),
+    dname: yup.string().when('selectCheckOption', {
+      is: (value) => value === 'custom',
+      then: (schema) =>
+        schema
+          .required("Name is required")
+          .min(3, "Name must be at least 3 characters long"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    dlastname: yup.string().when('selectCheckOption', {
+      is: (value) => value === 'custom',
+      then: (schema) =>
+        schema
+          .required("Last name is required")
+          .min(2, "Last name must be at least 2 characters long"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    demail: yup.string().when('selectCheckOption', {
+      is: (value) => value === 'custom',
+      then: (schema) =>
+        schema
+          .required("Email is required")
+          .email("Please enter a valid email"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    dphoneNumber: yup.string().when('selectCheckOption', {
+      is: (value) => value === 'custom',
+      then: (schema) =>
+        schema
+          .required("Phone number is required")
+          .matches(/^\d+$/, "Phone number should contain only digits")
+          .min(8, "Phone number must be at least 8 digits"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    
+  });
+  const handleCheckboxChange = (event) => {
+    const seletedValue = event.target.value;
+    setSelectedCheckOption(seletedValue);
+    setValue("selectCheckOption",seletedValue);
   };
 
   const defaultFirstName = user?.userDetails?.first_name || "";
@@ -75,7 +117,7 @@ const AddPickupDetails = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({ resolver: yupResolver(schema) });
+  } = useForm({ resolver: yupResolver(schema),defaultValues: {selectCheckOption: "",}});
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -87,11 +129,30 @@ const AddPickupDetails = () => {
   const onSubmit = (data) => {
     setValue("imageView", imagePreview);
     setValue("selectedOption", selectedOption);
-    // console.log('data => ',data)
+    let dropoffDetail = "";
+    if (selectCheckOption == "" || selectCheckOption == undefined) {
+      showErrorToast("Select dropoff location detail.");
+      return;
+    }
+    if (selectCheckOption == "custom") {
+      dropoffDetail = {
+        first_name: data?.dname,
+        last_name: data?.dlastname,
+        phone: data?.dphoneNumber,
+        email: data?.demail,
+        company: data?.dcompany,
+        dropoff_note: data?.dropoff_note,
+      };
+      setValue("dropoffdetail", true);
+    } else {
+      setValue("dropoffdetail", false);
+    }
+
     navigate("/consumer/order-preview", {
       state: {
         order: order,
         orderCustomerDetails: data,
+        dropoffDetail,
       },
     });
   };
@@ -307,6 +368,7 @@ const AddPickupDetails = () => {
                       />
                       {errors.phoneNumber && (
                         <p style={{ color: "red", fontSize: "13px" }}>
+                          
                           {errors.phoneNumber.message}
                         </p>
                       )}
@@ -437,7 +499,221 @@ const AddPickupDetails = () => {
                     </div>
                   </div>
                 </div>
+                <p className={Styles.pickupPersonalDetails}>Drorpoff details</p>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-start",
+                  }}
+                >
+                  {["same of above", "custom"].map((label, index) => (
+                    <div key={`radio-${index}`} className="mb-3 me-3">
+                      <input
+                        type="checkbox"
+                        name={label}
+                        value={label}
+                        checked={selectCheckOption === label}
+                        onChange={handleCheckboxChange}
+                        className={Styles.addPickupDetailRadioBtn}
+                      />
+                      <label
+                        htmlFor={`checkbox-${index}`}
+                        style={{ paddingLeft: "8px" }}
+                      >
+                        {label}
+                      </label>
+                      {errors[label] && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors[label].message}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {selectCheckOption == "custom" && (
+                  <div className={`row ${Styles.manageRow}`}>
+                    <div className="col-md-6">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="dname"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          First name:
+                        </label>
+                        <Controller
+                          name="dname"
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              placeholder="First name"
+                              style={{ width: "100%", padding: "5px" }}
+                            />
+                          )}
+                        />
+                        {errors.dname && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.dname.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
 
+                    <div className="col-md-6">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="dlastname"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          Last name:
+                        </label>
+                        <Controller
+                          name="dlastname"
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              placeholder="Last name"
+                              style={{ width: "100%", padding: "5px" }}
+                            />
+                          )}
+                        />
+                        {errors.lastname && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.lastname.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="col-md-12">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="dcompany"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          Company :
+                        </label>
+                        <Controller
+                          name="dcompany"
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              placeholder="Company"
+                              style={{ width: "100%", padding: "5px" }}
+                            />
+                          )}
+                        />
+                        {errors.dcompany && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.dcompany.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="demail"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          Email:
+                        </label>
+                        <Controller
+                          name="demail"
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              placeholder="Email"
+                              style={{ width: "100%", padding: "5px" }}
+                            />
+                          )}
+                        />
+                        {errors.demail && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.demail.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="dphoneNumber"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          Phone Number:
+                        </label>
+                        <Controller
+                          name="dphoneNumber"
+                          control={control}
+                          defaultValue=""
+                          render={({ field: { onChange, value } }) => (
+                            <PhoneInput
+                              country={"fr"}
+                              value={value}
+                              // onlyCountries={["fr", "in"]}
+                              countryCodeEditable={false}
+                              onChange={onChange}
+                              inputStyle={{
+                                width: "100%",
+                                paddingLeft: "42px",
+                              }}
+                              dropdownStyle={{ borderColor: "#ccc" }}
+                              enableSearch
+                              searchPlaceholder="Search country"
+                              specialLabel=""
+                            />
+                          )}
+                        />
+                        {errors.dphoneNumber && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.dphoneNumber.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className={`mb-1 ${Styles.addPickupDetailsInputs}`}>
+                        <label
+                          htmlFor="dropoffnote"
+                          className={Styles.addPickupDetailFormLabels}
+                        >
+                          Dropoff notes
+                        </label>
+                        <Controller
+                          name="dropoffnote"
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              placeholder="Type here..."
+                              style={{ width: "100%", padding: "5px" }}
+                            />
+                          )}
+                        />
+                        {errors.dropnote && (
+                          <p style={{ color: "red", fontSize: "13px" }}>
+                            {errors.dropnote.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className={`row ${Styles.manageRow}`}>
                   <div className="col-md-12">
                     <div className={Styles.addPickupDetailsBtnCard}>
@@ -462,6 +738,7 @@ const AddPickupDetails = () => {
             </div>
           </div>
         </div>
+        <ToastContainer />
       </section>
     </>
   );

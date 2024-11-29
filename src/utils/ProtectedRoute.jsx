@@ -5,7 +5,7 @@ import { UseFetch } from './UseFetch';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { isAuthenticated, role } = useSelector((state) =>state.auth );
-  const { user } = UseFetch();
+  const user = useSelector((state) => state.auth.user);
   
   if (!isAuthenticated) {
     return <Navigate to="/" />;
@@ -14,7 +14,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/unauthorized" />;
   }
   if(role == 'DELIVERY_BOY' || role== 'ENTERPRISE'){
-    if(user?.userDetails?.is_active==0){
+    const { is_active, vehicleAdd } = user?.userDetails || {};
+    if(is_active === 0 && vehicleAdd === true){
       return <Navigate to="/request-pending" />;
     }
   }
