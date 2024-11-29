@@ -311,7 +311,7 @@ function CommonDashboard() {
                 <p className={Styles.enterpriseCompanyLocationsText}>
                   Company locations
                 </p>
-                {branches.map((company, index) => (
+                {branches?.map((company, index) => (
                   <div
                     key={index}
                     className={Styles.enterpriseHomeCompanyLocCard}
