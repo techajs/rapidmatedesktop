@@ -4040,14 +4040,12 @@ a {
 .enterpriseselectServicesOptionCard {
   display: flex;
   align-items: center;
-  margin-right: 20px;
+  margin: 10px 0px;
   cursor: pointer;
 }
 
 .enterpriseselectServicesOptionCardMain {
-  display: flex;
-  align-items: center;
-  margin: 20px 0px 30px;
+  margin: 15px 0px 15px;
 }
 
 .enterpriseVehilces{
@@ -4108,7 +4106,7 @@ a {
 
 .enterpriseSelectServiceDateCard {
   background-color: var(--white-color);
-  padding: 8px 15px;
+  padding: 5px 15px;
   border-radius: 8px;
   width: 100%;
   margin-bottom: 15px;
@@ -4141,7 +4139,7 @@ a {
   display: flex;
   align-items: center;
   background-color: var(--white-color);
-  padding: 10px 15px;
+  padding: 5px 15px;
   border-radius: 8px;
   width: 100%;
   margin-bottom: 15px;

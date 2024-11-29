@@ -29,6 +29,14 @@ import {
   Gifts,
   Ecommerce,
   AboutUs,
+  EnterpriseOneTimeSelectLocation,
+  EnterpriseOneTimeSelectServiceType,
+  EnterpriseScheduleApproved,
+  EnterpriseMultipleDeliverySelectLocation,
+  EnterpriseMultipleDeliveriesSelectService,
+  DeliveryboyProfile,
+  EnterpriseAddPickupDetails,
+  EnterpriseOrderPreview,
 } from "../common/pages";
 import {
   Navigate,
@@ -41,12 +49,7 @@ import { useSelector } from "react-redux";
 import ThankPage from "../common/ThankPage";
 import RequestPending from "../common/RequestPending";
 import { elements } from "chart.js";
-import EnterpriseOneTimeSelectLocation from "../components/enterprise/EnterpriseOneTimeSelectLocation";
-import EnterpriseOneTimeSelectServiceType from "../components/enterprise/EnterpriseOneTimeSelectServiceType";
-import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseScheduleApproved";
-import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
-import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
-import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
+
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -114,6 +117,14 @@ function MainRoutes() {
         <Route
           path="/enterprises-multiple-deliveries-serviceselect"
           element={<EnterpriseMultipleDeliveriesSelectService />}
+        />
+        <Route
+          path="/enterprises-add-pickup-details"
+          element={<EnterpriseAddPickupDetails />}
+        />
+        <Route
+          path="/enterprises-order-preview"
+          element={<EnterpriseOrderPreview />}
         />
         {/* end here */}
         {/* consumer */}

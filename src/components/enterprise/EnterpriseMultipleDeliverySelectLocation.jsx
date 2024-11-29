@@ -60,7 +60,7 @@ const EnterpriseMultipleDeliverySelectLocation = () => {
               <div className={Styles.enterpriseNewScheduleTitleCard}>
                 <div>
                   <h4 className={Styles.enterpriseNewScheduleText}>
-                    One time delivery
+                    Multiple deliveries
                   </h4>
                   <img
                     className={Styles.enterpriseOneTimeTrackImg}
