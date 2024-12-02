@@ -9,7 +9,7 @@ export async function axiosCall(
   callbackResponse,
   callbackErrorResponse,
 ) {
- 
+  const token = await localforage.getItem('1');
 
   const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -21,21 +21,19 @@ export async function axiosCall(
     },
   });
 
-  axiosInstance.interceptors.request.use(
-    
-    function (config) {
-      const token = localStorage.getItem('1');
-      if (token) {
-        config.headers['rapid_token'] = `${token}`;
-      }
-      return config;
-    },
-    function (error) {
-      let parseError = JSON.stringify(error);
-      let errorResponse = JSON.parse(parseError);
-      return callbackErrorResponse(axiosError(errorResponse.code));
-    },
-  );
+  // axiosInstance.interceptors.request.use(
+  //   function (config) {
+  //     if (token) {
+  //       config.headers.Authorization = `Bearer ${token}`;
+  //     }
+  //     return config;
+  //   },
+  //   function (error) {
+  //     let parseError = JSON.stringify(error);
+  //     let errorResponse = JSON.parse(parseError);
+  //     return callbackErrorResponse(axiosError(errorResponse.code));
+  //   },
+  // );
 
   axiosInstance.interceptors.response.use(
     function (response) {

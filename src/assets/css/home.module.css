@@ -5427,3 +5427,74 @@ a {
 .EcoFriendlyFleetMainCard img {
   max-width: 100%;
 }
+
+.paymentSuccessSec {
+  padding: 60px 0;
+  background-color: #f9f9f9;
+}
+
+.paymentSuccessCard {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.paymentSuccessIcon {
+  color: #4CAF50; /* Green color for success */
+  margin-bottom: 20px;
+}
+
+.paymentSuccessText {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.paymentSuccessSubText {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.paymentSuccessDetails {
+  margin-top: 30px;
+}
+
+.orderSummaryText {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.paymentDetailsCard {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.paymentDetailsText {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.backToDashboardBtn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.3s;
+}
+
+.backToDashboardBtn:hover {
+  background-color: #0056b3;
+}
+

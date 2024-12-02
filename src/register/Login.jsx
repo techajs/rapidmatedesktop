@@ -19,7 +19,6 @@ import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 const Login = () => {
   const {lookup}=UseFetch()
   const { loading } = useSelector((state) => state.auth);
-  // console.log("loading--------", loading)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -100,6 +99,7 @@ const Login = () => {
                 userDetails: userDetail,
               };
               const getToken = successResponse[0]._response?.rapid_token;
+              console.log("respose loign",successResponse[0]._response)
               const userRole=successResponse[0]._response.user_profile[0].role
               const refreshToken = successResponse[0]._response?.refreshtoken;
               if (getToken && userData) {

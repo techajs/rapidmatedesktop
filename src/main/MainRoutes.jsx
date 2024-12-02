@@ -47,6 +47,7 @@ import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseSched
 import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
 import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
 import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
+import SearchDriver from "../common/SearchDriver";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -138,6 +139,14 @@ function MainRoutes() {
           element={
             <ProtectedRoute requiredRole={userRole}>
               <PaymentView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/consumer/find-driver`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <SearchDriver />
             </ProtectedRoute>
           }
         />

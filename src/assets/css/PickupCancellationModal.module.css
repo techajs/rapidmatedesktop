@@ -48,7 +48,7 @@
     margin: 0px 110px 0px 0px;
   }
 
-  .modalClose-HeaderBtn{
+  .modalCloseHeaderBtn{
     font-size: 15px;
     cursor: pointer;
   }
@@ -57,7 +57,7 @@
     border-radius: 15px !important;
   }
 
-  .cancellationModal-reasonCircle {
+  .cancellationModalReasonCircle {
     width: 20px;
     height: 20px;
     border: 1px solid #ccc;
@@ -68,7 +68,7 @@
     line-height: 20px; /* Ensure the check mark icon centers vertically */
   }
   
-  .cancellationReasonCard.selected .cancellationModal-reasonCircle {
+  .cancellationReasonCard.selected .cancellationModalReasonCircle {
     background-color: var(--primary-color); 
     color: #fff; 
     display: flex;
@@ -76,7 +76,7 @@
     justify-content: center;
   }
 
-  .reasonCancellation-CheckIcon{
+  .reasonCancellationCheckIcon{
     font-size: 12px;
   }
 
@@ -86,7 +86,7 @@
     cursor: pointer;
   }
 
-  .cancellationReason-TextDetails{
+  .cancellationReasonTextDetails{
     font-size: 12px;
     font-weight: 400;
     margin: 0px;
@@ -102,7 +102,7 @@
     padding: 10px 55px;
   }
 
-  .cancellationModal-SubmitBtn{
+  .cancellationModalSubmitBtn{
     font-size: 14px;
     font-weight: 500;
     border: 0px;
@@ -113,7 +113,7 @@
     padding: 10px 55px;
   }
 
-  .orderCanceled-SadEmoji{
+  .orderCanceledSadEmoji{
     width: 55px;
     height: 53px;
     margin: 20px 0px 30px;
@@ -182,13 +182,13 @@
 
   /* -------------------- Pickup Feedback ---------------------  */
 
-  .pickupFeedback-thansksImg{
+  .pickupFeedbackThansksImg{
     width: 63px;
     height: 71px;
     margin-bottom: 20px;
   }
 
-  .pickupfeedback-title{
+  .pickupfeedbackTitle{
     font-size: 14px;
     font-weight: 600;
     margin: 0px 140px 0px 0px;

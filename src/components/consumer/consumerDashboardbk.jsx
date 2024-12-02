@@ -105,11 +105,10 @@ function ConsumerDashboard() {
       getDistancePriceList(
         distanceValue,
         (successResponse) => {
-          // console.log(successResponse[0]._response);
           setDistancePriceList(successResponse[0]._response);
         },
         (errorResponse) => {
-          console.log("errorResponse==>", "" + errorResponse[0]);
+         //
         }
       );
     };

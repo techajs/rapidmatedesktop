@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
-import { MAPS_API_KEY } from "../../utils/Constants";
+import { extractAddress, getLocation, MAPS_API_KEY } from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-} from "@fortawesome/free-solid-svg-icons";
-import {useNavigate } from "react-router-dom";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -17,19 +15,22 @@ import {
   getDistancePriceList,
 } from "../../data_manager/dataManage";
 import PickupVehicleDimensionsModal from "./PickupVehicleDimensionsModal";
-import LocationInput from "../consumer/common/LocationInput"
+import LocationInput from "../consumer/common/LocationInput";
 import DateTimePicker from "./common/DateTimePicker";
-import VehicleSelection from "./common/VehicleSelection"
+import VehicleSelection from "./common/VehicleSelection";
 import { ToastContainer } from "react-toastify";
 
-const libraries = ['places'];
+const libraries = ["places"];
 
 function ConsumerDashboard() {
   const navigate = useNavigate();
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
   const [selectedVehiclePrice, setSelectedVehiclePrice] = useState(null);
-  const [center, setCenter] = useState({lat:48.85754309772872, lng:2.3513877855537912});
+  const [center, setCenter] = useState({
+    lat: 48.85754309772872,
+    lng: 2.3513877855537912,
+  });
   const [currentLocation, setCurrentLocation] = useState(null);
   const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,21 +40,25 @@ function ConsumerDashboard() {
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const [distancePriceList, setDistancePriceList] = useState([]);
-  const [vehicleDetail,setVehicleDetail]=useState(null)
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [dropoffLocation, setDropoffLocation] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [vehicleDetail, setVehicleDetail] = useState(null);
+  const [pickupLocation, setPickupLocation] = useState("");
+  const [dropoffLocation, setDropoffLocation] = useState("");
+  const [addPickupLocation, setAddPickupLocation] = useState(null);
+  const [addDestinationLocation, setAddDestinationLocation] = useState(null);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [map, setMap] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     const getAllVehiclesType = () => {
-      getAllVehicleTypes(null,(successResponse) => {
-        if (successResponse[0]._success){
-          setLoading(false);
-          setVehicleTypeList(successResponse[0]._response);
-        }
+      getAllVehicleTypes(
+        null,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            setLoading(false);
+            setVehicleTypeList(successResponse[0]._response);
+          }
         },
         (errorResponse) => {
           setLoading(false);
@@ -83,7 +88,7 @@ function ConsumerDashboard() {
       );
     }
   }, []);
-  
+
   useEffect(() => {
     if (pickupLocation && dropoffLocation) {
       calculateRoute();
@@ -92,7 +97,7 @@ function ConsumerDashboard() {
 
   useEffect(() => {
     const getDistancePrice = () => {
-      const distanceValue = distance.replace(' km', '');
+      const distanceValue = distance.replace(" km", "");
       getDistancePriceList(
         distanceValue,
         (successResponse) => {
@@ -115,30 +120,50 @@ function ConsumerDashboard() {
     return <div>Loading map...</div>;
   }
 
+  // const calculateRoute = async () => {
+  //   if (pickupLocation && dropoffLocation) {
+  //     const directionsService = new google.maps.DirectionsService();
+  //     const results = await directionsService.route({
+  //       origin: pickupLocation,
+  //       destination: dropoffLocation,
+  //       travelMode: google.maps.TravelMode.DRIVING,
+  //     });
+
+  //     setDirectionsResponse(results);
+  //     setDistance(results.routes[0].legs[0].distance.text);
+  //     setDuration(results.routes[0].legs[0].duration.text);
+  //   }
+  // };
   const calculateRoute = async () => {
     if (pickupLocation && dropoffLocation) {
       const directionsService = new google.maps.DirectionsService();
       const results = await directionsService.route({
-        origin: pickupLocation,
-        destination: dropoffLocation,
+        origin: { lat: pickupLocation.lat, lng: pickupLocation.lng },
+        destination: { lat: dropoffLocation.lat, lng: dropoffLocation.lng },
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
+      console.log("Pickup Details:", pickupLocation);
+      const pickup = getLocation(pickupLocation,pickupLocation.lat,pickupLocation.lng)
+      setAddPickupLocation(pickup)
+      const dropoff=getLocation(dropoffLocation,dropoffLocation.lat,dropoffLocation.lng)
+      setAddDestinationLocation(dropoff)
+
     }
   };
 
   const handleContinue = () => {
     if (!pickupLocation || !dropoffLocation || !selectedVehicle) {
-      alert('Please fill all fields.');
+      alert("Please fill all fields.");
       return;
     }
 
     const payload = {
-      pickupLocation,
-      dropoffLocation,
+      addPickupLocation,
+      addDestinationLocation,
       date,
       time,
       selectedVehicle,
@@ -154,7 +179,9 @@ function ConsumerDashboard() {
   };
 
   const getPriceUsingVehicleType = (vehicleTypeId) => {
-    const result = distancePriceList.find((priceList) => priceList.vehicle_type_id === vehicleTypeId);
+    const result = distancePriceList.find(
+      (priceList) => priceList.vehicle_type_id === vehicleTypeId
+    );
     return result?.total_price || 0;
   };
 
@@ -200,9 +227,17 @@ function ConsumerDashboard() {
               zIndex: "1000",
             }}
           >
-            <button onClick={handleContinue} className={Styles.goToOrderDetails}>
-              <p className={Styles.pickuphomeContinueBt}>Continue to order details</p>
-              <FontAwesomeIcon className="pickupHome-rightArrow-icon" icon={faArrowRight} />
+            <button
+              onClick={handleContinue}
+              className={Styles.goToOrderDetails}
+            >
+              <p className={Styles.pickuphomeContinueBt}>
+                Continue to order details
+              </p>
+              <FontAwesomeIcon
+                className="pickupHome-rightArrow-icon"
+                icon={faArrowRight}
+              />
             </button>
           </div>
         </div>
@@ -237,7 +272,7 @@ function ConsumerDashboard() {
           <GoogleMap
             center={center}
             zoom={14}
-            mapContainerStyle={{ width: '100%', height: '90.5vh' }}
+            mapContainerStyle={{ width: "100%", height: "90.5vh" }}
             options={{
               zoomControl: false,
               streetViewControl: false,
@@ -246,10 +281,16 @@ function ConsumerDashboard() {
             }}
             onLoad={(map) => setMap(map)}
           >
-            {pickupLocation && <Marker position={pickupLocation} label="Pickup" />}
-            {dropoffLocation && <Marker position={dropoffLocation} label="Dropoff" />}
+            {pickupLocation && (
+              <Marker position={pickupLocation} label="Pickup" />
+            )}
+            {dropoffLocation && (
+              <Marker position={dropoffLocation} label="Dropoff" />
+            )}
             {currentLocation && <Marker position={currentLocation} />}
-            {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
+            {directionsResponse && (
+              <DirectionsRenderer directions={directionsResponse} />
+            )}
           </GoogleMap>
         </div>
       </div>

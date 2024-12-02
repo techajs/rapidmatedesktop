@@ -65,7 +65,6 @@ function OrderView() {
  const handleSaveAddress=(e)=>{
   setIsAddressAdd(!isAddressAdd)
  }
-  // console.log(dropoffDetail)
 
   return (
     <>
@@ -99,7 +98,7 @@ function OrderView() {
                       icon={faLocationDot}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                      {order?.pickupLocation}
+                      {order?.addPickupLocation?.address + ","} {order?.addPickupLocation?.city + ","+order?.addPickupLocation?.state+","+order?.addPickupLocation?.country+"-"+order?.addPickupLocation?.postal_code}
                     </p>
                   </div>
 
@@ -111,7 +110,9 @@ function OrderView() {
                       icon={faLocationCrosshairs}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                      {order?.dropoffLocation}
+                      
+                      {order?.addDestinationLocation?.address + ","} {order?.addDestinationLocation?.city + ","+order?.addDestinationLocation?.state+","+order?.addDestinationLocation?.country+"-"+order?.addDestinationLocation?.postal_code}
+
                     </p>
                   </div>
                 </div>

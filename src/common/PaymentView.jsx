@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -14,63 +14,272 @@ import {
   faPercent,
   faCheck,
   faCircleInfo,
+  faClose,
 } from "@fortawesome/free-solid-svg-icons";
-import Truck from "../assets/images/Truck.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "./CommonHeader";
 import { useSelector } from "react-redux";
 import getImage from "../components/consumer/common/GetImage";
+import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
+import { ToastContainer } from "react-toastify";
+import { showErrorToast } from "../utils/Toastify";
+import { addLocation } from "../utils/Constants";
+
 const stripePromise = loadStripe(
   "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
 );
 
-const PaymentPage = () => {
+const PaymentPage = ({
+  clientSecret,
+  totalAmount,
+  setTotalAmount,
+  paymentAmount,
+  setPaymentAmount,
+}) => {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
+  const  navigate= useNavigate();
+
   const { order, orderCustomerDetails, dropoffDetail } = location.state || {};
   const stripe = useStripe();
   const elements = useElements();
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
+  const [orderNumber, setOrderNumber] = useState(null);
+  const [offerDiscount, setOfferDiscount] = useState(order?.paymentDiscount);
+  const [promoCodeResponse, setPromoCodeResponse] = useState();
+  const [promoCode, setPromoCode] = useState("");
+  const [sourceLocationId, setSourceLocationId] = useState(null);
+  const [destinationLocationId, setDestinationLocationId] = useState(null);
+ 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setLoading(true);
     if (!stripe || !elements) return;
 
-    setLoading(true);
+    try {
+      const pickupLocatiId = addLocation(order?.addPickupLocation);
+      const dropoffLocatiId = addLocation(order?.addDestinationLocation);
+      if (pickupLocatiId=="false") {
+        showErrorToast("Something went wrong.");
+        return true;
+      }
+      if (dropoffLocatiId=="false") {
+        showErrorToast("Something went wrong.");
+        return true;
+      }
+      setSourceLocationId(pickupLocatiId);
+      setDestinationLocationId(dropoffLocatiId);
 
-    const { error } = await stripe.confirmPayment({
+      await placePickUpOrder()
+
+    } catch (error) {
+      showErrorToast(
+        error.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const placePickUpOrder = async () => {
+    if (user.userDetails) {
+      if (order.date) {
+        var scheduleParam = {
+          schedule_date_time: order?.date + " " + order?.time,
+        };
+      }
+      const distance = order?.distance;
+      const floatDistance = distance
+        ? parseFloat(distance.replace(" km", ""))
+        : 0;
+      let requestParams = {
+        consumer_ext_id: user.userDetails.ext_id,
+        service_type_id: order?.date ? 1 : 2,
+        vehicle_type_id: order?.selectedVehicleDetails.id,
+        pickup_location_id: sourceLocationId ? sourceLocationId : 1,
+        dropoff_location_id: destinationLocationId ? destinationLocationId : 2,
+        distance: floatDistance,
+        total_amount: parseFloat(paymentAmount),
+        discount: offerDiscount,
+        pickup_notes: orderCustomerDetails?.pickupNotes || "",
+        company_name: orderCustomerDetails?.company || "",
+        drop_first_name: dropoffDetail?.first_name || "",
+        drop_last_name: dropoffDetail?.last_name || "",
+        drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
+        drop_company_name: dropoffDetail?.company || "",
+        ...scheduleParam,
+      };
+
+      if (promoCodeResponse) {
+        requestParams.promo_code = promoCodeResponse.promoCode;
+        requestParams.promo_value = promoCodeResponse.discount;
+        requestParams.order_amount = parseFloat(totalAmount);
+      }
+
+      setLoading(true);
+      createPickupOrder(
+        requestParams,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            setLoading(false);
+            setOrderNumber(successResponse[0]._response[0].order_number);
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+
+          if (errorResponse.errors) {
+            err = errorResponse.errors.msg[0].msg;
+          } else {
+            err = errorResponse[0]._errors.message;
+          }
+          showErrorToast(err);
+        }
+      );
+    } else {
+      showErrorToast("Consumer extended ID missing");
+    }
+  };
+
+  const doPayment = async () => {
+    setLoading(true);
+    const { error,paymentIntent} = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "http://localhost:5173/payment-success", // Set your success page
+        payment_method_data: {
+          billing_details: {
+            name: user?.userDetails.first_name +" "+ user?.userDetails?.last_name,
+            email: user?.userDetails.email || '',
+            address: {
+              line1: order?.addPickupLocation?.address,
+              city: order?.addPickupLocation?.city,
+              postal_code: order?.addPickupLocation?.postal_code,
+              country:order?.addPickupLocation?.country,
+            }
+          }
+        }
       },
+      redirect: "if_required", 
     });
 
     if (error) {
-      setMessage(error.message);
-    } else {
+      showErrorToast(error.message);
+    }
+
+    if (paymentIntent?.status === "succeeded") {
       setMessage("Payment successful!");
+      await createPayment()
+    } else {
+      showErrorToast(`Payment not successful. Current status: ${paymentIntent?.status}`);
     }
 
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (orderNumber) {
+      doPayment();
+    }
+  }, [orderNumber]);
+
+  useEffect(() => {
+    {
+      offerDiscount > 0 &&
+        setPaymentAmount(calculateFinalPrice(paymentAmount, offerDiscount));
+    }
+    
+  }, []);
+
+  const handleApplyCoupon = () => {
+    let params = {
+      promoCode: promoCode,
+      orderAmount: paymentAmount,
+    };
+    checkPromoCode(
+      params,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          const promoResponse = successResponse[0]._response[0];
+          setPromoCodeResponse(promoResponse);
+          setPaymentAmount(successResponse[0]._response[0].totalAmount);
+        }
+      },
+      (errorResponse) => {
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
+        }
+        showErrorToast(err);
+      }
+    );
+  };
+  const calculateFinalPrice = (originalPrice, discountPercentage) => {
+    const discount = (originalPrice * discountPercentage) / 100;
+    const finalPrice = originalPrice - discount;
+    return finalPrice.toFixed(2);
+  };
+
+  const createPayment = async () => {
+    let requestParams = {
+      order_number: orderNumber,
+      amount: paymentAmount,
+    };
+    addPayment(
+      requestParams,
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._success) {
+          navigate("/consumer/find-driver", {
+            state: {
+              orderNumber
+            },
+          });
+        }
+      },
+      (errorResponse) => {
+        let params = {
+          order_number: orderNumber,
+          status: "Payment Failed",
+        };
+       showErrorToast('Payment Failed.')
+      }
+    );
+  };
+
+  const pickupLocation =
+    order?.addPickupLocation?.address +
+    "," +
+    order?.addPickupLocation?.city +
+    "," +
+    order?.addPickupLocation?.state +
+    "," +
+    order?.addPickupLocation?.country +
+    "-" +
+    order?.addPickupLocation?.postal_code;
+  const dropOffLocation =
+    order?.addDestinationLocation?.address +
+    "," +
+    order?.addDestinationLocation?.city +
+    "," +
+    order?.addDestinationLocation?.state +
+    "," +
+    order?.addDestinationLocation?.country +
+    "-" +
+    order?.addDestinationLocation?.postal_code;
+
   return (
     <>
       <CommonHeader userData={user} />
-
       <section className={Styles.addPickupDetailsSec}>
         <div className="container">
           <div className="row">
             <div className="col-md-12">
               <div>
                 <div>
-                  <Link
-                    className={`${Styles.addPickupDetailsBackArrow}`}
-                    href="#"
-                  >
+                  <Link className={Styles.addPickupDetailsBackArrow} href="#">
                     <FontAwesomeIcon icon={faArrowLeft} />
                   </Link>
                   <h2 className={Styles.addPickupDetailsText}>Payment</h2>
@@ -91,14 +300,31 @@ const PaymentPage = () => {
                           className={Styles.promoCodeInputPayment}
                           type="text"
                           placeholder="Promo code"
+                          value={promoCode}
+                          disabled={promoCodeResponse ? true : false}
+                          onChange={(e) => setPromoCode(e.target.value)}
                         />
-                        <button className={Styles.paymentApplyCouponBtn}>
-                          <FontAwesomeIcon icon={faCheck} />
-                        </button>
+                        {promoCodeResponse ? (
+                          <button
+                            className={Styles.paymentApplyCouponBtn}
+                            onClick={() => {
+                              setPromoCodeResponse(null);
+                              setPaymentAmount(totalAmount);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faClose} />
+                          </button>
+                        ) : (
+                          <button
+                            className={Styles.paymentApplyCouponBtn}
+                            onClick={handleApplyCoupon}
+                          >
+                            <FontAwesomeIcon icon={faCheck} />
+                          </button>
+                        )}
                       </div>
-
                       <p className={Styles.paymentDebitCreditCardsText}>
-                        Credi & Debit Cards
+                        Credit & Debit Cards
                       </p>
 
                       <div className={Styles.paymentsOffCreaditCardInfo}>
@@ -133,9 +359,9 @@ const PaymentPage = () => {
                             Pickup
                           </p>
                           <p className={Styles.paymentMainDetailsText}>
-                            {order?.pickupLocation?.length <= 27
-                              ? order?.pickupLocation
-                              : `${order?.pickupLocation.substring(0, 27)}...`}
+                            {pickupLocation?.length <= 27
+                              ? pickupLocation
+                              : `${pickupLocation.substring(0, 27)}...`}
                           </p>
                         </div>
 
@@ -144,10 +370,9 @@ const PaymentPage = () => {
                             Drop-off
                           </p>
                           <p className={Styles.paymentMainDetailsText}>
-                            {/* {order?.dropoffLocation} */}
-                            {order?.dropoffLocation?.length <= 27
-                              ? order?.dropoffLocation
-                              : `${order?.dropoffLocation.substring(0, 27)}...`}
+                            {dropOffLocation?.length <= 27
+                              ? dropOffLocation
+                              : `${dropOffLocation.substring(0, 27)}...`}
                           </p>
                         </div>
 
@@ -183,7 +408,7 @@ const PaymentPage = () => {
                             Total amount
                           </p>
                           <p className={Styles.paymentTotalAmounttext}>
-                            € {order?.selectedVehiclePrice?.toFixed(2) || 0.0}
+                            € {paymentAmount || 0.0}
                           </p>
                         </div>
                       </div>
@@ -195,15 +420,14 @@ const PaymentPage = () => {
                   <button className={Styles.addPickupDetailsCancelBTn}>
                     Cancel
                   </button>
-                  {/* <Link
-                    to="/pickup-looking-for-driver"
-                    className={Styles.addPickupDetailsNextBtn}
-                  >
-                    Pay Now
-                  </Link> */}
+
                   <form onSubmit={handleSubmit}>
                     <PaymentElement />
-                    <button type="submit" disabled={!stripe || loading}>
+                    <button
+                      type="submit"
+                      disabled={!stripe || loading}
+                      className={`${Styles.addPickupDetailsNextBtn} m-2`}
+                    >
                       {loading ? "Processing..." : "Pay Now"}
                     </button>
                   </form>
@@ -220,35 +444,84 @@ const PaymentPage = () => {
 
 function PaymentView() {
   const [clientSecret, setClientSecret] = useState("");
+  const { order } = useLocation().state || {};
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const  navigate= useNavigate();
 
-  React.useEffect(() => {
-    // Fetch client secret from the backend
-    fetch("http://localhost:3009/api/payment/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 10, currency: "eur" }), // Adjust amount and currency as needed
-    })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
-  }, []);
+  useEffect(() => {
+    if (order?.selectedVehiclePrice) {
+      const calculatedTotalAmount =
+        typeof order.selectedVehiclePrice === "number"
+          ? order.selectedVehiclePrice.toFixed(2)
+          : parseFloat(order.selectedVehiclePrice).toFixed(2);
+
+      setTotalAmount(calculatedTotalAmount);
+      setPaymentAmount(calculatedTotalAmount);
+    }
+    setTimeout(()=>{
+      if(!order){
+        navigate('/consumer/dashboard')
+      }
+    },2000)
+  }, [order]);
+
+  useEffect(() => {
+    if (paymentAmount > 0) {
+      const createPaymentIntent = async () => {
+        try {
+          const response = await fetch(
+            "http://localhost:3009/api/payment/create-payment-intent",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                amount: parseFloat(paymentAmount), // Convert to cents for Stripe
+                currency: "eur",
+              }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (data.clientSecret) {
+            setClientSecret(data.clientSecret);
+          } else {
+            console.error("Failed to fetch client secret:", data);
+          }
+        } catch (error) {
+          console.error("Error creating payment intent:", error);
+        }
+      };
+
+      createPaymentIntent();
+    }
+  }, [paymentAmount]);
 
   const options = {
     clientSecret,
     appearance: {
-      theme: "stripe", // Other themes: 'flat', 'night', 'none'
+      theme: "stripe",
     },
+    defaultValues: { billingDetails: { address: { country: "FR" } } },
   };
+
   return (
     <div>
       {clientSecret ? (
         <Elements stripe={stripePromise} options={options}>
-          <PaymentPage />
+          <PaymentPage
+            clientSecret={clientSecret}
+            totalAmount={totalAmount}
+            setTotalAmount={setTotalAmount}
+            paymentAmount={paymentAmount}
+            setPaymentAmount={setPaymentAmount}
+          />
         </Elements>
       ) : (
-        <>
-          <p>Loading...</p>
-        </>
+        <p>Loading...</p>
       )}
+      <ToastContainer />
     </div>
   );
 }
