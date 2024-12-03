@@ -140,23 +140,32 @@ export const getLocation = (location, lat, long) => {
 };
 
 export const addLocation = (locationParams) => {
-  
-  getLocationId(
-    locationParams,
-    (successResponse) => {
-      if (successResponse[0]._success) {
-        return successResponse[0]._response.location_id;
+  return new Promise((resolve, reject) => {
+    getLocationId(
+      locationParams,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          resolve(successResponse[0]._response.location_id);
+        } else {
+          reject("false");
+        }
+      },
+      (errorResponse) => {
+        let errorMessage = "";
+          if (errorResponse.errors && errorResponse.errors.msg) {
+            errorMessage = errorResponse.errors.msg[0].msg;
+          } else if (errorResponse[0] && errorResponse[0]._errors) {
+            errorMessage = errorResponse[0]._errors.message;
+          } else {
+            errorMessage = "Unknown error occurred.";
+          }
+          console.error("Error in addLocation:", errorMessage);
+          resolve("false");
       }
-    },
-    (errorResponse) => {
-      let err = "";
-      if (errorResponse.errors) {
-        err = errorResponse.errors.msg[0].msg;
-      } else {
-        err = errorResponse[0]._errors.message;
-      }
-
-      return "false";
-    }
-  );
+    );
+  });
 };
+
+
+
+export const buildAddress = (...parts) => parts.filter(Boolean).join(",");

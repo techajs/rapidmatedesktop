@@ -48,6 +48,7 @@ import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/
 import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
 import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
 import SearchDriver from "../common/SearchDriver";
+import LiveTracking from "../common/LiveTracking";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -147,6 +148,14 @@ function MainRoutes() {
           element={
             <ProtectedRoute requiredRole={userRole}>
               <SearchDriver />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/consumer/order-tracking`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <LiveTracking />
             </ProtectedRoute>
           }
         />

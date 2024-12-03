@@ -5,12 +5,14 @@ import { faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";
 import SadEmoji from "../../assets/images/SadFace-Emoji.png";
 import Styles from  "../../assets/css/PickupCancellationModal.module.css";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-function PickupOrderCancelled({ show, handleClose }) {
+function PickupOrderCancelled({ show, handleClose}) {
+  const navigate=useNavigate()
     const handleSaveChanges = () => {
         // Implement save changes logic here, if needed
         handleClose();
+        navigate('/consumber/dashboard')
       };
 
       return (
@@ -19,7 +21,7 @@ function PickupOrderCancelled({ show, handleClose }) {
             <Modal.Header>
               <div className={Styles.modalCancellationHeader}>
                 <p className={Styles.orderCanceledTextHead}>Order cancelled</p>
-                <FontAwesomeIcon  className={Styles.modalCloseHeaderBtn} icon={faTimes} onClick={handleClose} />
+                <FontAwesomeIcon  className={Styles.modalCloseHeaderBtn} icon={faTimes} onClick={handleSaveChanges} />
               </div>
             </Modal.Header>
             <Modal.Body>
@@ -33,7 +35,7 @@ function PickupOrderCancelled({ show, handleClose }) {
             </Modal.Body>
             <Modal.Footer>
                <div>
-                  <Link to="/consumer/pickup-ordertracking" className={Styles.cancellationModalSubmitBtn}>Ok</Link>
+                  <Link to="/consumer/dashboard" className={Styles.cancellationModalSubmitBtn}>Ok</Link>
                </div>
             </Modal.Footer>
           </Modal>

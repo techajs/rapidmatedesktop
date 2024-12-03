@@ -22,7 +22,7 @@ import { useSelector } from "react-redux";
 import getImage from "../components/consumer/common/GetImage";
 import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
-import { showErrorToast } from "../utils/Toastify";
+import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 import { addLocation } from "../utils/Constants";
 
 const stripePromise = loadStripe(
@@ -49,8 +49,8 @@ const PaymentPage = ({
   const [offerDiscount, setOfferDiscount] = useState(order?.paymentDiscount);
   const [promoCodeResponse, setPromoCodeResponse] = useState();
   const [promoCode, setPromoCode] = useState("");
-  const [sourceLocationId, setSourceLocationId] = useState(null);
-  const [destinationLocationId, setDestinationLocationId] = useState(null);
+  const [sourceLocationId, setSourceLocationId] = useState("");
+  const [destinationLocationId, setDestinationLocationId] = useState("");
  
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,8 +58,10 @@ const PaymentPage = ({
     if (!stripe || !elements) return;
 
     try {
-      const pickupLocatiId = addLocation(order?.addPickupLocation);
-      const dropoffLocatiId = addLocation(order?.addDestinationLocation);
+      const pickupLocationParam=order?.addPickupLocation
+      const dropoffLocationParam=order?.addDestinationLocation
+      const pickupLocatiId = await addLocation(pickupLocationParam);
+      const dropoffLocatiId = await addLocation(dropoffLocationParam);
       if (pickupLocatiId=="false") {
         showErrorToast("Something went wrong.");
         return true;
@@ -70,8 +72,8 @@ const PaymentPage = ({
       }
       setSourceLocationId(pickupLocatiId);
       setDestinationLocationId(dropoffLocatiId);
-
-      await placePickUpOrder()
+      console.log("locationId ",sourceLocationId)
+      
 
     } catch (error) {
       showErrorToast(
@@ -81,9 +83,22 @@ const PaymentPage = ({
       setLoading(false);
     }
   };
-
+ 
+  useEffect(() => {
+    const callPlaceOrder = async () =>{
+      console.log('sadfas')
+      await placePickUpOrder()
+    }
+    if(sourceLocationId && destinationLocationId){
+      callPlaceOrder()
+    }
+    // callPlaceOrder()
+  }, [sourceLocationId, destinationLocationId]); 
   const placePickUpOrder = async () => {
     if (user.userDetails) {
+      console.log("location Id ",sourceLocationId)
+      console.log("dropoff Id ",destinationLocationId)
+
       if (order.date) {
         var scheduleParam = {
           schedule_date_time: order?.date + " " + order?.time,
@@ -97,8 +112,8 @@ const PaymentPage = ({
         consumer_ext_id: user.userDetails.ext_id,
         service_type_id: order?.date ? 1 : 2,
         vehicle_type_id: order?.selectedVehicleDetails.id,
-        pickup_location_id: sourceLocationId ? sourceLocationId : 1,
-        dropoff_location_id: destinationLocationId ? destinationLocationId : 2,
+        pickup_location_id: sourceLocationId ||  1,
+        dropoff_location_id: destinationLocationId || 2,
         distance: floatDistance,
         total_amount: parseFloat(paymentAmount),
         discount: offerDiscount,
@@ -234,7 +249,7 @@ const PaymentPage = ({
         if (successResponse[0]._success) {
           navigate("/consumer/find-driver", {
             state: {
-              orderNumber
+              orderNumber:orderNumber
             },
           });
         }
@@ -431,7 +446,7 @@ const PaymentPage = ({
                       {loading ? "Processing..." : "Pay Now"}
                     </button>
                   </form>
-                  {message && <p>{message}</p>}
+                  {message && <p>{showSuccessToast(message)}</p>}
                 </div>
               </div>
             </div>
@@ -443,6 +458,8 @@ const PaymentPage = ({
 };
 
 function PaymentView() {
+  const user = useSelector((state) => state.auth.user);
+
   const [clientSecret, setClientSecret] = useState("");
   const { order } = useLocation().state || {};
   const [totalAmount, setTotalAmount] = useState(0);
@@ -476,7 +493,7 @@ function PaymentView() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                amount: parseFloat(paymentAmount), // Convert to cents for Stripe
+                amount: paymentAmount, // Convert to cents for Stripe
                 currency: "eur",
               }),
             }
@@ -519,7 +536,11 @@ function PaymentView() {
           />
         </Elements>
       ) : (
-        <p>Loading...</p>
+        <>
+          <CommonHeader userData={user} />
+          <p>Loading...</p>
+        </>
+       
       )}
       <ToastContainer />
     </div>
