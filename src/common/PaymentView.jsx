@@ -23,7 +23,7 @@ import getImage from "../components/consumer/common/GetImage";
 import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
-import { addLocation } from "../utils/Constants";
+import { addLocation, BASE_URL } from "../utils/Constants";
 
 const stripePromise = loadStripe(
   "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
@@ -488,7 +488,7 @@ function PaymentView() {
       const createPaymentIntent = async () => {
         try {
           const response = await fetch(
-            "http://localhost:3009/api/payment/create-payment-intent",
+            `${BASE_URL}payment/create-payment-intent`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
