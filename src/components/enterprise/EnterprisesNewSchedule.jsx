@@ -1,115 +1,104 @@
-import React from 'react'
+import React, { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
+import { useSelector } from "react-redux";
 import Styles from "../../assets/css/home.module.css";
 import ScheduleImg from "../../assets/images/schedule-calender.png";
 import OneTime from "../../assets/images/One-TimePackage.png";
 import Calender from "../../assets/images/Calender-withBg.png";
 import CalenderClock from "../../assets/images/Calender-Clock.png";
-import CommonHeader from '../../common/CommonHeader';
-import { useSelector } from 'react-redux';
+import CommonHeader from "../../common/CommonHeader";
 
 function EnterprisesNewSchedule() {
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user);
+  const { enterpriseDeliveryType } = useSelector(
+    (state) => state.commonData.commonData
+  );
+  const navigate = useNavigate();
+
+  // Memoized function for getting icons
+  const getIcon = useMemo(
+    () => (id) => {
+      switch (id) {
+        case 1:
+          return OneTime;
+        case 2:
+          return Calender;
+        case 3:
+          return CalenderClock;
+        default:
+          return OneTime;
+      }
+    },
+    []
+  );
+
+  // Navigation handler
+  const PageHandler = (serviceType) => {
+    if (!serviceType) return;
+    navigate("/enterprise/select-branch", { state: { servicetype: serviceType } });
+  };
+
   return (
     <>
-    <CommonHeader userData={user}/>
-    <section className={Styles.enterprisenewScheduleSec}>
+      <CommonHeader userData={user} />
+      <section className={Styles.enterprisenewScheduleSec}>
         <div>
           <div className={`row ${Styles.manageRow}`}>
+            {/* Left Section */}
             <div className="col-md-4">
               <div className={Styles.enterpriseNewScheduleTitleCard}>
                 <div>
-                  <h4 className={Styles.enterpriseNewScheduleText}>New schedule</h4>
+                  <h4 className={Styles.enterpriseNewScheduleText}>
+                    New Schedule
+                  </h4>
                   <p className={Styles.enterpriseNewScheduleDiscription}>
-                    Let’s create new schedule for one time or for multiple hours
+                    Let’s create a new schedule for one time or for multiple hours.
                   </p>
                 </div>
                 <div>
                   <img
                     className={Styles.enterpriseNewScheduleImg}
                     src={ScheduleImg}
-                    alt="Img"
+                    alt="Schedule Illustration"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Right Section */}
             <div className="col-md-8">
               <div className={Styles.enterpriseNewScheduletypeMainCard}>
                 <h4 className={Styles.enterpriseNewScheduleSelectType}>
                   Select the type of schedule
                 </h4>
                 <div className={Styles.enterpriseNewScheduleMainLinkCards}>
-                  <Link
-                    to="/enterprises-onetime-selectlocation"
-                    className={Styles.enterpriseNewScheduleLinkCard}
-                  >
-                    <img
-                      className={Styles.enterpriseNewScheduleOneTimeImg}
-                      src={OneTime}
-                      alt="icon"
-                    />
-                    <div>
-                      <h4 className={Styles.enterpriseNewScheduleDeliveryTitle}>
-                        One time delivery
-                      </h4>
-                      <p className={Styles.enterpriseNewScheduleDeliveryDiscription}>
-                        Avail any service for fixed time and location
-                      </p>
+                  {enterpriseDeliveryType?.map((servicetype, key) => (
+                    <div
+                      className={Styles.enterpriseNewScheduleLinkCard}
+                      key={key}
+                      onClick={() => PageHandler(servicetype)}
+                    >
+                      <img
+                        className={Styles.enterpriseNewScheduleOneTimeImg}
+                        src={getIcon(servicetype?.id)}
+                        alt={`${servicetype?.delivery_type} Icon`}
+                      />
+                      <div>
+                        <h4 className={Styles.enterpriseNewScheduleDeliveryTitle}>
+                          {servicetype?.delivery_type}
+                        </h4>
+                        <p className={Styles.enterpriseNewScheduleDeliveryDiscription}>
+                          {servicetype?.delivery_type_desc}
+                        </p>
+                      </div>
+                      <FontAwesomeIcon
+                        className={Styles.enterpriseNewScheduleRightArrow}
+                        icon={faArrowRight}
+                      />
                     </div>
-                    <FontAwesomeIcon
-                      className={Styles.enterpriseNewScheduleRightArrow}
-                      icon={faArrowRight}
-                    />
-                  </Link>
-
-                  <Link
-                    to="/enterprises-multiple-deliveries-selectlocation"
-                    className={Styles.enterpriseNewScheduleLinkCard}
-                  >
-                    <img
-                      className={Styles.enterpriseNewScheduleCalenderImg}
-                      src={Calender}
-                      alt="icon"
-                    />
-                    <div>
-                      <h4 className={Styles.enterpriseNewScheduleDeliveryTitle}>
-                        Multiple deliveries
-                      </h4>
-                      <p className={Styles.enterpriseNewScheduleDeliveryDiscription}>
-                        Repeat single delivery for multiple days
-                      </p>
-                    </div>
-                    <FontAwesomeIcon
-                      className={Styles.enterpriseNewScheduleRightArrow}
-                      icon={faArrowRight}
-                    />
-                  </Link>
-
-                  <Link
-                    to="/enterprises-createshift-selectlocation"
-                    className={Styles.enterpriseNewScheduleLinkCard}
-                  >
-                    <img
-                      className={Styles.enterpriseNewScheduleCalenderImg}
-                      src={CalenderClock}
-                      alt="icon"
-                    />
-                    <div>
-                      <h4 className={Styles.enterpriseNewScheduleDeliveryTitle}>
-                        Create shift
-                      </h4>
-                      <p className={Styles.enterpriseNewScheduleDeliveryDiscription}>
-                        Avail any service for a time slot with multiple hours
-                      </p>
-                    </div>
-                    <FontAwesomeIcon
-                      className={Styles.enterpriseNewScheduleRightArrow}
-                      icon={faArrowRight}
-                    />
-                  </Link>
+                  ))}
                 </div>
               </div>
             </div>
@@ -117,7 +106,7 @@ function EnterprisesNewSchedule() {
         </div>
       </section>
     </>
-  )
+  );
 }
 
-export default EnterprisesNewSchedule
+export default EnterprisesNewSchedule;

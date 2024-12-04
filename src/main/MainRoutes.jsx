@@ -29,6 +29,15 @@ import {
   Gifts,
   Ecommerce,
   AboutUs,
+  EnterpriseAddPickupDetails,
+  EnterpriseOrderPreview,
+  EnterpriseOneTimeSelectServiceType,
+  EnterpriseScheduleApproved,
+  EnterpriseMultipleDeliverySelectLocation,
+  EnterpriseMultipleDeliveriesSelectService,
+  DeliveryboyProfile,
+  ManageCompanyLocation,
+  SelectBranch,
 } from "../common/pages";
 import {
   Navigate,
@@ -40,13 +49,6 @@ import ProtectedRoute from "../utils/ProtectedRoute";
 import { useSelector } from "react-redux";
 import ThankPage from "../common/ThankPage";
 import RequestPending from "../common/RequestPending";
-import { elements } from "chart.js";
-import EnterpriseOneTimeSelectLocation from "../components/enterprise/EnterpriseOneTimeSelectLocation";
-import EnterpriseOneTimeSelectServiceType from "../components/enterprise/EnterpriseOneTimeSelectServiceType";
-import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseScheduleApproved";
-import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
-import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
-import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
 import SearchDriver from "../common/SearchDriver";
 import LiveTracking from "../common/LiveTracking";
 function MainRoutes() {
@@ -98,24 +100,32 @@ function MainRoutes() {
           }
         />
         <Route
-          path="/enterprises-onetime-selectlocation"
-          element={<EnterpriseOneTimeSelectLocation />}
+          path={`/enterprise/select-branch`}
+          element={<SelectBranch />}
         />
         <Route
-          path="/enterprises-onetime-selectservicetype"
+          path={`/enterprise/enterprises-onetime-selectservicetype`}
           element={<EnterpriseOneTimeSelectServiceType />}
         />
         <Route
-          path="/enterprises-schedule-approved"
+          path={`/enterprise/enterprises-schedule-approved`}
           element={<EnterpriseScheduleApproved />}
         />
         <Route
-          path="/enterprises-multiple-deliveries-selectlocation"
+          path={`/enterprise/enterprises-multiple-deliveries-selectlocation`}
           element={<EnterpriseMultipleDeliverySelectLocation />}
         />
         <Route
-          path="/enterprises-multiple-deliveries-serviceselect"
+          path={`/enterprise/enterprises-multiple-deliveries-serviceselect`}
           element={<EnterpriseMultipleDeliveriesSelectService />}
+        />
+        <Route
+          path="/enterprise/enterprises-add-pickup-details"
+          element={<EnterpriseAddPickupDetails />}
+        />
+        <Route
+          path="/enterpise/enterprises-order-preview"
+          element={<EnterpriseOrderPreview />}
         />
         {/* end here */}
         {/* consumer */}
@@ -200,6 +210,10 @@ function MainRoutes() {
           <Route
             path="delivery-profile-type"
             element={<DeliveryboyProfile />}
+          />
+          <Route
+            path="manage-company-location"
+            element={<ManageCompanyLocation />}
           />
         </Route>
         {/*deliveryboy*/}

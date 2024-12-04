@@ -175,7 +175,7 @@ a {
 }
 
 .pharmacyImmediateRequestsCard {
-  background-image: url("../images/PharmacyScheduled-DeliveriesCard.png");
+  background-image: url("../assets/images/PharmacyScheduled-DeliveriesCard.png");
   background-size: cover;
   background-position: center;
 }

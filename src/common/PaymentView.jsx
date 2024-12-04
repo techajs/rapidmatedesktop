@@ -23,7 +23,7 @@ import getImage from "../components/consumer/common/GetImage";
 import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
-import { addLocation, BASE_URL } from "../utils/Constants";
+import { addLocation, BASE_URL, uploadImage } from "../utils/Constants";
 
 const stripePromise = loadStripe(
   "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
@@ -51,6 +51,7 @@ const PaymentPage = ({
   const [promoCode, setPromoCode] = useState("");
   const [sourceLocationId, setSourceLocationId] = useState("");
   const [destinationLocationId, setDestinationLocationId] = useState("");
+  const [packageImageId, setPackageImageId] = useState(null);
  
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -72,9 +73,10 @@ const PaymentPage = ({
       }
       setSourceLocationId(pickupLocatiId);
       setDestinationLocationId(dropoffLocatiId);
-      console.log("locationId ",sourceLocationId)
-      
-
+      const passportFormData = new FormData();
+      passportFormData.append("file", orderCustomerDetails?.file[0]);
+      const passportResponse = await uploadImage(passportFormData);
+      setPackageImageId(passportResponse);
     } catch (error) {
       showErrorToast(
         error.message || "Something went wrong. Please try again."
@@ -86,18 +88,15 @@ const PaymentPage = ({
  
   useEffect(() => {
     const callPlaceOrder = async () =>{
-      console.log('sadfas')
       await placePickUpOrder()
     }
-    if(sourceLocationId && destinationLocationId){
+    if(sourceLocationId && destinationLocationId && packageImageId){
       callPlaceOrder()
     }
     // callPlaceOrder()
-  }, [sourceLocationId, destinationLocationId]); 
+  }, [sourceLocationId, destinationLocationId,packageImageId]); 
   const placePickUpOrder = async () => {
     if (user.userDetails) {
-      console.log("location Id ",sourceLocationId)
-      console.log("dropoff Id ",destinationLocationId)
 
       if (order.date) {
         var scheduleParam = {
@@ -122,6 +121,7 @@ const PaymentPage = ({
         drop_first_name: dropoffDetail?.first_name || "",
         drop_last_name: dropoffDetail?.last_name || "",
         drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
+        package_photo:packageImageId,
         drop_company_name: dropoffDetail?.company || "",
         ...scheduleParam,
       };

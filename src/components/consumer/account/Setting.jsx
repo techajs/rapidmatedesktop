@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/authSlice";
 import localforage from "localforage";
 function Setting() {
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   const location = useLocation();
   const currentPath = location.pathname;
   const dispatch = useDispatch();
@@ -64,43 +64,47 @@ function Setting() {
                     Address book
                   </Link>
                 </div>
-                {/* <div
-                  className={`${Styles.pickupAccountSideNavBtns} ${
-                    currentPath.includes("delivery-profile-type")
-                      ? Styles.active
-                      : ""
-                  }`}
-                >
-                  <Link
-                    to="delivery-profile-type"
-                    className={`${Styles.pickupAccountNavLinkText} ${
-                      currentPath.includes("delivery-profile-type")
-                        ? Styles.activeLink
-                        : ""
-                    }`}
-                  >
-                    Delivery Preferance
-                  </Link>
-                </div> */}
 
-                <div
-                  className={`${Styles.pickupAccountSideNavBtns} ${
-                    currentPath.includes("pickup-payment-methods")
-                      ? Styles.active
-                      : ""
-                  }`}
-                >
-                  <Link
-                    to="pickup-payment-methods"
-                    className={`${Styles.pickupAccountNavLinkText} ${
-                      currentPath.includes("pickup-payment-methods")
-                        ? Styles.activeLink
+                {user?.userDetails?.role == "DELIVERY_BOY" && (
+                  <div
+                    className={`${Styles.pickupAccountSideNavBtns} ${
+                      currentPath.includes("delivery-profile-type")
+                        ? Styles.active
                         : ""
                     }`}
                   >
-                    Wallets
-                  </Link>
-                </div>
+                    <Link
+                      to="delivery-profile-type"
+                      className={`${Styles.pickupAccountNavLinkText} ${
+                        currentPath.includes("delivery-profile-type")
+                          ? Styles.activeLink
+                          : ""
+                      }`}
+                    >
+                      Delivery Preferance
+                    </Link>
+                  </div>
+                )}
+                {user?.userDetails?.role == "ENTERPRISE" && (
+                  <div
+                    className={`${Styles.pickupAccountSideNavBtns} ${
+                      currentPath.includes("delivery-profile-type")
+                        ? Styles.active
+                        : ""
+                    }`}
+                  >
+                    <Link
+                      to="manage-company-location"
+                      className={`${Styles.pickupAccountNavLinkText} ${
+                        currentPath.includes("manage-company-location")
+                          ? Styles.activeLink
+                          : ""
+                      }`}
+                    >
+                      Manager company locations
+                    </Link>
+                  </div>
+                )}
 
                 {user?.userDetails?.role !== "DELIVERY_BOY" && (
                   <div
@@ -122,7 +126,24 @@ function Setting() {
                     </Link>
                   </div>
                 )}
-
+                <div
+                  className={`${Styles.pickupAccountSideNavBtns} ${
+                    currentPath.includes("pickup-payment-methods")
+                      ? Styles.active
+                      : ""
+                  }`}
+                >
+                  <Link
+                    to="pickup-payment-methods"
+                    className={`${Styles.pickupAccountNavLinkText} ${
+                      currentPath.includes("pickup-payment-methods")
+                        ? Styles.activeLink
+                        : ""
+                    }`}
+                  >
+                    Wallets
+                  </Link>
+                </div>
                 <div
                   className={`${Styles.pickupAccountSideNavBtns} ${
                     currentPath.includes("pickup-change-password")

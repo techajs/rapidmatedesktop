@@ -6,6 +6,7 @@ import {
   faArrowLeft,
   faGear,
   faDownload,
+  faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
 import Driver from "../../assets/images/Driver-Image.jpeg";
 import PackageDrop from "../../assets/images/PackageDrop.png";
@@ -129,7 +130,11 @@ function OrderDetail() {
                     </h4>
                   </div>
                   <p className={Styles.pickupDevliveryDetailVehicleNumber}>
-                    VOLVO FH16 2022
+                  <Link to={'#'}  className={Styles.pickupDeliveryDetailDownloadIcon}>
+                  <FontAwesomeIcon className={Styles.pickupHomeLocationIcon} icon={faLocationCrosshairs} />
+                  </Link>
+                  
+
                   </p>
                 </div>
 
