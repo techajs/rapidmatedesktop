@@ -16,15 +16,19 @@ import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
 import { showErrorToast } from "../../utils/Toastify";
 import { ToastContainer } from "react-toastify";
-import EnterpriseSelectServiceDatePicker from "./common/EnterpriseSelectServiceDatePicker";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { TimePicker } from "react-time-picker";
+import "react-time-picker/dist/TimePicker.css";
+import { useSelector } from "react-redux";
 
 const EnterpriseAddPickupDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = UseFetch();
+  const user = useSelector((state) => state.auth.user);
   const { order } = location.state || {};
 
-  const [selectCheckOption, setSelectedCheckOption] = useState();
+  const [selectCheckOption, setSelectedCheckOption] = useState("custom");
   const [repeatOrder, setRepeatOrder] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Daily");
   const [selectedDays, setSelectedDays] = useState({
@@ -55,7 +59,7 @@ const EnterpriseAddPickupDetails = () => {
   const FILE_SIZE = 2 * 1024 * 1024; // 2MB
   const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "application/pdf"];
   const schema = yup.object().shape({
-    company: yup.string(),
+    company: yup.string().required("Company name is required"),
     packageId: yup
       .string()
       .required("Package id is required")
@@ -81,23 +85,27 @@ const EnterpriseAddPickupDetails = () => {
       }),
     dropoffnote: yup.string(),
     dcompany: yup.string(),
-    demail: yup.string().when("selectCheckOption", {
-      is: (value) => value === "custom",
-      then: (schema) =>
-        schema
-          .required("Email is required")
-          .email("Please enter a valid email"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    dphoneNumber: yup.string().when("selectCheckOption", {
-      is: (value) => value === "custom",
-      then: (schema) =>
-        schema
-          .required("Phone number is required")
-          .matches(/^\d+$/, "Phone number should contain only digits")
-          .min(8, "Phone number must be at least 8 digits"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+    dname: yup
+      .string()
+      .required("Name is required")
+      .min(3, "Name must be at least 3 characters long"),
+    dlastname: yup
+      .string()
+      .required("Last name is required")
+      .min(2, "Last name must be at least 2 characters long"),
+    demail: yup
+      .string()
+      .required("Email is required")
+      .email("Please enter a valid email"),
+    dphoneNumber: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\d+$/, "Phone number should contain only digits")
+      .min(8, "Phone number must be at least 8 digits"),
+    pickupDate: yup.date(),
+    pickupTime: yup
+      .string()
+      .matches(/^([0-9]{2}):([0-9]{2})$/, "Please enter a valid time (HH:MM)"),
   });
   const handleCheckboxChange = (event) => {
     const seletedValue = event.target.value;
@@ -106,9 +114,10 @@ const EnterpriseAddPickupDetails = () => {
   };
 
   const defaultEmail = user?.userDetails?.email || "";
+  const defaultCompany = user?.userDetails?.company_name || "";
   const defaultPhone = user?.userDetails?.phone.replace("+", "") || "";
   const [imagePreview, setImagePreview] = useState(null);
-
+  const [time, setTime] = useState("10:00");
   const {
     control,
     handleSubmit,
@@ -146,7 +155,7 @@ const EnterpriseAddPickupDetails = () => {
       setValue("dropoffdetail", false);
     }
 
-    navigate("/enterprises-order-preview", {
+    navigate("/enterprise/order-preview", {
       state: {
         order: order,
         orderCustomerDetails: data,
@@ -199,7 +208,7 @@ const EnterpriseAddPickupDetails = () => {
                       <Controller
                         name="company"
                         control={control}
-                        defaultValue=""
+                        defaultValue={defaultCompany}
                         render={({ field }) => (
                           <input
                             {...field}
@@ -227,9 +236,7 @@ const EnterpriseAddPickupDetails = () => {
                       <Controller
                         name="email"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultEmail : " "
-                        }
+                        defaultValue={defaultEmail}
                         render={({ field }) => (
                           <input
                             {...field}
@@ -257,9 +264,7 @@ const EnterpriseAddPickupDetails = () => {
                       <Controller
                         name="phoneNumber"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultPhone : " "
-                        }
+                        defaultValue={defaultPhone}
                         render={({ field: { onChange, value } }) => (
                           <PhoneInput
                             country={"fr"}
@@ -410,24 +415,64 @@ const EnterpriseAddPickupDetails = () => {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div style={{ padding: 10 }}>
-                      <p className={Styles.enterpriseSelectServicePickupDate}>
-                        Pickup date
-                      </p>
-                      <div className={Styles.enterpriseSelectServiceDateCard}>
-                        <EnterpriseSelectServiceDatePicker mode="date" />
-                      </div>
+                    <div className={Styles.addPickupDetailsInputs}>
+                      <label
+                        htmlFor="pickupDate"
+                        className={Styles.enterpriseSelectServicePickupDate}
+                      >
+                        Pickup Date:
+                      </label>
+                      <Controller
+                        name="pickupDate"
+                        control={control}
+                        render={({ field }) => (
+                          <DatePicker
+                            {...field}
+                            selected={field.value}
+                            onChange={field.onChange}
+                            dateFormat="dd/MM/yyyy"
+                            className={Styles.enterpriseSelectServiceDateCard}
+                            placeholderText="Select date"
+                          />
+                        )}
+                      />
+                      {errors.pickupDate && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.pickupDate.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="col-md-6">
-                    <div style={{ padding: 10 }}>
-                      <p className={Styles.enterpriseSelectServicePickupDate}>
-                        Pickup time
-                      </p>
-                      <div className={Styles.enterpriseSelectServiceTimeCard}>
-                        <EnterpriseSelectServiceDatePicker mode="time" />
-                      </div>
+                    <div className={Styles.addPickupDetailsInputs}>
+                      <label
+                        htmlFor="pickupTime"
+                        className={Styles.addPickupDetailFormLabels}
+                      >
+                        Pickup Time:
+                      </label>
+                      <Controller
+                        name="pickupTime"
+                        control={control}
+                        render={({ field }) => (
+                          <TimePicker
+                            {...field}
+                            value={time}
+                            onChange={(newTime) => {
+                              setTime(newTime);
+                              field.onChange(newTime);
+                            }}
+                            className={Styles.timePicker}
+                            disableClock={true}
+                          />
+                        )}
+                      />
+                      {errors.pickupTime && (
+                        <p style={{ color: "red", fontSize: "13px" }}>
+                          {errors.pickupTime.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -915,31 +960,7 @@ const EnterpriseAddPickupDetails = () => {
                     alignItems: "center",
                     justifyContent: "space-start",
                   }}
-                >
-                  {["same of above", "custom"].map((label, index) => (
-                    <div key={`radio-${index}`} className="mb-3 me-3">
-                      <input
-                        type="checkbox"
-                        name={label}
-                        value={label}
-                        checked={selectCheckOption === label}
-                        onChange={handleCheckboxChange}
-                        className={Styles.addPickupDetailRadioBtn}
-                      />
-                      <label
-                        htmlFor={`checkbox-${index}`}
-                        style={{ paddingLeft: "8px" }}
-                      >
-                        {label}
-                      </label>
-                      {errors[label] && (
-                        <p style={{ color: "red", fontSize: "13px" }}>
-                          {errors[label].message}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                ></div>
                 {selectCheckOption == "custom" && (
                   <div className={`row ${Styles.manageRow}`}>
                     <div className="col-md-6">

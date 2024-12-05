@@ -492,29 +492,6 @@ const AddPickupDetails = () => {
                     justifyContent: "space-start",
                   }}
                 >
-                  {/* {["same of above", "custom"].map((label, index) => (
-                    <div key={`radio-${index}`} className="mb-3 me-3">
-                      <input
-                        type="checkbox"
-                        name={label}
-                        value={label}
-                        checked={selectCheckOption === label}
-                        onChange={handleCheckboxChange}
-                        className={Styles.addPickupDetailRadioBtn}
-                      />
-                      <label
-                        htmlFor={`checkbox-${index}`}
-                        style={{ paddingLeft: "8px" }}
-                      >
-                        {label}
-                      </label>
-                      {errors[label] && (
-                        <p style={{ color: "red", fontSize: "13px" }}>
-                          {errors[label].message}
-                        </p>
-                      )}
-                    </div>
-                  ))} */}
                 </div>
                 {selectCheckOption == "custom" && (
                   <div className={`row ${Styles.manageRow}`}>

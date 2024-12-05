@@ -32,26 +32,7 @@ function OrderView() {
   const user = useSelector((state)=>state.auth.user)
   const submitHandler = async (e) => {
     e.preventDefault();
-    // let photo = {
-    //   uri: URL.createObjectURL(orderCustomerDetails?.file[0]),
-    //   type: orderCustomerDetails?.file[0]?.type,
-    //   name: orderCustomerDetails?.file[0]?.name,
-    // };
-    // const passportFormData = new FormData();
-    //   passportFormData.append("file", orderCustomerDetails?.file[0]);
-    //   const passportResponse = await uploadImage(passportFormData);
-    // formdata.append('file', orderCustomerDetails?.file[0]);
-    // setLoading(true);
-    // uploadDocumentsApi(
-    //   formdata,
-    //   successResponse => {
-    //     setLoading(false);
-    //     setPackageImageId(JSON.parse(successResponse).id);
-    //   },
-    //   errorResponse => {
-    //     setLoading(false);
-    //   },
-    // );
+    
     navigate("/consumer/payment", {
       state: {
         order,

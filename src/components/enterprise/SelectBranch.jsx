@@ -72,8 +72,7 @@ const SelectBranch = () => {
       showErrorToast('Undefined branch')
       return 
     }
-    console.log('branch',branch)
-    navigate('/enterprise/enterprises-onetime-selectservicetype')
+    navigate(`/enterprise/${serviceType?.delivery_type?.toLowerCase().replace(/ /g, '-')}`, { state: { selectedBranch: branch,serviceType:serviceType } })
   }
   return (
     <>

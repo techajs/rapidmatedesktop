@@ -31,7 +31,7 @@ import {
   AboutUs,
   EnterpriseAddPickupDetails,
   EnterpriseOrderPreview,
-  EnterpriseOneTimeSelectServiceType,
+  OneTimeAndMultipleOrder,
   EnterpriseScheduleApproved,
   EnterpriseMultipleDeliverySelectLocation,
   EnterpriseMultipleDeliveriesSelectService,
@@ -104,8 +104,12 @@ function MainRoutes() {
           element={<SelectBranch />}
         />
         <Route
-          path={`/enterprise/enterprises-onetime-selectservicetype`}
-          element={<EnterpriseOneTimeSelectServiceType />}
+          path={`/enterprise/one-time-delivery`}
+          element={<OneTimeAndMultipleOrder />}
+        />
+        <Route
+          path={`/enterprise/multiple-deliveries`}
+          element={<OneTimeAndMultipleOrder />}
         />
         <Route
           path={`/enterprise/enterprises-schedule-approved`}
@@ -120,11 +124,11 @@ function MainRoutes() {
           element={<EnterpriseMultipleDeliveriesSelectService />}
         />
         <Route
-          path="/enterprise/enterprises-add-pickup-details"
+          path="/enterprise/add-pickup-details"
           element={<EnterpriseAddPickupDetails />}
         />
         <Route
-          path="/enterpise/enterprises-order-preview"
+          path="/enterprise/order-preview"
           element={<EnterpriseOrderPreview />}
         />
         {/* end here */}
@@ -138,7 +142,7 @@ function MainRoutes() {
           }
         />
         <Route
-          path={`/${baseUrl}/order-preview`}
+          path={`/consumer/order-preview`}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <OrderView />

@@ -5,6 +5,7 @@ import getImage from "../../consumer/common/GetImage";
 import { showErrorToast } from "../../../utils/Toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle, faCircleDot } from "@fortawesome/free-regular-svg-icons";
+import { useSelector } from "react-redux";
 
 const ServiceTypeSelection = ({
   vehicleTypeList,
@@ -16,14 +17,16 @@ const ServiceTypeSelection = ({
   setSelectedVehiclePrice,
   openModal,
   dropoffLocation,
+  selectedServiceType, 
+  setSelectedServiceType,
+  enterpriseServiceType,
 }) => {
-  const [selectedServiceType, setSelectedServiceType] = useState("");
-
+  
   const handleServiceTypeClick = (serviceType, vehicleMatch) => {
-    setSelectedServiceType(serviceType);
-    if (vehicleMatch) {
+    
+    if (serviceType===1) {
       const vehicle = vehicleTypeList.find(
-        (v) => v.vehicle_type === vehicleMatch
+        (v) => v.id === vehicleMatch
       );
       if (vehicle) {
         if (dropoffLocation !== "") {
@@ -33,10 +36,14 @@ const ServiceTypeSelection = ({
           setSelectedVehiclePrice(price);
         } else {
           showErrorToast("Please select a pickup and dropoff location.");
+          return 
         }
       }
-    }
-  };
+      
+
+    };
+    setSelectedServiceType(serviceType);
+  }
 
   return (
     <>
@@ -45,95 +52,23 @@ const ServiceTypeSelection = ({
       </p>
 
       {/* Delivery Boy with Scooter */}
-      <div
-        className={Styles.enterpriseselectServicesOptionCard}
-        onClick={() => handleServiceTypeClick("Delivery boy with scooter", "Scooter")} // Replace "Scooter" with the exact vehicle_type in your list
-      >
-        <FontAwesomeIcon
-          className={Styles.enterpriseSelectServiceTypeCricle}
-          icon={
-            selectedServiceType === "Delivery boy with scooter"
-              ? faCircleDot
-              : faCircle
-          }
-          style={{
-            color:
-              selectedServiceType === "Delivery boy with scooter"
-                ? "red"
-                : "black",
-          }}
-        />
-        <p className={Styles.enterpriseSelectServiceTypeText}>
-          Delivery boy with scooter
-        </p>
-      </div>
 
-      {/* Delivery Boy without Scooter */}
-      <div
-        className={Styles.enterpriseselectServicesOptionCard}
-        onClick={() =>
-          handleServiceTypeClick("Delivery boy without scooter")
-        }
-      >
-        <FontAwesomeIcon
-          className={Styles.enterpriseSelectServiceTypeCricle}
-          icon={
-            selectedServiceType === "Delivery boy without scooter"
-              ? faCircleDot
-              : faCircle
-          }
-          style={{
-            color:
-              selectedServiceType === "Delivery boy without scooter"
-                ? "red"
-                : "black",
-          }}
-        />
-        <p className={Styles.enterpriseSelectServiceTypeText}>
-          Delivery boy without scooter
-        </p>
-      </div>
-
-      {/* Multi-task Employee */}
-      <div
-        className={Styles.enterpriseselectServicesOptionCard}
-        onClick={() => handleServiceTypeClick("Multi-task employee")}
-      >
-        <FontAwesomeIcon
-          className={Styles.enterpriseSelectServiceTypeCricle}
-          icon={
-            selectedServiceType === "Multi-task employee"
-              ? faCircleDot
-              : faCircle
-          }
-          style={{
-            color:
-              selectedServiceType === "Multi-task employee" ? "red" : "black",
-          }}
-        />
-        <p className={Styles.enterpriseSelectServiceTypeText}>
-          Multi-task employee
-        </p>
-      </div>
-
-      {/* Cleaning Staff */}
-      <div
-        className={Styles.enterpriseselectServicesOptionCard}
-        onClick={() => handleServiceTypeClick("Cleaning staff")}
-      >
-        <FontAwesomeIcon
-          className={Styles.enterpriseSelectServiceTypeCricle}
-          icon={
-            selectedServiceType === "Cleaning staff" ? faCircleDot : faCircle
-          }
-          style={{
-            color: selectedServiceType === "Cleaning staff" ? "red" : "black",
-          }}
-        />
-        <p className={Styles.enterpriseSelectServiceTypeText}>
-          Cleaning staff
-        </p>
-      </div>
+      {enterpriseServiceType?.map((item, key) => (
+        <div
+          className={Styles.enterpriseselectServicesOptionCard}
+          onClick={() =>handleServiceTypeClick(item?.id, 2)} 
+          key={key}
+        >
+          <FontAwesomeIcon
+            className={Styles.enterpriseSelectServiceTypeCricle}
+            icon={selectedServiceType === item?.id  ? faCircleDot : faCircle}
+            style={{color:selectedServiceType === item?.id ? "red" : "black",}}
+          />
+          <p className={Styles.enterpriseSelectServiceTypeText}>
+            {item?.service_type}
+          </p>
+        </div>
+      ))}
 
       {/* Vehicle Selection Section */}
       <div className={Styles.homePickupVehicleCardMain}>
@@ -155,7 +90,7 @@ const ServiceTypeSelection = ({
                     : ""
                 }`}
                 onClick={() => {
-                  if (selectedServiceType === "Delivery boy with scooter") {
+                  if (selectedServiceType ===1) {
                     showErrorToast(
                       "Cannot select another vehicle with this service type."
                     );
@@ -167,7 +102,9 @@ const ServiceTypeSelection = ({
                     const price = getPriceUsingVehicleType(vehicle.id);
                     setSelectedVehiclePrice(price);
                   } else {
-                    showErrorToast("Please select a pickup and dropoff location.");
+                    showErrorToast(
+                      "Please select a pickup and dropoff location."
+                    );
                   }
                 }}
               >

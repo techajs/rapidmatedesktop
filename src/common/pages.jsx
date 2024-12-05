@@ -49,7 +49,6 @@ import PickupPaymentMethods from "../components/consumer/account/PickupPaymentMe
 import PickupChangePassword from "../components/consumer/account/PickupChangePassword"
 import PastOrder from "../components/consumer/PastOrder";
 import SelectBranch from "../components/enterprise/SelectBranch";
-import EnterpriseOneTimeSelectServiceType from "../components/enterprise/EnterpriseOneTimeSelectServiceType";
 import EnterpriseScheduleApproved from "../components/enterprise/EnterpriseScheduleApproved";
 import EnterpriseMultipleDeliveriesSelectService from "../components/enterprise/EnterpriseMultipleDeliveriesSelectService";
 import EnterpriseMultipleDeliverySelectLocation from "../components/enterprise/EnterpriseMultipleDeliverySelectLocation";
@@ -57,6 +56,7 @@ import EnterpriseAddPickupDetails from "../components/enterprise/EnterpriseAddPi
 import EnterpriseOrderPreview from "../components/enterprise/common/EnterpriseOrderPreview";
 import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
 import ManageCompanyLocation from "../components/consumer/account/ManageCompanyLocation"
+import OneTimeAndMultipleOrder from "../components/enterprise/oneTimeAndMultipleOrder"
 export {
     Home,
     HomeHeader,
@@ -109,7 +109,7 @@ export {
     PickupPaymentMethods,
     PickupChangePassword,
     SelectBranch,
-    EnterpriseOneTimeSelectServiceType,
+    OneTimeAndMultipleOrder,
     EnterpriseScheduleApproved,
     EnterpriseMultipleDeliveriesSelectService,
     EnterpriseMultipleDeliverySelectLocation,

@@ -120,20 +120,6 @@ function ConsumerDashboard() {
     return <div>Loading map...</div>;
   }
 
-  // const calculateRoute = async () => {
-  //   if (pickupLocation && dropoffLocation) {
-  //     const directionsService = new google.maps.DirectionsService();
-  //     const results = await directionsService.route({
-  //       origin: pickupLocation,
-  //       destination: dropoffLocation,
-  //       travelMode: google.maps.TravelMode.DRIVING,
-  //     });
-
-  //     setDirectionsResponse(results);
-  //     setDistance(results.routes[0].legs[0].distance.text);
-  //     setDuration(results.routes[0].legs[0].duration.text);
-  //   }
-  // };
   const calculateRoute = async () => {
     if (pickupLocation && dropoffLocation) {
       const directionsService = new google.maps.DirectionsService();

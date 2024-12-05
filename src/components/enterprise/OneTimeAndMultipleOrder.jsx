@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
-import { MAPS_API_KEY } from "../../utils/Constants";
+import { buildAddress, MAPS_API_KEY } from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -15,40 +15,49 @@ import {
   getDistancePriceList,
 } from "../../data_manager/dataManage";
 import PickupVehicleDimensionsModal from "../consumer/PickupVehicleDimensionsModal";
-import LocationInput from "../consumer/common/LocationInput";
 import CommonHeader from "../../common/CommonHeader";
 import { ToastContainer } from "react-toastify";
 import ServiceTypeSelection from "./common/ServiceTypeSelection";
 import { useSelector } from "react-redux";
+import LocationInputs from "./common/LocationInputs";
+import { showErrorToast } from "../../utils/Toastify";
 
 const libraries = ["places"];
 
-function EnterpriseOneTimeSelectServiceType() {
+function OneTimeAndMultipleOrder() {
   const navigate = useNavigate();
+  const location = useLocation()
+  const {serviceType,selectedBranch}=location.state
   const user = useSelector((state)=>state.auth.user)
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
   const [selectedVehiclePrice, setSelectedVehiclePrice] = useState(null);
   const [center, setCenter] = useState({
-    lat: 48.85754309772872,
-    lng: 2.3513877855537912,
+    lat: parseFloat(selectedBranch.latitude),
+    lng: parseFloat(selectedBranch.longitude),
   });
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState();
   const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const [distancePriceList, setDistancePriceList] = useState([]);
   const [vehicleDetail, setVehicleDetail] = useState(null);
-  const [pickupLocation, setPickupLocation] = useState("");
+  const [pickupLocation, setPickupLocation] = useState({
+    address:buildAddress(selectedBranch?.address,selectedBranch?.city,selectedBranch?.state,selectedBranch?.country,selectedBranch?.postal_code),
+    ...center
+  });
   const [dropoffLocation, setDropoffLocation] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [map, setMap] = useState(null);
-
+  const [selectedServiceType, setSelectedServiceType] = useState("");
+  const { enterpriseServiceType } = useSelector(
+    (state) => state.commonData.commonData
+  );
+  
   useEffect(() => {
     setLoading(true);
     const getAllVehiclesType = () => {
@@ -68,7 +77,7 @@ function EnterpriseOneTimeSelectServiceType() {
           } else {
             err = errorResponse[0]._errors.message;
           }
-          setErrorMessage(err);
+          showErrorToast(err);
         }
       );
     };
@@ -87,6 +96,8 @@ function EnterpriseOneTimeSelectServiceType() {
         }
       );
     }
+   
+    
   }, []);
 
   useEffect(() => {
@@ -136,24 +147,25 @@ function EnterpriseOneTimeSelectServiceType() {
   };
 
   const handleContinue = () => {
-    if (!pickupLocation || !dropoffLocation || !selectedVehicle) {
-      alert("Please fill all fields.");
+    if (!pickupLocation || !dropoffLocation || !selectedVehicle || !selectedServiceType) {
+      showErrorToast("Please fill all fields.");
       return;
     }
 
     const payload = {
       pickupLocation,
       dropoffLocation,
-      date,
-      time,
       selectedVehicle,
       distance,
       duration,
       selectedVehicleDetails,
       selectedVehiclePrice,
+      selectedServiceType,
+      selectedBranch,
+      serviceType,
     };
 
-    navigate("/enterprise/enterprises-add-pickup-details", {
+    navigate("/enterprise/add-pickup-details", {
       state: { order: payload },
     });
   };
@@ -178,10 +190,12 @@ function EnterpriseOneTimeSelectServiceType() {
           <div className="col-md-3">
             <div className={Styles.requestPickupMaincard}>
               <p className={Styles.pickupRequestText}>Request a Pick up!</p>
-              <LocationInput
+              <LocationInputs
                 setPickupLocation={setPickupLocation}
                 setDropoffLocation={setDropoffLocation}
+                pickupLocation={pickupLocation}
                 calculateRoute={calculateRoute}
+                isPickupDisabled={true}
               />
 
               <ServiceTypeSelection
@@ -194,6 +208,9 @@ function EnterpriseOneTimeSelectServiceType() {
                 getPriceUsingVehicleType={getPriceUsingVehicleType}
                 openModal={openModal}
                 dropoffLocation={dropoffLocation}
+                selectedServiceType={selectedServiceType}
+                setSelectedServiceType={setSelectedServiceType}
+                enterpriseServiceType={enterpriseServiceType}
               />
             </div>
 
@@ -287,4 +304,4 @@ function EnterpriseOneTimeSelectServiceType() {
   );
 }
 
-export default EnterpriseOneTimeSelectServiceType;
+export default OneTimeAndMultipleOrder;
