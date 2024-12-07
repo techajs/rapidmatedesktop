@@ -57,6 +57,8 @@ import Order from "../components/enterprise/Order";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
+  
+ 
   return (
     <Router>
       <Routes>
@@ -256,7 +258,7 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         />
-        {/* <Route path="*" element={<Navigate to="/" />} /> */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );

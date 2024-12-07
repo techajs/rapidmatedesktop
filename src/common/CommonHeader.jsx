@@ -22,6 +22,7 @@ import {
   enterpriseRoute,
   consumerRoute,
 } from "../utils/RoutePath";
+import { persistor } from "../redux/store";
 
 const CommonHeader = ({ userData }) => {
   const { userDetails, userInfo } = { ...userData };
@@ -30,9 +31,15 @@ const CommonHeader = ({ userData }) => {
   const dispatch = useDispatch();
   const { isAuthenticated, role } = useSelector((state) => state.auth);
   const baseUrl = role?.toLowerCase().replace(/_/g, "");
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(logout());
-    localforage.clear();
+    try {
+      await localforage.clear();
+      await persistor.purge();
+      console.log("LocalForage cleared");
+    } catch (error) {
+      console.error("Failed to clear LocalForage:", error);
+    }
     navigate("/");
   };
   const openModal = () => {

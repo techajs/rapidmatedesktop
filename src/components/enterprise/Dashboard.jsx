@@ -237,15 +237,16 @@ function CommonDashboard() {
   };
 
   useEffect(() => {
-    if (!bookings || bookings === "") {
+    if (!bookings || branches.length ==0) {
       getBookingList();
+      
     }
     getEnterprisePlans(currentDate);
     if (branches) {
       // console.log('chatdat',chartData)
       displayChartData(branches[0]);
     }
-    getLocationsData();
+    
   }, [user,currentDate]);
 
   const branchList = branches?.map((item, index) => ({
