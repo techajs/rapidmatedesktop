@@ -31,13 +31,14 @@ import {
   AboutUs,
   EnterpriseAddPickupDetails,
   EnterpriseOrderPreview,
-  OneTimeAndMultipleOrder,
+  MultipleDelivery,
   EnterpriseScheduleApproved,
   EnterpriseMultipleDeliverySelectLocation,
   EnterpriseMultipleDeliveriesSelectService,
   DeliveryboyProfile,
   ManageCompanyLocation,
   SelectBranch,
+  EnterprisePaymentView,
 } from "../common/pages";
 import {
   Navigate,
@@ -51,6 +52,8 @@ import ThankPage from "../common/ThankPage";
 import RequestPending from "../common/RequestPending";
 import SearchDriver from "../common/SearchDriver";
 import LiveTracking from "../common/LiveTracking";
+import OneTimeDelivery from "../components/enterprise/OneTimeDelivery";
+import Order from "../components/enterprise/Order";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -105,11 +108,11 @@ function MainRoutes() {
         />
         <Route
           path={`/enterprise/one-time-delivery`}
-          element={<OneTimeAndMultipleOrder />}
+          element={<OneTimeDelivery />}
         />
         <Route
           path={`/enterprise/multiple-deliveries`}
-          element={<OneTimeAndMultipleOrder />}
+          element={<MultipleDelivery />}
         />
         <Route
           path={`/enterprise/enterprises-schedule-approved`}
@@ -150,10 +153,18 @@ function MainRoutes() {
           }
         />
         <Route
-          path={`/${baseUrl}/payment`}
+          path={`/consumer/payment`}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <PaymentView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/enterprise/payment`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <EnterprisePaymentView />
             </ProtectedRoute>
           }
         />
@@ -174,10 +185,18 @@ function MainRoutes() {
           }
         />
         <Route
-          path={`/${baseUrl}/past-order`}
+          path={`/consumer/orders`}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <PastOrder />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/enterprise/orders`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <Order />
             </ProtectedRoute>
           }
         />

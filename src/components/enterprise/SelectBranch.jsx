@@ -49,8 +49,6 @@ const SelectBranch = () => {
         showErrorToast(errorResponse[0]._errors.message);
       }
     );
-
-    console.log('etest',enterpriseBranch)
   };
 
 

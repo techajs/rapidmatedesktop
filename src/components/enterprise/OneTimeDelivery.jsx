@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
-import { buildAddress, MAPS_API_KEY } from "../../utils/Constants";
+import { buildAddress, getLocation, MAPS_API_KEY } from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -21,10 +21,11 @@ import ServiceTypeSelection from "./common/ServiceTypeSelection";
 import { useSelector } from "react-redux";
 import LocationInputs from "./common/LocationInputs";
 import { showErrorToast } from "../../utils/Toastify";
+import OneLocation from "./common/OneLocation";
 
 const libraries = ["places"];
 
-function OneTimeAndMultipleOrder() {
+function OneTimeDelivery() {
   const navigate = useNavigate();
   const location = useLocation()
   const {serviceType,selectedBranch}=location.state
@@ -36,6 +37,8 @@ function OneTimeAndMultipleOrder() {
     lat: parseFloat(selectedBranch.latitude),
     lng: parseFloat(selectedBranch.longitude),
   });
+
+  console.log("selecttype",serviceType?.id)
   const [currentLocation, setCurrentLocation] = useState();
   const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,11 +48,10 @@ function OneTimeAndMultipleOrder() {
   const [duration, setDuration] = useState("");
   const [distancePriceList, setDistancePriceList] = useState([]);
   const [vehicleDetail, setVehicleDetail] = useState(null);
-  const [pickupLocation, setPickupLocation] = useState({
-    address:buildAddress(selectedBranch?.address,selectedBranch?.city,selectedBranch?.state,selectedBranch?.country,selectedBranch?.postal_code),
-    ...center
-  });
+  const [pickupLocation, setPickupLocation] = useState("");
   const [dropoffLocation, setDropoffLocation] = useState("");
+  const [addPickupLocation, setAddPickupLocation] = useState(null);
+  const [addDestinationLocation, setAddDestinationLocation] = useState(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [map, setMap] = useState(null);
@@ -135,14 +137,19 @@ function OneTimeAndMultipleOrder() {
     if (pickupLocation && dropoffLocation) {
       const directionsService = new google.maps.DirectionsService();
       const results = await directionsService.route({
-        origin: pickupLocation,
-        destination: dropoffLocation,
+        origin: { lat: pickupLocation.lat, lng: pickupLocation.lng },
+        destination: { lat: dropoffLocation.lat, lng: dropoffLocation.lng },
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
+      const pickup = getLocation(pickupLocation,pickupLocation.lat,pickupLocation.lng)
+      setAddPickupLocation(pickup)
+      const dropoff=getLocation(dropoffLocation,dropoffLocation.lat,dropoffLocation.lng)
+      setAddDestinationLocation(dropoff)
+
     }
   };
 
@@ -153,8 +160,8 @@ function OneTimeAndMultipleOrder() {
     }
 
     const payload = {
-      pickupLocation,
-      dropoffLocation,
+      addPickupLocation,
+      addDestinationLocation,
       selectedVehicle,
       distance,
       duration,
@@ -190,12 +197,10 @@ function OneTimeAndMultipleOrder() {
           <div className="col-md-3">
             <div className={Styles.requestPickupMaincard}>
               <p className={Styles.pickupRequestText}>Request a Pick up!</p>
-              <LocationInputs
+              <OneLocation
                 setPickupLocation={setPickupLocation}
                 setDropoffLocation={setDropoffLocation}
-                pickupLocation={pickupLocation}
                 calculateRoute={calculateRoute}
-                isPickupDisabled={true}
               />
 
               <ServiceTypeSelection
@@ -304,4 +309,4 @@ function OneTimeAndMultipleOrder() {
   );
 }
 
-export default OneTimeAndMultipleOrder;
+export default OneTimeDelivery;

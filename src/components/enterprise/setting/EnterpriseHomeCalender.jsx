@@ -1,8 +1,9 @@
+import moment from "moment";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
-const EnterpriseHomeCalender = () => {
+const EnterpriseHomeCalender = ({setCurrentDate}) => {
   const [value, setValue] = useState(new Date());
 
   // Define dates with different colors
@@ -12,6 +13,14 @@ const EnterpriseHomeCalender = () => {
     { date: new Date(2024, 6, 25), color: "steelblue" },
     { date: new Date(2024, 6, 28), color: "mediumpurple" },
   ];
+
+  
+  // Handle date change
+  const handleDateChange = (newValue) => {
+    setValue(newValue);
+    const newDate=moment(newValue).format("YYYY-MM-DD")
+    setCurrentDate(newDate)
+  };
 
   const tileClassName = ({ date }) => {
     const style = dateStyles.find(
@@ -26,7 +35,7 @@ const EnterpriseHomeCalender = () => {
   return (
     <>
       <Calendar
-        onChange={setValue}
+        onChange={handleDateChange}
         value={value}
         tileClassName={tileClassName}
       />

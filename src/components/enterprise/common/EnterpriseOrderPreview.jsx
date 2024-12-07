@@ -21,17 +21,35 @@ const EnterpriseOrderPreview = () => {
   const checkboxTypes = ["checkbox"];
   const navigate = useNavigate();
   const location = useLocation();
-  const user = useSelector((state)=>state.auth.user)
-  const { order, orderCustomerDetails, dropoffDetail } = location.state || {};
+  const user = useSelector((state) => state.auth.user);
+  const { order, orderCustomerDetails } = location.state || {};
   const [imageView, setImageView] = useState(
     URL.createObjectURL(orderCustomerDetails?.file[0]) || null
   );
-  console.log("test", order);
-  const dropoff=getLocation(order?.dropoffLocation,order?.dropoffLocation.lat,order?.dropoffLocation.lng)
-  console.log('s',dropoff)
+
+  console.log("orderCustomerDetails",orderCustomerDetails)
+  const [isAddressAdd, setIsAddressAdd] = useState(false);
+  
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    
+    navigate("/enterprise/payment", {
+      state: {
+        order,
+        orderCustomerDetails,
+        isAddressAdd,
+      },
+    });
+   
+  };
+
+  const handleSaveAddress=(e)=>{
+    setIsAddressAdd(!isAddressAdd)
+  }
   return (
     <>
-      <CommonHeader userData={user}/>
+      <CommonHeader userData={user} />
       <section className={Styles.addPickupDetailsSec}>
         <div>
           <div className={`row ${Styles.manageRow}`}>
@@ -47,9 +65,7 @@ const EnterpriseOrderPreview = () => {
             <div className="col-md-8">
               <div className={Styles.pickupOrderPreviewMainCard}>
                 <div>
-                  <h2 className={Styles.addPickupDetailsText}>
-                    Order preview
-                  </h2>
+                  <h2 className={Styles.addPickupDetailsText}>Order preview</h2>
                   <p className={Styles.addPickupDetailsSubtext}>
                     Let’s review your order details. if it looks ok please
                     proceed to payment
@@ -63,7 +79,8 @@ const EnterpriseOrderPreview = () => {
                       icon={faLocationDot}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                      {order?.pickupLocation?.address}
+                    {order?.addPickupLocation?.address + ","} {order?.addPickupLocation?.city + ","+order?.addPickupLocation?.state+","+order?.addPickupLocation?.country+"-"+order?.addPickupLocation?.postal_code}
+
                     </p>
                   </div>
 
@@ -75,7 +92,8 @@ const EnterpriseOrderPreview = () => {
                       icon={faLocationCrosshairs}
                     />
                     <p className={Styles.pickuporderPreviewPickupAddressText}>
-                    {buildAddress(dropoff?.address,dropoff?.city,dropoff?.state,dropoff?.country,dropoff?.postal_code)}
+                    {order?.addDestinationLocation?.address + ","} {order?.addDestinationLocation?.city + ","+order?.addDestinationLocation?.state+","+order?.addDestinationLocation?.country+"-"+order?.addDestinationLocation?.postal_code}
+
                     </p>
                   </div>
                 </div>
@@ -110,13 +128,8 @@ const EnterpriseOrderPreview = () => {
                   <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
                     <div>
                       <h5 className={Styles.pickupOrderPreviewVehicleType}>
-                        {orderCustomerDetails?.name +
-                          " " +
-                          orderCustomerDetails?.lastname}
-                      </h5>
-                      <p className={Styles.pickupOrderPreviewCompanyName}>
                         {orderCustomerDetails?.company}
-                      </p>
+                      </h5>
                     </div>
                     <div>
                       <img
@@ -167,7 +180,6 @@ const EnterpriseOrderPreview = () => {
                   </p>
                   <div className={Styles.pickupOrderPreviewVehicleDetailsCard}>
                     <div>
-                    
                       <h5 className={Styles.pickupOrderPreviewVehicleType}>
                         {orderCustomerDetails?.dname +
                           " " +
@@ -188,7 +200,7 @@ const EnterpriseOrderPreview = () => {
                         icon={faGlobe}
                       />
                       <p className={Styles.pickupOrderAdminEmail}>
-                        {dropoffDetail?.email}
+                        {orderCustomerDetails?.demail}
                       </p>
                     </div>
 
@@ -198,7 +210,7 @@ const EnterpriseOrderPreview = () => {
                         icon={faPhone}
                       />
                       <p className={Styles.pickupOrderAdminEmail}>
-                        {dropoffDetail?.phone}
+                        {orderCustomerDetails?.dphoneNumber}
                       </p>
                     </div>
                   </div>
@@ -210,7 +222,7 @@ const EnterpriseOrderPreview = () => {
                     />
                     <p className={Styles.pickupOrderPreviewPickupNotes}>
                       {" "}
-                      {dropoffDetail?.dropoff_note}
+                      {orderCustomerDetails?.dropoffnote}
                     </p>
                   </div>
                 </div>
@@ -248,24 +260,21 @@ const EnterpriseOrderPreview = () => {
                 </div>
 
                 <div>
-                  <Form>
-                    {checkboxTypes.map((type) => (
-                      <div
-                        key={`default-${type}`}
-                        className={`mb-3 ${Styles.checkboxCard}`}
-                      >
-                        <Form.Check
-                          type={type}
-                          id={`default-${type}`}
-                          label={null}
-                          className={Styles.saveAddresslaterCheckBox}
-                        />
-                        <p className={Styles.checkText}>
-                          Save these addresses for later
-                        </p>
-                      </div>
-                    ))}
-                  </Form>
+                  {checkboxTypes.map((type) => (
+                    <div
+                      key={`default-${type}`}
+                      className={`mb-3 ${Styles.checkboxCard}`}
+                    >
+                      <Form.Check
+                        type={type}
+                        id={`default-${type}`}
+                        label={"Save thes addresses for later"}
+                        checked={isAddressAdd}
+                        className={`${Styles.saveAddresslaterCheckBox}`}
+                        onClick={handleSaveAddress}
+                      />
+                    </div>
+                  ))}
                 </div>
 
                 <div className={Styles.addPickupDetailsBtnCard}>
@@ -277,12 +286,13 @@ const EnterpriseOrderPreview = () => {
                     Back
                   </Link>
 
-                  <Link
-                    to="/enterprises-schedule-approved"
+                  <div
+                    onClick={submitHandler}
                     className={Styles.addPickupDetailsNextBtn}
+                    style={{cursor:"pointer"}}
                   >
                     Proceed to payment
-                  </Link>
+                  </div>
                 </div>
               </div>
             </div>

@@ -354,9 +354,6 @@ function PickupEditAddressModal({
         </Modal.Body>
         <Modal.Footer>
           <div>
-            <button className={Styles.pickupEditAddressDeleteBtn}>
-              Delete
-            </button>
             <button
               className={modalCss.pickupEditAddressSaveBtn}
               onClick={handleSubmit(onSubmit)}

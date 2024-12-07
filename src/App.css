@@ -12,31 +12,30 @@ h5,
 h6,
 p,
 a {
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .modal-content {
   background-color: #fbfaf5 !important;
-}
-.modal-content {
   border-radius: 15px !important;
 }
+
 .modal-header {
   border: none !important;
-}
-.modal-header {
   padding: 0px !important;
   display: block !important;
 }
+
 .modal {
   --bs-modal-width: 400px !important;
 }
+
 .modal-footer {
   justify-content: center !important;
   border: none !important;
 }
 
-.dropdown-toggle::after{
+.dropdown-toggle::after {
   color: #000;
 }
 
@@ -88,7 +87,7 @@ a {
   color: var(--secondary-color);
 }
 
-.tabs .tab-input:checked + .tab-label {
+.tabs input[type="radio"]:checked + label {
   background-color: #ffcc00; /* Active tab background color */
   border-color: #ccc;
   border-bottom-color: #fff;
@@ -98,18 +97,10 @@ a {
   display: none;
 }
 
-.tabs
-  input[type="radio"]:nth-of-type(1):checked
-  ~ .content
-  section:nth-of-type(1),
-.tabs
-  input[type="radio"]:nth-of-type(2):checked
-  ~ .content
-  section:nth-of-type(2),
-.tabs
-  input[type="radio"]:nth-of-type(3):checked
-  ~ .content
-  section:nth-of-type(3) {
+.tabs input[type="radio"]:nth-of-type(1):checked ~ .content section:nth-of-type(1),
+.tabs input[type="radio"]:nth-of-type(2):checked ~ .content section:nth-of-type(2),
+.tabs input[type="radio"]:nth-of-type(3):checked ~ .content section:nth-of-type(3),
+.tabs input[type="radio"]:nth-of-type(4):checked ~ .content section:nth-of-type(4) {
   display: block;
 }
 
@@ -131,20 +122,17 @@ a {
   }
 }
 
-
 /* ProgressTracker.css */
 .progress-container {
   display: flex;
   justify-content: space-between;
-  /* align-items: center; */
   flex-direction: column;
   margin: 20px;
 }
 
 .progress-step {
-  /* text-align: center; */
   position: relative;
-  padding:5px;
+  padding: 5px;
 }
 
 .circle {
@@ -163,8 +151,8 @@ a {
   font-size: 12px;
   color: gray;
   margin-left: 45px;
-    margin-top: -29px;
-    position: absolute;
+  margin-top: -29px;
+  position: absolute;
 }
 
 .active .circle {
@@ -181,4 +169,21 @@ a {
 .circle:hover {
   cursor: pointer;
   background-color: darkblue;
+}
+
+
+.tabs .content section {
+  display: none;
+}
+
+#tab1:checked ~ .content #content1,
+#tab2:checked ~ .content #content2,
+#tab3:checked ~ .content #content3,
+#tab4:checked ~ .content #content4 {
+  display: block;
+}
+
+
+.activetab{
+  border-bottom: 2px solid #ff0058;
 }

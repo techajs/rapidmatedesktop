@@ -1392,7 +1392,7 @@ a {
 
 .homePickupVehicleCardMain {
   margin: 10px 0px;
-  height: 550px;
+  height: 500px;
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
@@ -3503,12 +3503,18 @@ a {
 }
 
 .enterpriseHomeTotalHoursText {
-  font-size: 34px;
+  font-size: 25px;
   font-weight: 600;
   margin: 0px;
   color: var(--secondary-color);
 }
 
+.enterpriseHomeTotalSpendHoursText {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0px;
+  color: var(--primary-color);
+}
 .enterpriseHomeTotalHourseCard {
   display: flex;
   align-items: baseline;

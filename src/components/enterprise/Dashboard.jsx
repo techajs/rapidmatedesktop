@@ -8,6 +8,9 @@ import {
   faCircle,
   faLocationDot,
   faLocationCrosshairs,
+  faRefresh,
+  faPlus,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import ActiveBooking from "../../assets/images/Active-bookings.png";
 import ScheduledBooking from "../../assets/images/Scheduled-bookings.png";
@@ -16,6 +19,8 @@ import Home from "../../assets/images/home-icon.png";
 import Package from "../../assets/images/Package.png";
 import Calender from "../../assets/images/Calender-withBg.png";
 import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -36,37 +41,38 @@ ChartJS.register(
 import EnterpriseHomeCalender from "./setting/EnterpriseHomeCalender";
 import { Bar } from "react-chartjs-2";
 import {
+  fetchEnterprisePlans,
   getEnterpriseDashboardInfo,
   getEnterpriseOrders,
+  getLocations,
 } from "../../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast } from "../../utils/Toastify";
 import { setBookings, setBranches } from "../../redux/enterpriseSlice";
+import moment from "moment";
+import OrderCardBox from "./common/OrderCardBox";
+import { Link } from "react-router-dom";
+import Spinners from "../../common/Loader";
 function CommonDashboard() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const {vehicleType} = useSelector((state) => state.commonData.commonData);
   const { bookings, branches } = useSelector((state) => state.enterprise);
-  const [laoding, setLoading] = useState(false);
-
-  const data = {
-    labels: ["January", "February", "March", "April", "May"], // X-axis labels
+  const [bookingHour, setBookingHour] = useState(0);
+  const [spendHr, setSpendHr] = useState(0);
+  const [enterprisePlans, setEnterprisePlans] = useState([]);
+  const [locationList, setLocationList] = useState([]);
+  const [currentDate,setCurrentDate]=useState(moment(new Date()).format("YYYY-MM-DD"))
+  const [loading,setLoading]=useState(false)
+  const [chartData, setChartData] = useState({
+    labels: [],
     datasets: [
       {
-        label: "Hours booked",
-        data: [1, 2, 4, 2, 7], // Data points for Series 1
-        backgroundColor: "rgba(255, 0, 88, 1)",
-        borderColor: "rgba(255, 0, 88, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "Hours used",
-        data: [3, 1, 5, 6, 4], // Data points for Series 2
-        backgroundColor: "rgba(255, 199, 43, 1)",
-        borderColor: "rgba(255, 199, 43, 1)",
-        borderWidth: 1,
+        data: [],
       },
     ],
-  };
+  });
+
 
   const options = {
     responsive: true,
@@ -99,26 +105,104 @@ function CommonDashboard() {
     },
   };
 
-  const dropdownData2 = [{ label: "This week", value: "This week" }];
+  const displayChartData = (branch) => {
+    // console.log("branch", branch);
+    setLoading(true)
+    let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    let hours = [0, 0, 0, 0, 0, 0, 0];
+    let usedHour = [0, 0, 0, 0, 0, 0, 0];
+    branch.chartData.forEach((element) => {
+      if (element.day == "Monday") {
+        hours[0] = element.booked_hours;
+        usedHour[0] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Tuesday") {
+        hours[1] = element.booked_hours;
+        usedHour[1] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Wednesday") {
+        hours[2] = element.booked_hours;
+        usedHour[2] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Thursday") {
+        hours[3] = element.booked_hours;
+        usedHour[3] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Friday") {
+        hours[4] = element.booked_hours;
+        usedHour[4] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Saturday") {
+        hours[5] = element.booked_hours;
+        usedHour[5] = element?.is_select ? element.booked_hours : 0;
+      } else if (element.day == "Sunday") {
+        hours[6] = element.booked_hours;
+        usedHour[6] = element?.is_select ? element.booked_hours : 0;
+      }
+    });
+    const data = {
+      labels: days,
+      datasets: [
+        {
+          label: "Hours booked",
+          data: hours,
+          backgroundColor: "rgba(255, 0, 88, 1)",
+          borderColor: "rgba(255, 0, 88, 1)",
+          borderWidth: 1,
+        },
+        {
+          label: "Hours used",
+          data: usedHour, // Data points for Series 2
+          backgroundColor: "rgba(255, 199, 43, 1)",
+          borderColor: "rgba(255, 199, 43, 1)",
+          borderWidth: 1,
+        },
+      ],
+    };
+    setChartData(data);
+    setBookingHour(branch.bookinghr);
+    setSpendHr(branch.spenthr);
+    setLoading(false)
+  };
 
-  const getOrderList = () => {
-    getEnterpriseOrders(
-      user.userDetails.ext_id,
+  const dropdownData2 = [
+    { label: "Today", value: "Today" },
+    { label: "This week", value: "This week" },
+    { label: "This month", value: "This month" },
+    { label: "This year", value: "This year" },
+  ];
+
+  const getLocationsData = () => {
+    setLocationList([]);
+    getLocations(
+      null,
       (successResponse) => {
-        setLoading(false);
-        if (successResponse[0]._response.length > 0) {
-          console.log(successResponse[0]._response);
+        if (successResponse[0]._success) {
+          let tempOrderList = successResponse[0]._response;
+          setLocationList(tempOrderList);
         }
       },
       (errorResponse) => {
-        let err = "";
-        if (errorResponse.errors) {
-          err = errorResponse.errors.msg[0].msg;
-        } else {
-          err = errorResponse[0]._errors.message;
+        if (errorResponse[0]._errors.message) {
+          setLocationList([]);
         }
-        showErrorToast(err);
-        setLoading(false);
+      }
+    );
+  };
+
+  const getEnterprisePlans = (dateString) => {
+    let params = {
+      enterprise_ext_id: user.userDetails.ext_id,
+      plan_date: dateString,
+    };
+    fetchEnterprisePlans(
+      params,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response) {
+            setEnterprisePlans(successResponse[0]._response);
+          }
+        } else {
+          setEnterprisePlans([]);
+        }
+      },
+      (errorResponse) => {
+        setEnterprisePlans([]);
       }
     );
   };
@@ -136,6 +220,7 @@ function CommonDashboard() {
           dispatch(
             setBranches(successResponse[0]._response[0]?.dashboard.branch)
           );
+          displayChartData(successResponse[0]._response[0].dashboard.branch[0]);
         }
       },
       (errorResponse) => {
@@ -150,13 +235,37 @@ function CommonDashboard() {
       }
     );
   };
+
   useEffect(() => {
     if (!bookings || bookings === "") {
       getBookingList();
     }
-    getOrderList()
-  }, [user]);
+    getEnterprisePlans(currentDate);
+    if (branches) {
+      // console.log('chatdat',chartData)
+      displayChartData(branches[0]);
+    }
+    getLocationsData();
+  }, [user,currentDate]);
 
+  const branchList = branches?.map((item, index) => ({
+    label: item.branch_name,
+    value: item.branch_id,
+  }));
+  const handleDayChange = (selectedOption) => {
+    // console.log('Selected option:', selectedOption);
+  };
+
+  const handleChange = (selectedOption) => {
+    const getSinglebranch = branches.filter(
+      (branch) => branch.branch_id == selectedOption.value
+    );
+    displayChartData(getSinglebranch[0]);
+  };
+  if(loading){
+    return <Spinners />
+  
+  }
   return (
     <>
       <section className={Styles.enterpriseHomeSec}>
@@ -174,7 +283,13 @@ function CommonDashboard() {
                   </b>
                 </p>
                 <p className={Styles.enterprisesHomeDashbordDiscription}>
-                  This is your Rapidmate enterprise dashboard!
+                  This is your Rapidmate enterprise dashboard!{" "}
+                  <button
+                    className="m-2 border-0 text-white bg-primary rounded-md"
+                    onClick={getBookingList}
+                  >
+                    <FontAwesomeIcon icon={faRefresh} />
+                  </button>
                 </p>
                 <div className="row">
                   <div className="col-md-4">
@@ -182,6 +297,7 @@ function CommonDashboard() {
                       <button className={Styles.enterpriseHomeInfoButton}>
                         <FontAwesomeIcon icon={faCircleInfo} />
                       </button>
+
                       <p className={Styles.enterpriseHomeActiveBookingText}>
                         Active bookings
                       </p>
@@ -251,28 +367,20 @@ function CommonDashboard() {
                         Hours booked
                       </h4>
                       <div className={Styles.enterpriseHomeLocationSelectCard}>
-                        <Form.Group className="mb-3" controlId="formPlaintext1">
-                          <Form.Select
-                            className={Styles.enterpriseHomeFranchiseSelect}
-                            aria-label="Default select example"
-                          >
-                            <option>North Street Franchise</option>
-                            <option value="1">South Street Franchise</option>
-                            <option value="2">West Street Franchise</option>
-                            <option value="3">East Street Franchise</option>
-                          </Form.Select>
-                        </Form.Group>
+                        <Select
+                          options={branchList}
+                          styles={customSelectStyles}
+                          defaultValue={branchList ? branchList[0] : ""}
+                          onChange={handleChange}
+                          className="me-5"
+                        />
 
-                        <Form.Group className="mb-3" controlId="formPlaintext2">
-                          <Form.Select
-                            className={Styles.enterpriseHomeFranchiseSelect}
-                            aria-label="Default select example"
-                          >
-                            <option>This week</option>
-                            <option value="1">This month</option>
-                            <option value="2">This year</option>
-                          </Form.Select>
-                        </Form.Group>
+                        <Select
+                          options={dropdownData2}
+                          styles={customSelectStyles}
+                          defaultValue={dropdownData2 ? dropdownData2[0] : ""}
+                          onChange={handleDayChange}
+                        />
                       </div>
                     </div>
 
@@ -286,7 +394,11 @@ function CommonDashboard() {
                           Hours booked
                         </p>
                       </div>
-
+                      <h2
+                        className={`${Styles.enterpriseHomeTotalHoursText} me-2`}
+                      >
+                        {bookingHour}
+                      </h2>
                       <div className={Styles.enterpriseHomeBookedCard}>
                         <FontAwesomeIcon
                           className={Styles.enterpriseHomeHoursusedCircleIcon}
@@ -296,22 +408,22 @@ function CommonDashboard() {
                           Hours used
                         </p>
                       </div>
-
-                      <h4 className={Styles.enterpriseHomeTotalHoursText}>
-                        32
-                      </h4>
+                      <h2 className={Styles.enterpriseHomeTotalSpendHoursText}>
+                        {" "}
+                        {spendHr}
+                      </h2>
                     </div>
                   </div>
                   <div>
                     <div className="chart-container">
-                      <Bar data={data} options={options} />
+                      <Bar data={chartData} options={options} />
                     </div>
                   </div>
                 </div>
                 <p className={Styles.enterpriseCompanyLocationsText}>
                   Company locations
                 </p>
-                {branches?.map((company, index) => (
+                {branches?.slice(0, 3).map((company, index) => (
                   <div
                     key={index}
                     className={Styles.enterpriseHomeCompanyLocCard}
@@ -364,9 +476,26 @@ function CommonDashboard() {
               </div>
             </div>
             <div className="col-md-4">
+            <div className="col-md-12 mb-5">
+              <div className={Styles.enterprisePlannigHeadCard}>
+                <h4 className={Styles.enterprisePlanningTitle}>Planning</h4>
+                <div className={Styles.enterprisePlannigFilterScheduleCard}>
+                  {/* <button className={Styles.enterprisePlanningFilterBtn}>
+                    <FontAwesomeIcon icon={faFilter} />
+                  </button> */}
+                  <Link to="/enterprise/schedules" className={Styles.enterprisePlanningNewScheduleBtn}>
+                    <FontAwesomeIcon
+                      className={Styles.enterprisePlanningPlusIcon}
+                      icon={faPlus}
+                    />
+                    New schedule
+                  </Link>
+                </div>
+              </div>
+            </div>
               <div className={Styles.enterpriseHomeCalenderMainCard}>
                 {/* Calender Start Here  */}
-                <EnterpriseHomeCalender />
+                <EnterpriseHomeCalender setCurrentDate={setCurrentDate} />
                 {/* Calender End Here  */}
                 <div className={Styles.enterprisesHomeEnterpriesNameCard}>
                   <div className={Styles.enterpriseHomeResturntCard}>
@@ -410,217 +539,17 @@ function CommonDashboard() {
                 </div>
 
                 <div>
-                  <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
-                    <div>
-                      <div
-                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
-                      >
-                        <div className={Styles.enterpriseHomePackageImgCard}>
-                          <img
-                            className={Styles.enterpriseHomePackage}
-                            src={Package}
-                            alt="Icon"
-                          />
-                          <FontAwesomeIcon
-                            className={Styles.enterpriseHomeDotCircleResturent}
-                            icon={faCircle}
-                          />
-                        </div>
+                {enterprisePlans?.length >=5 &&   <div className="container"><p className="text-end"><button className="border-0 text-primary p-1">All</button></p></div>}
 
-                        <p className={Styles.enterpriseHomePickupTimeinfo}>
-                          Pickup on Apr 19, 2024 at 11:30 AM
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressFromCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationDot}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          From <b>North Street, ABC</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressToCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationCrosshairs}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          To <b>5th Avenue, XYZ</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeOrderidCard}>
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Order ID: <span>98237469</span>
-                        </p>
-
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Pickup Truck
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
-                    <div>
-                      <div
-                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
-                      >
-                        <div className={Styles.enterpriseHomePackageImgCard}>
-                          <img
-                            className={Styles.enterpriseHomePackage}
-                            src={Calender}
-                            alt="Icon"
-                          />
-                          <FontAwesomeIcon
-                            className={Styles.enterpriseHomeDotCircleResturent}
-                            icon={faCircle}
-                          />
-                        </div>
-
-                        <div className={Styles.enterpriseHomeShiftHeaderCard}>
-                          <p className={Styles.enterpriseHomePickupTimeinfo}>
-                            11 AM to 04 PM
-                          </p>
-
-                          <p className={Styles.enterpriseHomePickupTimeinfo}>
-                            5 hours shift
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressFromCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationDot}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          <b>North Franchise</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeOrderidCard}>
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Order ID: <span>98237469</span>
-                        </p>
-
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Motor Bike
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
-                    <div>
-                      <div
-                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
-                      >
-                        <div className={Styles.enterpriseHomePackageImgCard}>
-                          <img
-                            className={Styles.enterpriseHomePackage}
-                            src={Package}
-                            alt="Icon"
-                          />
-                          <FontAwesomeIcon
-                            className={Styles.enterpriseHomeDotCircleEcommerce}
-                            icon={faCircle}
-                          />
-                        </div>
-
-                        <p className={Styles.enterpriseHomePickupTimeinfo}>
-                          Pickup on Apr 19, 2024 at 11:30 AM
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressFromCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationDot}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          From <b>North Street, ABC</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressToCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationCrosshairs}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          To <b>5th Avenue, XYZ</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeOrderidCard}>
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Order ID: <span>98237469</span>
-                        </p>
-
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Pickup Truck
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={Styles.enterpriseHomeDeliveryHistoryCard}>
-                    <div>
-                      <div
-                        className={Styles.enterpriseHomePackagedeliveryInfoCard}
-                      >
-                        <div className={Styles.enterpriseHomePackageImgCard}>
-                          <img
-                            className={Styles.enterpriseHomePackage}
-                            src={Package}
-                            alt="Icon"
-                          />
-                          <FontAwesomeIcon
-                            className={Styles.enterpriseHomeDotCircleMovers}
-                            icon={faCircle}
-                          />
-                        </div>
-
-                        <p className={Styles.enterpriseHomePickupTimeinfo}>
-                          Pickup on Apr 19, 2024 at 11:30 AM
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressFromCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationDot}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          From <b>North Street, ABC</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeAddressToCard}>
-                        <FontAwesomeIcon
-                          className={Styles.enterpriseHomeAddresslocDotIcon}
-                          icon={faLocationCrosshairs}
-                        />
-                        <p className={Styles.enterpriseHomeAddressText}>
-                          To <b>5th Avenue, XYZ</b>
-                        </p>
-                      </div>
-
-                      <div className={Styles.enterpriseHomeOrderidCard}>
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Order ID: <span>98237469</span>
-                        </p>
-
-                        <p className={Styles.enterpriseHomeOrderIdText}>
-                          Pickup Truck
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  {enterprisePlans?.slice(0, 4).map((item, key) => (
+                    <OrderCardBox
+                      order={item}
+                      locationList={locationList}
+                      key={key}
+                      vehicleTypeList={vehicleType}
+                      branches={branches}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
@@ -632,4 +561,19 @@ function CommonDashboard() {
   );
 }
 
+const customSelectStyles = {
+  control: (styles) => ({
+    ...styles,
+    backgroundColor: "#fff",
+    width: "190px",
+    // height: "-50px",
+    fontSize: "13px",
+  }),
+  option: (styles, { isFocused, isSelected }) => ({
+    ...styles,
+    backgroundColor: isSelected ? "#ffc72b" : isFocused ? "#f8f9fa" : "#fff",
+    color: "#333",
+    fontSize: "14px",
+  }),
+};
 export default CommonDashboard;

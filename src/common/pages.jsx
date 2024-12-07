@@ -56,7 +56,8 @@ import EnterpriseAddPickupDetails from "../components/enterprise/EnterpriseAddPi
 import EnterpriseOrderPreview from "../components/enterprise/common/EnterpriseOrderPreview";
 import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfile";
 import ManageCompanyLocation from "../components/consumer/account/ManageCompanyLocation"
-import OneTimeAndMultipleOrder from "../components/enterprise/oneTimeAndMultipleOrder"
+import MultipleDelivery from "../components/enterprise/MultipleDelivery"
+import EnterprisePaymentView from "./EnterprisePaymentView"
 export {
     Home,
     HomeHeader,
@@ -109,12 +110,13 @@ export {
     PickupPaymentMethods,
     PickupChangePassword,
     SelectBranch,
-    OneTimeAndMultipleOrder,
+    MultipleDelivery,
     EnterpriseScheduleApproved,
     EnterpriseMultipleDeliveriesSelectService,
     EnterpriseMultipleDeliverySelectLocation,
     EnterpriseAddPickupDetails,
     EnterpriseOrderPreview,
     DeliveryboyProfile,
-    ManageCompanyLocation
+    ManageCompanyLocation,
+    EnterprisePaymentView
 }

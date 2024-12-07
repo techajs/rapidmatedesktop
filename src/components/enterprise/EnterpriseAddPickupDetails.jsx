@@ -158,8 +158,7 @@ const EnterpriseAddPickupDetails = () => {
     navigate("/enterprise/order-preview", {
       state: {
         order: order,
-        orderCustomerDetails: data,
-        dropoffDetail,
+        orderCustomerDetails: data
       },
     });
   };

@@ -1,8 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  getConsumerViewOrdersList,
-  getLocations,
-} from "../../../data_manager/dataManage";
+import React from "react";
 import Styles from "../../../assets/css/home.module.css";
 import Package from "../../../assets/images/Package.png";
 import NoDataImage from "../../../assets/images/NoOrder.png";
@@ -11,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
   faLocationCrosshairs,
-  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "../../../utils/Constants";
 import { useSelector } from "react-redux";
@@ -48,9 +43,8 @@ function RenderItem({ status = "",locationList=[],orderList=[]}) {
                       alt="icon"
                     />
                     <h4 className={Styles.pickupHistoryDeliveredText}>
-                      Delivery On {formatDate(item.delivery_date).date} at{" "}
-                      {formatDate(item.delivery_date).time}
-                      {/* {item?.order_status} */}
+                     
+                       {item?.consumer_order_title}
                     </h4>
                   </div>
 
