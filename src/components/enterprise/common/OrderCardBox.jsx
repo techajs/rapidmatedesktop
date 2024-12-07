@@ -6,7 +6,7 @@ import {
   faLocationDot,
   faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
-import Package from "../../../assets/images/package.png"; // Replace with the actual path to the image
+import Package from "../../../assets/images/Package.png"; // Replace with the actual path to the image
 import moment from "moment";
 import Calender from "../../../assets/images/Calender-withBg.png";
 import { buildAddress } from "../../../utils/Constants";
