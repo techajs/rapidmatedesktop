@@ -113,7 +113,7 @@ function CommonDashboard() {
     let usedHour = [0, 0, 0, 0, 0, 0, 0];
     branch?.chartData?.forEach((element) => {
       if (element.day == "Monday") {
-        hours[0] = element.booked_hours;
+        hours[0] = element?.booked_hours;
         usedHour[0] = element?.is_select ? element.booked_hours : 0;
       } else if (element.day == "Tuesday") {
         hours[1] = element.booked_hours;
@@ -155,8 +155,8 @@ function CommonDashboard() {
       ],
     };
     setChartData(data);
-    setBookingHour(branch.bookinghr);
-    setSpendHr(branch.spenthr);
+    setBookingHour(branch?.bookinghr);
+    setSpendHr(branch?.spenthr);
     setLoading(false)
   };
 
