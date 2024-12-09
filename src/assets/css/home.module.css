@@ -3899,7 +3899,7 @@ a {
   background-color: var(--mainbg-color);
 }
 
-.enterpriseScheduleApprovedSec{
+.enterpriseScheduleApprovedSec {
   background-image: url(../images/Celebration-Bg.png);
   height: 90vh;
   padding: 20px 0px;
@@ -3936,8 +3936,8 @@ a {
 }
 
 .enterpriseNewScheduleOneTimeImg {
-  width: 50px;
   height: 31px;
+  width: auto;
   margin-right: 15px;
 }
 
@@ -4056,7 +4056,7 @@ a {
   margin: 20px 0px 30px;
 }
 
-.enterpriseVehilces{
+.enterpriseVehilces {
   height: 40px;
   margin-left: auto;
 }
@@ -5448,7 +5448,7 @@ a {
 }
 
 .paymentSuccessIcon {
-  color: #4CAF50; /* Green color for success */
+  color: #4caf50; /* Green color for success */
   margin-bottom: 20px;
 }
 
@@ -5504,3 +5504,57 @@ a {
   background-color: #0056b3;
 }
 
+.oneTimeVehicleCard {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin: 10px 0px;
+}
+
+.onleTimeVehicleNameText {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.oneTimeActiveText {
+  background: #27AE6012;
+  color: var(--active-color);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 0px;
+  font-weight: 600;
+}
+
+.pickupHistoryMultipleLocationCard {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.shiftOrderHeaderMainCard{
+  display: flex;
+}
+
+.shiftOrderhoursText{
+  font-size: 15px;
+  color: var(--text-color);
+  font-weight: 700;
+  margin: 0px;
+  margin-left: auto;
+}
+
+.oneTimePendingText{
+  background: #F39C1212;
+  color: var(--pending-color);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 0px;
+  font-weight: 600;
+}
+
+.pickupHistoryPastVehicleText{
+  font-size: 12px;
+  margin-top: 12px;
+}
