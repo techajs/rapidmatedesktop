@@ -16,8 +16,10 @@ import { showErrorToast } from "../../utils/Toastify";
 import { ToastContainer } from "react-toastify";
 import NoDataImage from "../../assets/images/NoOrder.png";
 import Package from "../../assets/images/Package.png";
+import Calender from "../../assets/images/Calender-withBg.png";
 import { buildAddress } from "../../utils/Constants";
 import moment from "moment";
+import EnterpriseOrderFilterModal from "./common/EnterpriseOrderFilterModal";
 
 const OneTime = ({ orders, locations, vehicles, navigation }) => {
   const [searchText, setSearchText] = useState("");
@@ -71,7 +73,7 @@ const OneTime = ({ orders, locations, vehicles, navigation }) => {
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
                         {" "}
-                        c From <b>{getLocationAddress(item.pickup_location)}</b>
+                        From: <b>{getLocationAddress(item.pickup_location)}</b>
                       </p>
                     </div>
 
@@ -83,8 +85,17 @@ const OneTime = ({ orders, locations, vehicles, navigation }) => {
                         icon={faLocationCrosshairs}
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
-                        To <b>{getLocationAddress(item.dropoff_location)}</b>
+                        To: <b>{getLocationAddress(item.dropoff_location)}</b>
                       </p>
+                    </div>
+                  </div>
+
+                  <div className={Styles.oneTimeVehicleCard}>
+                    <p className={Styles.onleTimeVehicleNameText}>
+                      {getVehicleType(item.vehicle_type_id)}
+                    </p>
+                    <div>
+                      <p className={Styles.oneTimeActiveText}>Active</p>
                     </div>
                   </div>
 
@@ -170,28 +181,35 @@ const MultipleTimeOrder = ({ orders, locations, vehicles, navigation }) => {
                     </h4>
                   </div>
 
-                  <div className={Styles.pickupHistoryLocationCard}>
-                    <div className={Styles.pickupHistoryFromLocaCard}>
+                  <div>
+                    <div className={Styles.pickupHistoryMultipleLocationCard}>
                       <FontAwesomeIcon
                         className={Styles.pickupHistoryLocIcon}
                         icon={faLocationDot}
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
                         {" "}
-                        From <b>{getLocationAddress(item.pickup_location)}</b>
+                        From: <b>{getLocationAddress(item.pickup_location)}</b>
                       </p>
                     </div>
 
-                    <div className={Styles.pickupHistoryShowOff} />
-
-                    <div className={Styles.pickupHistoryFromLocaCard}>
+                    <div className={Styles.pickupHistoryMultipleLocationCard}>
                       <FontAwesomeIcon
                         className={Styles.pickupHistoryLocIcon}
                         icon={faLocationCrosshairs}
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
-                        To <b>{getLocationAddress(item.dropoff_location)}</b>
+                        To: <b>{getLocationAddress(item.dropoff_location)}</b>
                       </p>
+                    </div>
+                  </div>
+
+                  <div className={Styles.oneTimeVehicleCard}>
+                    <p className={Styles.onleTimeVehicleNameText}>
+                      {getVehicleType(item.vehicle_type_id)}
+                    </p>
+                    <div>
+                      <p className={Styles.oneTimeActiveText}>Active</p>
                     </div>
                   </div>
 
@@ -253,13 +271,130 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
     return null;
   };
 
-  const getVehicleType = vehicleId => {
-    let result = vehicles.filter(vehicle => vehicle.id == vehicleId);
+  const getVehicleType = (vehicleId) => {
+    let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
     return result[0]?.vehicle_type;
   };
 
   return (
     <section id="content3">
+      <div className="row">
+        <div className="col-md-12">
+          {orders.length > 0 ? (
+            orders.map((item, index) => (
+              <div key={index} onClick={() => detailHandler(item.order_number)}>
+                <div className={Styles.pickuphistoryMainCard}>
+                  <div className={Styles.shiftOrderHeaderMainCard}>
+                    <div className={Styles.pickupHistoryPackageCard}>
+                      <img
+                        className={Styles.pickupHistoryPackageIcon}
+                        src={Calender}
+                        alt="icon"
+                      />
+                      <h4 className={Styles.pickupHistoryDeliveredText}>
+                        {item.slots[0] &&
+                          moment(item.slots[0].from_time, "HH:mm:ss").format(
+                            "hh A"
+                          )}
+                        {" to "}
+                        {item.slots[0] &&
+                          moment(item.slots[0].to_time, "HH:mm:ss").format(
+                            "hh A"
+                          )}
+                      </h4>
+                    </div>
+                    <p className={Styles.shiftOrderhoursText}>
+                      {" "}
+                      <b>
+                        {" "}
+                        {item.slots[0] &&
+                          moment(item.slots[0].to_time, "HH:mm:ss").diff(
+                            moment(item.slots[0].from_time, "HH:mm:ss")
+                          ) / 3600000}{" "}
+                        hours shift
+                      </b>
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className={Styles.pickupHistoryFromLocaCard}>
+                      <FontAwesomeIcon
+                        className={Styles.pickupHistoryLocIcon}
+                        icon={faLocationDot}
+                      />
+                      <p className={Styles.pickupHistoryFromLoc}>
+                        <b>{getBranchAddress(item.branch_id)}</b>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={Styles.pickupHistoryBorderBottomShow} />
+
+                  <div className={Styles.oneTimeVehicleCard}>
+                    <p className={Styles.onleTimeVehicleNameText}>
+                      {getVehicleType(item.vehicle_type_id)}
+                    </p>
+                    <div>
+                      <p className={Styles.oneTimePendingText}>
+                        Pending approval
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className={Styles.pickupHistoryNoDataMainCard}>
+              <div className={Styles.pickupHistoryNoDataCard}>
+                <img
+                  className={Styles.pickupHistoryNodataImage}
+                  src={NoDataImage}
+                  alt="No-Data"
+                />
+              </div>
+              <div>
+                <h4 className={Styles.pickupHistoryNoDatatext}>
+                  No orders to show
+                </h4>
+                <p className={Styles.pickupHistoryNodataSubText}>
+                  If there is any active order, it will be shown here..
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const PastOrder = ({ orders, locations, vehicles, navigation }) => {
+  const [searchText, setSearchText] = useState("");
+  const [index, setIndex] = useState(0);
+  const getLocationAddress = (locationId) => {
+    let result = locations.filter((location) => location.id == locationId);
+    return buildAddress(
+      result[0]?.address,
+      result[0]?.city,
+      result[0]?.state,
+      result[0]?.country,
+      result[0]?.postal_code
+    );
+  };
+
+  const getVehicleType = (vehicleId) => {
+    let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
+    return result[0]?.vehicle_type;
+  };
+  const detailHandler = (order_number) => {
+    navigation("/enterprise/order-detail", {
+      state: {
+        order: order_number,
+      },
+    });
+  };
+  return (
+    <section id="content4">
       <div className="row">
         <div className="col-md-12">
           {orders.length > 0 ? (
@@ -273,13 +408,7 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
                       alt="icon"
                     />
                     <h4 className={Styles.pickupHistoryDeliveredText}>
-                    {item.slots[0] &&
-                      moment(item.slots[0].from_time, 'HH:mm:ss').format(
-                        'hh A',
-                      )}
-                    {' to '}
-                    {item.slots[0] &&
-                      moment(item.slots[0].to_time, 'HH:mm:ss').format('hh A')}
+                      {item.consumer_order_title}
                     </h4>
                   </div>
 
@@ -290,11 +419,8 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
                         icon={faLocationDot}
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
-                        {" "}<b>  {item.slots[0] &&
-                    moment(item.slots[0].to_time, 'HH:mm:ss').diff(
-                      moment(item.slots[0].from_time, 'HH:mm:ss'),
-                    ) / 3600000}{' '}
-                  hours shift</b>
+                        {" "}
+                        From: <b>{getLocationAddress(item.pickup_location)}</b>
                       </p>
                     </div>
 
@@ -306,16 +432,18 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
                         icon={faLocationCrosshairs}
                       />
                       <p className={Styles.pickupHistoryFromLoc}>
-                        <b>{getBranchAddress(item.branch_id)}</b>
+                        To: <b>{getLocationAddress(item.dropoff_location)}</b>
                       </p>
                     </div>
                   </div>
-
+                  <p className={Styles.pickupHistoryPastVehicleText}>
+                    {getVehicleType(item.vehicle_type_id)}
+                  </p>
                   <div className={Styles.pickupHistoryBorderBottomShow} />
 
                   <div className={Styles.pickupHistoryOrderMoneyCard}>
                     <p className={Styles.pickupHistoryOrderId}>
-                      <span>{item.order_status}</span>
+                      Order ID: <span>{item.order_number}</span>
                     </p>
                     <h4 className={Styles.pickupHistoryMoneyText}>
                       €{item.amount ? item.amount.toFixed(2) : "0.00"}
@@ -347,125 +475,7 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
       </div>
     </section>
   );
-
 };
-
-const PastOrder = ({ orders, locations, vehicles, navigation }) =>{
-    const [searchText, setSearchText] = useState("");
-    const [index, setIndex] = useState(0);
-    const getLocationAddress = (locationId) => {
-      let result = locations.filter((location) => location.id == locationId);
-      return buildAddress(
-        result[0]?.address,
-        result[0]?.city,
-        result[0]?.state,
-        result[0]?.country,
-        result[0]?.postal_code
-      );
-    };
-  
-    const getVehicleType = (vehicleId) => {
-      let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
-      return result[0]?.vehicle_type;
-    };
-    const detailHandler = (order_number) => {
-      navigation("/enterprise/order-detail", {
-        state: {
-          order: order_number,
-        },
-      });
-    };
-    return (
-      <section id="content4">
-        <div className="row">
-          <div className="col-md-12">
-            {orders.length > 0 ? (
-              orders.map((item, index) => (
-                <div key={index} onClick={() => detailHandler(item.order_number)}>
-                  <div className={Styles.pickuphistoryMainCard}>
-                    <div className={Styles.pickupHistoryPackageCard}>
-                      <img
-                        className={Styles.pickupHistoryPackageIcon}
-                        src={Package}
-                        alt="icon"
-                      />
-                      <h4 className={Styles.pickupHistoryDeliveredText}>
-                        {item.consumer_order_title}
-                      </h4>
-                    </div>
-  
-                    <div className={Styles.pickupHistoryLocationCard}>
-                      <div className={Styles.pickupHistoryFromLocaCard}>
-                        <FontAwesomeIcon
-                          className={Styles.pickupHistoryLocIcon}
-                          icon={faLocationDot}
-                        />
-                        <p className={Styles.pickupHistoryFromLoc}>
-                          {" "}
-                          From <b>{getLocationAddress(item.pickup_location)}</b>
-                        </p>
-                      </div>
-  
-                      <div className={Styles.pickupHistoryShowOff} />
-  
-                      <div className={Styles.pickupHistoryFromLocaCard}>
-                        <FontAwesomeIcon
-                          className={Styles.pickupHistoryLocIcon}
-                          icon={faLocationCrosshairs}
-                        />
-                        <p className={Styles.pickupHistoryFromLoc}>
-                          To <b>{getLocationAddress(item.dropoff_location)}</b>
-                        </p>
-                      </div>
-                      <div className={Styles.pickupHistoryFromLocaCard}>
-                        <FontAwesomeIcon
-                          className={Styles.pickupHistoryLocIcon}
-                          icon={faLocationCrosshairs}
-                        />
-                        
-                      </div>
-                     
-                    </div>
-                    <p className={Styles.pickupHistoryFromLoc}>
-                          Active
-                        </p>
-                    <div className={Styles.pickupHistoryBorderBottomShow} />
-  
-                    <div className={Styles.pickupHistoryOrderMoneyCard}>
-                      <p className={Styles.pickupHistoryOrderId}>
-                        Order ID: <span>{item.order_number}</span>
-                      </p>
-                      <h4 className={Styles.pickupHistoryMoneyText}>
-                        €{item.amount ? item.amount.toFixed(2) : "0.00"}
-                      </h4>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className={Styles.pickupHistoryNoDataMainCard}>
-                <div className={Styles.pickupHistoryNoDataCard}>
-                  <img
-                    className={Styles.pickupHistoryNodataImage}
-                    src={NoDataImage}
-                    alt="No-Data"
-                  />
-                </div>
-                <div>
-                  <h4 className={Styles.pickupHistoryNoDatatext}>
-                    No orders to show
-                  </h4>
-                  <p className={Styles.pickupHistoryNodataSubText}>
-                    If there is any active order, it will be shown here..
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    );
-}
 const Order = () => {
   const user = useSelector((state) => state.auth.user);
   const { branches } = useSelector((state) => state.enterprise);
@@ -481,6 +491,15 @@ const Order = () => {
   const [enterpriseOrderList, setEnterpriseOrderList] = useState([]);
   const [enterpriseBranches, setEnterpriseBranches] = useState(branches);
   const [vehicleTypeList, setVehicleTypeList] = useState(vehicleType);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   const goBack = () => {
     navigate(-1); // Navigate back to the previous page
@@ -597,7 +616,10 @@ const Order = () => {
                         onChange={handleInputChange}
                       />
                     </div>
-                    <button className={Styles.pickupHistoryFillterIcon}>
+                    <button
+                      onClick={handleOpenModal}
+                      className={Styles.pickupHistoryFillterIcon}
+                    >
                       <FontAwesomeIcon icon={faFilter} />
                     </button>
                   </div>
@@ -685,12 +707,12 @@ const Order = () => {
                       />
                     )}
                     {selectedTab === "tab3" && (
-                       <ShiftOrder
-                       orders={enterpriseOrderList}
-                       branches={branches}
-                       vehicles={vehicleType}
-                       navigation={navigation}
-                     />
+                      <ShiftOrder
+                        orders={enterpriseOrderList}
+                        branches={branches}
+                        vehicles={vehicleType}
+                        navigation={navigation}
+                      />
                     )}
                     {selectedTab === "tab4" && (
                       <PastOrder
@@ -698,7 +720,12 @@ const Order = () => {
                         locations={locationList}
                         vehicles={vehicleType}
                         navigation={navigation}
-                        />
+                      />
+                    )}
+                    {showModal && (
+                      <EnterpriseOrderFilterModal
+                        handleClose={handleCloseModal} // Pass the close handler
+                      />
                     )}
                   </div>
                 </div>
