@@ -6,7 +6,6 @@ import { faPaperclip, faRepeat } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
-import { UseFetch } from "../../utils/UseFetch";
 import { faCircle, faCircleDot } from "@fortawesome/free-regular-svg-icons";
 
 import { useForm, Controller } from "react-hook-form";
@@ -21,6 +20,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { TimePicker } from "react-time-picker";
 import "react-time-picker/dist/TimePicker.css";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 const EnterpriseAddPickupDetails = () => {
   const location = useLocation();
@@ -50,10 +50,6 @@ const EnterpriseAddPickupDetails = () => {
 
   const handleSelect = (option) => {
     setSelectedOption(option);
-  };
-
-  const handleRepeatOrder = (event) => {
-    setRepeatOrder(event.target.checked);
   };
 
   const FILE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -106,6 +102,58 @@ const EnterpriseAddPickupDetails = () => {
     pickupTime: yup
       .string()
       .matches(/^([0-9]{2}):([0-9]{2})$/, "Please enter a valid time (HH:MM)"),
+    repeatOrder: yup.boolean(),
+    repeatEvery: yup
+      .number()
+      .integer("Must be an integer")
+      .min(1, "Minimum value is 1")
+      .when("selectedOption", {
+        is: (value) => ["Daily", "Weekly", "Monthly"].includes(value),
+        then: yup.number().required("Repeat interval is required."),
+      }),
+    until: yup
+      .date()
+      .nullable()
+      .required("End date is required.")
+      .min(new Date(), "End date must be in the future."),
+    selectedDays: yup
+      .object()
+      .shape({
+        Monday: yup.boolean(),
+        Tuesday: yup.boolean(),
+        Wednesday: yup.boolean(),
+        Thursday: yup.boolean(),
+        Friday: yup.boolean(),
+        Saturday: yup.boolean(),
+        Sunday: yup.boolean(),
+      })
+      .when("selectedOption", {
+        is: "Weekly",
+        then: yup
+          .object()
+          .test(
+            "at-least-one-day",
+            "Select at least one day.",
+            (selectedDays) =>
+              Object.values(selectedDays || {}).some((day) => day === true)
+          ),
+      }),
+    // onDay: yup
+    //   .number()
+    //   .nullable()
+    //   .integer("Must be an integer")
+    //   .min(1, "Day must be at least 1")
+    //   .when("selectedOption", {
+    //     is: "Monthly",
+    //     then: yup.number().required("You must select a specific day."),
+    //   }),
+    // onThe: yup
+    //   .string()
+    //   .nullable()
+    //   .when("selectedOption", {
+    //     is: "Monthly",
+    //     then: yup.string().required("You must select a specific day."),
+    //   }),
   });
   const handleCheckboxChange = (event) => {
     const seletedValue = event.target.value;
@@ -118,6 +166,9 @@ const EnterpriseAddPickupDetails = () => {
   const defaultPhone = user?.userDetails?.phone.replace("+", "") || "";
   const [imagePreview, setImagePreview] = useState(null);
   const [time, setTime] = useState("10:00");
+  const [untilDate, setUntilDate] = useState(
+    moment(new Date()).format("YYYY-MM-DD")
+  );
   const {
     control,
     handleSubmit,
@@ -125,7 +176,11 @@ const EnterpriseAddPickupDetails = () => {
     setValue,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { selectCheckOption: "" },
+    defaultValues: {
+      selectCheckOption: "",
+      pickupDate: new Date(),
+      until: new Date(),
+    },
   });
 
   const handleImageChange = (e) => {
@@ -158,11 +213,20 @@ const EnterpriseAddPickupDetails = () => {
     navigate("/enterprise/order-preview", {
       state: {
         order: order,
-        orderCustomerDetails: data
+        orderCustomerDetails: data,
       },
     });
   };
 
+  const handleRepeatOrder = (event) => {
+    setRepeatOrder(event.target.checked);
+    setValue("repeatOrder", event.target.checked);
+  };
+
+  const handleUntilChange = (date) => {
+    setUntilDate(moment(date).format("YYYY-MM-DD"));
+    // setValue("until", date); // Update the form value dynamically
+  };
   return (
     <>
       {/* Header Start Here  */}
@@ -475,7 +539,7 @@ const EnterpriseAddPickupDetails = () => {
                     </div>
                   </div>
                 </div>
-
+                
                 <div
                   className={Styles.enterpriseSelectServiceRepeatOrderMainCard}
                 >
@@ -486,19 +550,20 @@ const EnterpriseAddPickupDetails = () => {
                       className={Styles.enterpriseSelectServiceRepeatOrderText}
                     >
                       Repeat this order
+                      {console.log("error", errors)}
                     </p>
-                    <Form>
-                      <Form.Check
-                        type="switch"
-                        id="repeat-switch"
-                        checked={repeatOrder}
-                        onChange={handleRepeatOrder}
-                        className={repeatOrder ? "repeat-switch" : ""}
-                      />
-                    </Form>
+
+                    <Form.Check
+                      type="switch"
+                      id="repeat-switch"
+                      checked={repeatOrder}
+                      onChange={handleRepeatOrder}
+                      className={repeatOrder ? "repeat-switch" : ""}
+                    />
                   </div>
+
                   {repeatOrder && (
-                    <div>
+                    <>
                       <div
                         className={Styles.enterpriseSelectServiceDayilyCardMain}
                       >
@@ -583,7 +648,6 @@ const EnterpriseAddPickupDetails = () => {
                           </p>
                         </div>
                       </div>
-
                       {selectedOption === "Daily" && (
                         <div
                           className={
@@ -608,30 +672,19 @@ const EnterpriseAddPickupDetails = () => {
                             </p>
                           </div>
                           <div>
-                            <Form.Select
-                              className={
-                                Styles.enterpriseSelectServiceRepeatDateSelect
-                              }
-                              aria-label="Default select example"
-                            >
-                              <option>1</option>
-                              <option value="1">2</option>
-                              <option value="2">3</option>
-                              <option value="3">4</option>
-                            </Form.Select>
-                          </div>
-                          <div>
-                            <Form.Select
-                              className={
-                                Styles.enterpriseSelectServiceRepeatDaySelect
-                              }
-                              aria-label="Default select example"
-                            >
-                              <option>Day</option>
-                              <option value="1">2</option>
-                              <option value="2">3</option>
-                              <option value="3">4</option>
-                            </Form.Select>
+                            <Controller
+                              name="repeatEvery"
+                              control={control}
+                              render={({ field }) => (
+                                <select {...field} className="form-select">
+                                  <option value="1">1</option>
+                                  <option value="2">2</option>
+                                  <option value="3">3</option>
+                                  <option value="4">4</option>
+                                  <option value="5">5</option>
+                                </select>
+                              )}
+                            />
                           </div>
                           <div
                             className={Styles.enterpriseSelectServiceUntilCard}
@@ -644,38 +697,50 @@ const EnterpriseAddPickupDetails = () => {
                               until
                             </p>
                             <div>
-                              <Form.Select
-                                className={
-                                  Styles.enterpriseSelectServiceRepeatDateuntil
-                                }
-                                aria-label="Default select example"
-                              >
-                                <option>8/23/2024</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
-                              </Form.Select>
+                              <Controller
+                                name="until"
+                                control={control}
+                                render={({ field }) => (
+                                  <DatePicker
+                                    selected={field.value || untilDate}
+                                    placeholderText="Select date"
+                                    onChange={(date) => {
+                                      field.onChange(date); // Update the form field
+                                      handleUntilChange(date); // Sync state
+                                    }}
+                                    minDate={new Date()} // Ensure date is in the future
+                                    dateFormat="yyyy-MM-dd"
+                                  />
+                                )}
+                              />
+
+                              {errors.until && (
+                                <p style={{ color: "red", fontSize: "13px" }}>
+                                  {errors.until.message}
+                                </p>
+                              )}
                             </div>
                           </div>
+
                           <div>
                             <p
                               className={
                                 Styles.enterpriseSelectServiceOccursday
                               }
                             >
+                              {" "}
                               Occurs every day until{" "}
                               <span
                                 className={
                                   Styles.enterpriseSelectServiceOccursSpan
                                 }
                               >
-                                August 23, 2024
+                                {untilDate}
                               </span>
                             </p>
                           </div>
                         </div>
                       )}
-
                       {selectedOption === "Weekly" && (
                         <div>
                           <div
@@ -703,17 +768,22 @@ const EnterpriseAddPickupDetails = () => {
                               </p>
                             </div>
                             <div>
-                              <Form.Select
+                              <Controller
+                                name="repeatEvery"
+                                control={control}
                                 className={
                                   Styles.enterpriseSelectServiceRepeatDateSelect
                                 }
-                                aria-label="Default select example"
-                              >
-                                <option>1</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
-                              </Form.Select>
+                                render={({ field }) => (
+                                  <select {...field} className="form-select">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                  </select>
+                                )}
+                              />
                             </div>
                             <div>
                               <Form.Select
@@ -722,10 +792,7 @@ const EnterpriseAddPickupDetails = () => {
                                 }
                                 aria-label="Default select example"
                               >
-                                <option>Week</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
+                                <option>Day</option>
                               </Form.Select>
                             </div>
 
@@ -742,17 +809,31 @@ const EnterpriseAddPickupDetails = () => {
                                 until
                               </p>
                               <div>
-                                <Form.Select
-                                  className={
-                                    Styles.enterpriseSelectServiceRepeatDateuntil
-                                  }
-                                  aria-label="Default select example"
-                                >
-                                  <option>8/23/2024</option>
-                                  <option value="1">2</option>
-                                  <option value="2">3</option>
-                                  <option value="3">4</option>
-                                </Form.Select>
+                                <Controller
+                                  name="until"
+                                  control={control}
+                                  render={({ field }) => (
+                                    <DatePicker
+                                      selected={field.value || untilDate}
+                                      placeholderText="Select date"
+                                      onChange={(date) => {
+                                        field.onChange(date); // Update the form field
+                                        handleUntilChange(date); // Sync state
+                                      }}
+                                      minDate={new Date()} // Ensure date is in the future
+                                      dateFormat="yyyy-MM-dd"
+                                      className={
+                                        Styles.enterpriseSelectServiceRepeatDateuntil
+                                      }
+                                    />
+                                  )}
+                                />
+
+                                {errors.until && (
+                                  <p style={{ color: "red", fontSize: "13px" }}>
+                                    {errors.until.message}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <div>
@@ -767,13 +848,13 @@ const EnterpriseAddPickupDetails = () => {
                                     Styles.enterpriseSelectServiceOccursSpan
                                   }
                                 >
-                                  August 23, 2024
+                                  {untilDate}
                                 </span>
                               </p>
                             </div>
                           </div>
                           <div className="d-flex flex-wrap">
-                            {Object.keys(selectedDays).map((day) => (
+                            {/* {Object.keys(selectedDays).map((day) => (
                               <div key={day} className="form-check">
                                 <Form.Check
                                   type="checkbox"
@@ -781,6 +862,27 @@ const EnterpriseAddPickupDetails = () => {
                                   label={day}
                                   checked={selectedDays[day]}
                                   onChange={() => handleDaySelect(day)}
+                                />
+                              </div>
+                            ))} */}
+                            {Object.keys(selectedDays).map((day) => (
+                              <div key={day} className="form-check">
+                                <Controller
+                                  name={`selectedDays.${day}`}
+                                  control={control}
+                                  render={({ field }) => (
+                                    <div>
+                                      <input
+                                        type="checkbox"
+                                        {...field}
+                                        checked={field.value}
+                                        onChange={(e) =>
+                                          field.onChange(e.target.checked)
+                                        }
+                                      />
+                                      <label>{day}</label>
+                                    </div>
+                                  )}
                                 />
                               </div>
                             ))}
@@ -815,17 +917,19 @@ const EnterpriseAddPickupDetails = () => {
                               </p>
                             </div>
                             <div>
-                              <Form.Select
-                                className={
-                                  Styles.enterpriseSelectServiceRepeatDateSelect
-                                }
-                                aria-label="Default select example"
-                              >
-                                <option>1</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
-                              </Form.Select>
+                              <Controller
+                                name="repeatEvery"
+                                control={control}
+                                render={({ field }) => (
+                                  <select {...field} className="form-select">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                  </select>
+                                )}
+                              />
                             </div>
                             <div>
                               <Form.Select
@@ -834,10 +938,7 @@ const EnterpriseAddPickupDetails = () => {
                                 }
                                 aria-label="Default select example"
                               >
-                                <option>Week</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
+                                <option>Day</option>
                               </Form.Select>
                             </div>
 
@@ -916,17 +1017,28 @@ const EnterpriseAddPickupDetails = () => {
                                 until
                               </p>
                               <div>
-                                <Form.Select
-                                  className={
-                                    Styles.enterpriseSelectServiceRepeatDateuntil
-                                  }
-                                  aria-label="Default select example"
-                                >
-                                  <option>8/23/2024</option>
-                                  <option value="1">2</option>
-                                  <option value="2">3</option>
-                                  <option value="3">4</option>
-                                </Form.Select>
+                                <Controller
+                                  name="until"
+                                  control={control}
+                                  render={({ field }) => (
+                                    <DatePicker
+                                      selected={field.value || untilDate}
+                                      placeholderText="Select date"
+                                      onChange={(date) => {
+                                        field.onChange(date); // Update the form field
+                                        handleUntilChange(date); // Sync state
+                                      }}
+                                      minDate={new Date()} // Ensure date is in the future
+                                      dateFormat="yyyy-MM-dd"
+                                    />
+                                  )}
+                                />
+
+                                {errors.until && (
+                                  <p style={{ color: "red", fontSize: "13px" }}>
+                                    {errors.until.message}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <div>
@@ -941,14 +1053,14 @@ const EnterpriseAddPickupDetails = () => {
                                     Styles.enterpriseSelectServiceOccursSpan
                                   }
                                 >
-                                  August 23, 2024
+                                  {untilDate}
                                 </span>
                               </p>
                             </div>
                           </div>
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
 
