@@ -61,6 +61,7 @@ const SetSchedule = () => {
 //       }
 //     }
 //   ];
+console.log('ts')
   const handleAddEvent = () => {
     
     if (!newEvent.start || !newEvent.end) {

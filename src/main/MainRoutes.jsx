@@ -59,7 +59,7 @@ import SetSchedule from "../components/enterprise/setSchedule";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
-  
+   
  
   return (
     <Router>
