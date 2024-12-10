@@ -20,10 +20,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "./CommonHeader";
 import { useSelector } from "react-redux";
 import getImage from "../components/consumer/common/GetImage";
-import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
+import { addPayment, checkPromoCode, createEnterpriseOrder, createPickupOrder } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
-import { addLocation, BASE_URL, buildAddress, getLocation, uploadImage } from "../utils/Constants";
+import { addLocation, BASE_URL, buildAddress, getLocation, localToUTC, uploadImage } from "../utils/Constants";
 
 const stripePromise = loadStripe("pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e");
 
@@ -96,101 +96,78 @@ const PaymentPage = ({
     // callPlaceOrder()
   }, [sourceLocationId, destinationLocationId,packageImageId]); 
   const placePickUpOrder = async () => {
-    if (user.userDetails) {
-      const distance = order?.distance;
-      const floatDistance = distance
-        ? parseFloat(distance.replace(" km", ""))
-        : 0;
-      let requestParams = {
-        enterprise_ext_id: user.userDetails.ext_id,
-        branch_id: order?.selectedBranch.id,
-        delivery_type_id: order?.serviceType.id,
-        service_type_id: order?.selectedServiceType,
-        vehicle_type_id: order?.selectedVehicleDetails.id,
-        pickup_date: params.pickup_date,
-        pickup_time: params.pickup_time,
-        pickup_location_id: sourceLocationId ||  1,
-        dropoff_location_id: destinationLocationId || 2,
-        is_repeat_mode: params.is_repeat_mode,
-        repeat_day: '',
-        is_my_self: 1,
-        first_name: userDetails.userDetails[0].first_name,
-        last_name: userDetails.userDetails[0].last_name,
-        company_name: orderCustomerDetails?.company,
-        email: user.userDetails.email,
-        mobile: params.mobile,
-        package_id: params.package_id,
-        pickup_notes: params.pickup_notes,
-        is_same_dropoff_location: 0,
-        repeat_dropoff_location_id: '',
-        distance:floatDistance,
-        total_amount: parseFloat(order.selectedVehiclePrice),
-        package_photo: packageImageId,
-        repeat_mode: orderCustomerDetails?.repeat_mode,
-        repeat_every: orderCustomerDetails?.repeat_every,
-        repeat_until: orderCustomerDetails?.repeat_until,
-      };
-      if (order.selectedBranch) {
-        requestParams.branches = order.selectedBranch;
-      }
-      // if (order.date) {
-      //   var scheduleParam = {
-      //     schedule_date_time: order?.date + " " + order?.time,
-      //   };
-      // }
-      // const distance = order?.distance;
-      // const floatDistance = distance
-      //   ? parseFloat(distance.replace(" km", ""))
-      //   : 0;
-      // let requestParams = {
-      //   consumer_ext_id: user.userDetails.ext_id,
-      //   service_type_id: order?.date ? 1 : 2,
-      //   vehicle_type_id: order?.selectedVehicleDetails.id,
-      //   pickup_location_id: sourceLocationId ||  1,
-      //   dropoff_location_id: destinationLocationId || 2,
-      //   distance: floatDistance,
-      //   total_amount: parseFloat(paymentAmount),
-      //   discount: offerDiscount,
-      //   pickup_notes: orderCustomerDetails?.pickupNotes || "",
-      //   company_name: orderCustomerDetails?.company || "",
-      //   drop_first_name: dropoffDetail?.first_name || "",
-      //   drop_last_name: dropoffDetail?.last_name || "",
-      //   drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
-      //   package_photo:packageImageId,
-      //   drop_company_name: dropoffDetail?.company || "",
-      //   ...scheduleParam,
-      // };
-
-      // if (promoCodeResponse) {
-      //   requestParams.promo_code = promoCodeResponse.promoCode;
-      //   requestParams.promo_value = promoCodeResponse.discount;
-      //   requestParams.order_amount = parseFloat(totalAmount);
-      // }
-
-      setLoading(true);
-      // createPickupOrder(
-      //   requestParams,
-      //   (successResponse) => {
-      //     if (successResponse[0]._success) {
-      //       setLoading(false);
-      //       setOrderNumber(successResponse[0]._response[0].order_number);
-      //     }
-      //   },
-      //   (errorResponse) => {
-      //     setLoading(false);
-
-      //     if (errorResponse.errors) {
-      //       err = errorResponse.errors.msg[0].msg;
-      //     } else {
-      //       err = errorResponse[0]._errors.message;
-      //     }
-      //     showErrorToast(err);
-      //   }
-      // );
-    } else {
+    if (!user?.userDetails) {
       showErrorToast("Consumer extended ID missing");
+      return;
+    }
+  
+    const distance = order?.distance;
+    const floatDistance = distance ? parseFloat(distance.replace(" km", "")) : 0;
+  
+    let requestParams = {
+      enterprise_ext_id: user.userDetails.ext_id,
+      branch_id: order?.selectedBranch?.id,
+      delivery_type_id: order?.serviceType?.id,
+      service_type_id: order?.selectedServiceType,
+      vehicle_type_id: order?.selectedVehicleDetails?.id,
+      pickup_date: localToUTC(order?.orderCustomerDetails?.pickupDate),
+      pickup_time: order?.orderCustomerDetails?.pickupTime,
+      pickup_location_id: sourceLocationId,
+      dropoff_location_id: destinationLocationId,
+      is_repeat_mode: order?.orderCustomerDetails?.repeatOrder,
+      repeat_mode: order?.orderCustomerDetails?.selectedOption,
+      repeat_every: order?.orderCustomerDetails?.repeatEvery,
+      repeat_until: localToUTC(order?.orderCustomerDetails?.until),
+      repeat_day: order?.orderCustomerDetails?.days || "",
+      package_photo: packageImageId,
+      package_id: order?.orderCustomerDetails?.packageId,
+      distance: floatDistance,
+      total_amount: parseFloat(paymentAmount),
+      pickup_notes: order?.orderCustomerDetails?.pickup_notes,
+    };
+  
+    if (order?.serviceType?.id !== 1) {
+      // Add alternative logic for other service types here if needed
+      requestParams = {
+        // Provide appropriate fallback or adjustments for `requestParams`
+      };
+    }
+  
+    if (promoCodeResponse) {
+      requestParams.promo_code = promoCodeResponse.promoCode;
+      requestParams.promo_value = promoCodeResponse.discount;
+      requestParams.order_amount = parseFloat(totalAmount);
+    }
+  
+    try {
+      setLoading(true);
+  
+      createEnterpriseOrder(
+        requestParams,
+        (successResponse) => {
+          setLoading(false);
+  
+          if (successResponse[0]?._success) {
+            console.log("createEnterpriseOrder", successResponse[0]._response);
+            setOrderNumber(successResponse[0]._response[0]?.order_number);
+          } else {
+            showErrorToast("Order creation failed. Please try again.");
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+  
+          const err = errorResponse?.errors?.msg?.[0]?.msg || errorResponse[0]?._errors?.message || "An error occurred";
+          showErrorToast(err);
+        }
+      );
+    } catch (error) {
+      setLoading(false);
+      console.error("Error placing order:", error);
+      showErrorToast("An unexpected error occurred. Please try again.");
     }
   };
+  
 
   const doPayment = async () => {
     setLoading(true);
@@ -202,10 +179,10 @@ const PaymentPage = ({
             name: user?.userDetails.first_name +" "+ user?.userDetails?.last_name,
             email: user?.userDetails.email || '',
             address: {
-              line1: addPickupL?.address,
-              city: addPickupL?.city,
-              postal_code: addPickupL?.postal_code,
-              country:addPickupL?.country,
+              line1: order?.addPickupLocation?.address,
+              city: order?.addPickupLocation?.city,
+              postal_code: order?.addPickupLocation?.postal_code,
+              country:order?.addPickupLocation?.country,
             }
           }
         }
@@ -465,7 +442,7 @@ const PaymentPage = ({
                     Cancel
                   </button>
 
-                  {/* <form onSubmit={handleSubmit}>
+                  <form onSubmit={handleSubmit}>
                     <PaymentElement />
                     <button
                       type="submit"
@@ -475,7 +452,7 @@ const PaymentPage = ({
                       {loading ? "Processing..." : "Pay Now"}
                     </button>
                   </form>
-                  {message && <p>{showSuccessToast(message)}</p>} */}
+                  {message && <p>{showSuccessToast(message)}</p>}
                 </div>
               </div>
             </div>

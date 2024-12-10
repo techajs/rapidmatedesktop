@@ -6,9 +6,10 @@ import Van from "../../../assets/images/Van.png";
 import Pickup from "../../../assets/images/Pickup.png";
 import Truck from "../../../assets/images/Truck.png";
 import Other from "../../../assets/images/Package.png";
+import VehicleSelection from "./VehicleSelection";
 
 const getImage = (vehicleData) => {
-  switch (vehicleData.vehicle_type_id) {
+  switch (vehicleData?.vehicle_type_id || vehicleData?.id) {
     case 1:
       return Bicycle;
     case 2:

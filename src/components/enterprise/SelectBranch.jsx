@@ -20,7 +20,7 @@ const SelectBranch = () => {
   const navigate = useNavigate();
   const [enterpriseBranch, setEnterpriseBranches] = useState(null);
 
-
+ console.log("test",serviceType?.delivery_type?.toLowerCase().replace(/ /g, '-'))
   const getBranchLocation = () => {
     getEnterpriseBranch(
       user.userDetails.ext_id,

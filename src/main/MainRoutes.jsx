@@ -54,6 +54,8 @@ import SearchDriver from "../common/SearchDriver";
 import LiveTracking from "../common/LiveTracking";
 import OneTimeDelivery from "../components/enterprise/OneTimeDelivery";
 import Order from "../components/enterprise/Order";
+import EnterpriseCreateShiftSelectServiceType from "../components/enterprise/EnterpriseCreateShiftSelectServiceType";
+import SetSchedule from "../components/enterprise/setSchedule";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -115,6 +117,14 @@ function MainRoutes() {
         <Route
           path={`/enterprise/multiple-deliveries`}
           element={<MultipleDelivery />}
+        />
+        <Route
+          path={`/enterprise/create-shift`}
+          element={<EnterpriseCreateShiftSelectServiceType />}
+        />
+        <Route
+          path={`/enterprise/set-schedule`}
+          element={<SetSchedule />}
         />
         <Route
           path={`/enterprise/enterprises-schedule-approved`}

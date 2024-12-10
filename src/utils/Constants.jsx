@@ -1,3 +1,4 @@
+import moment from "moment";
 import { getLocationId, uploadDocumentsApi } from "../data_manager/dataManage";
 
 export const HTTPMethod = {
@@ -186,3 +187,7 @@ export const addLocation = (locationParams) => {
 
 
 export const buildAddress = (...parts) => parts.filter(Boolean).join(",");
+
+export const localToUTC=(date=new Date(),timezone,format='YYYY-MM-DD HH:mm:ss')=>{
+  return moment(date,timezone || Intl.DateTimeFormat().resolvedOptions().timeZone).utc().format(format)
+}

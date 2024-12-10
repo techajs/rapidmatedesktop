@@ -38,7 +38,6 @@ function OneTimeDelivery() {
     lng: parseFloat(selectedBranch.longitude),
   });
 
-  console.log("selecttype",serviceType?.id)
   const [currentLocation, setCurrentLocation] = useState();
   const [vehicleTypeList, setVehicleTypeList] = useState([]);
   const [loading, setLoading] = useState(false);
