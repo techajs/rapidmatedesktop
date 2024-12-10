@@ -11,7 +11,7 @@ import { faClock, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons
 import { Form } from "react-bootstrap";
 import CalenderEvent from "./setting/CalenderEvent";
 import moment from "moment";
-const SetSchedule = () => {
+const SetNewSchedule = () => {
   const user = useSelector((state) => state.auth.user);
   const [loading,setLoading]=useState(false)
   const [currentData,setCurrentDate]=useState(moment(new Date()).format('MMMM D, YYYY'))
@@ -262,4 +262,4 @@ console.log('ts')
   );
 };
 
-export default SetSchedule;
+export default SetNewSchedule;

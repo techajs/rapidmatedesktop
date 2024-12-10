@@ -55,7 +55,8 @@ import LiveTracking from "../common/LiveTracking";
 import OneTimeDelivery from "../components/enterprise/OneTimeDelivery";
 import Order from "../components/enterprise/Order";
 import EnterpriseCreateShiftSelectServiceType from "../components/enterprise/EnterpriseCreateShiftSelectServiceType";
-import SetSchedule from "../components/enterprise/setSchedule";
+import SetNewSchedule from "../components/enterprise/SetNewSchedule";
+
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -124,7 +125,7 @@ function MainRoutes() {
         />
         <Route
           path={`/enterprise/set-schedule`}
-          element={<SetSchedule />}
+          element={<SetNewSchedule />}
         />
         <Route
           path={`/enterprise/enterprises-schedule-approved`}
