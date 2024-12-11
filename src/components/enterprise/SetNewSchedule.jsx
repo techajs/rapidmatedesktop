@@ -67,43 +67,43 @@ const SetNewSchedule = () => {
     allDay: false,
   });
 
-  const getOrder = () => {
-    let params = {
-      enterprise_ext_id: user.userDetails.ext_id,
-      delivery_type_id: 3,
-    };
+  // const getOrder = () => {
+  //   let params = {
+  //     enterprise_ext_id: user.userDetails.ext_id,
+  //     delivery_type_id: 3,
+  //   };
   
-    setLoading(true);
-    searchOrderApi(
-      params,
-      (successResponse) => {
-        setLoading(false);
-        if (successResponse[0]._success) {
-          const filteredOrders = successResponse[0]._response.filter((item) => item.slots.length > 0 && item.branch_id === branch?.id);
+  //   setLoading(true);
+  //   searchOrderApi(
+  //     params,
+  //     (successResponse) => {
+  //       setLoading(false);
+  //       if (successResponse[0]._success) {
+  //         const filteredOrders = successResponse[0]._response.filter((item) => item.slots.length > 0 && item.branch_id === branch?.id);
   
-          // Map the filtered orders into the desired structure
-          const mappedOrders = filteredOrders.map((order,key) => ({
-            title: "Created Shift" + key ,
-            start: order.shift_from_date ? moment(order.shift_from_date).toDate() :new Date(currentYear, currentMonth, 6, 11, 30),
-            end:order.shift_tp_date ?  moment(order.shift_tp_date).toDate() : new Date(currentYear, currentMonth, 6, 12, 30),
-            allDay: false,
-            resource:order,
-          }));
+  //         // Map the filtered orders into the desired structure
+  //         const mappedOrders = filteredOrders.map((order,key) => ({
+  //           title: "Created Shift" + key ,
+  //           start: order.shift_from_date ? moment(order.shift_from_date).toDate() :new Date(currentYear, currentMonth, 6, 11, 30),
+  //           end:order.shift_tp_date ?  moment(order.shift_tp_date).toDate() : new Date(currentYear, currentMonth, 6, 12, 30),
+  //           allDay: false,
+  //           resource:order,
+  //         }));
   
-          setEvents(mappedOrders); // Set the transformed orders into state
-        }
-      },
-      (errorResponse) => {
-        setLoading(false);
-        setEnterpriseOrderList([]);
-        showErrorToast(errorResponse[0]._errors.message);
-      }
-    );
-  };
+  //         setEvents(mappedOrders); // Set the transformed orders into state
+  //       }
+  //     },
+  //     (errorResponse) => {
+  //       setLoading(false);
+  //       setEnterpriseOrderList([]);
+  //       showErrorToast(errorResponse[0]._errors.message);
+  //     }
+  //   );
+  // };
   
-  useEffect(()=>{
-    getOrder()
-  },[user])
+  // useEffect(()=>{
+  //   getOrder()
+  // },[user])
   console.log("order",orders)
   const [calendarDate, setCalendarDate] = useState(new Date());
 
