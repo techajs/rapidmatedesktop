@@ -1,51 +1,46 @@
-import React from "react";
+import React, { memo } from "react";
 import Styles from "../../assets/css/home.module.css";
-import Approved from "../../assets/images/Booking-Approved.png";
-import Celebration from "../../assets/images/Celebration-Bg.png";
-import Logo from "../../assets/images/Logo-icon.png";
-import { Link } from "react-router-dom";
+import Timeline from "../../assets/images/Signup-loader.png";
+import CommonHeader from "../../common/CommonHeader";
+import { useSelector } from "react-redux";
+import SideComponent from "./common/SideComponent";
 
-const EnterpriseScheduleApproved = () => {
+const EnterpriseScheduleApproved = memo(() => {
+  const user = useSelector((state) => state.auth.user);
   return (
     <>
-      <section className={Styles.enterpriseScheduleApprovedSec}>
-        <div className="container">
-          <div>
-            <a className={Styles.logoCard} href="#">
-              <img className={Styles.logo} src={Logo} alt="Rapidmate Logo" />
-              <h2 className={Styles.companyName}>Rapidmate</h2>
-            </a>
-          </div>
-          <div className={Styles.row}>
-            <div className={Styles.colMd12}>
-              <div className={Styles.deliveryboyThankyoumainCard}>
-                <div>
-                  <div className={Styles.deliveryboyThankyouLoaderImgCard}>
-                    <img
-                      className={Styles.deliveryboyScheduleApprovedImg}
-                      src={Approved}
-                      alt="Approved"
-                    />
-                  </div>
-                  <div>
-                    <h4 className={Styles.deliveryboyThankyouSignupText}>
-                      Thank you for signing up
-                    </h4>
-                    <p className={Styles.deliveryboyThankyouSignupDiscription}>
-                      We are reviewing your request and we will update you about
-                      it shortly.
-                    </p>
+      <CommonHeader userData={user} />
+      <section className={Styles.enterprisenewScheduleSec}>
+        <div>
+          <div className={`row ${Styles.manageRow}`}>
+            <div className="col-md-4">
+              <SideComponent icon={true} />
+            </div>
+            <div className="col-md-8">
+            <div className={Styles.enterpriseCreateShiftRequestLoaderMainCard}>
+                <div className={Styles.enterpriseCreateShiftRequestLoaderImageCard}>
+                  <img
+                    style={{height:'150px',marginTop:"25px"}}
+                    src={Timeline}
+                    alt="loader"
+                  />
+                </div>
+                <h4 className={Styles.enterpriseCreateShiftRequestSubmitText}>
+                  Schedule request submitted
+                </h4>
+                <p className={Styles.enterpriseCreateShiftRequestSubmitDiscription}>
+                  We are reviewing your request and we will notify you soon via
+                  email or phone call
+                </p>
+              </div>
+              <div className={`${Styles.enterpriseSelectServiceNextBtnCard} m-5`}>
 
-                    <div className={Styles.deliveryboyThankyouSignupBtnCard}>
-                      <Link
-                        to=""
-                        className={Styles.pickupSignupContinueBtn}
-                        type="button"
-                      >
-                        Ok
-                      </Link>
-                    </div>
-                  </div>
+                <div
+                  onClick={() => navigate("/enterprise/dashboard")}
+                  className={Styles.enterpriseSelectServiceNextBtn}
+                  style={{ cursor: "pointer" }}
+                >
+                  ok
                 </div>
               </div>
             </div>
@@ -54,6 +49,6 @@ const EnterpriseScheduleApproved = () => {
       </section>
     </>
   );
-};
+});
 
 export default EnterpriseScheduleApproved;

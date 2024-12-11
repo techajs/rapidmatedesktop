@@ -123,6 +123,7 @@ const PaymentPage = ({
         drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
         package_photo:packageImageId,
         drop_company_name: dropoffDetail?.company || "",
+        drop_notes: dropoffDetail?.dropoff_note || "",
         ...scheduleParam,
       };
 

@@ -32,7 +32,7 @@ const EnterpriseAddPickupDetails = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const { order } = location.state || {};
-
+console.log('order',order)
   const [selectCheckOption, setSelectedCheckOption] = useState("custom");
   const [repeatOrder, setRepeatOrder] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Daily");

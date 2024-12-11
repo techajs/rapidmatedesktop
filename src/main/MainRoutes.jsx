@@ -128,10 +128,6 @@ function MainRoutes() {
           element={<SetNewSchedule />}
         />
         <Route
-          path={`/enterprise/enterprises-schedule-approved`}
-          element={<EnterpriseScheduleApproved />}
-        />
-        <Route
           path={`/enterprise/enterprises-multiple-deliveries-selectlocation`}
           element={<EnterpriseMultipleDeliverySelectLocation />}
         />
@@ -210,6 +206,15 @@ function MainRoutes() {
           element={
             <ProtectedRoute requiredRole={userRole}>
               <Order />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path={'/enterprise/schedule-request'}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <EnterpriseScheduleApproved />
             </ProtectedRoute>
           }
         />

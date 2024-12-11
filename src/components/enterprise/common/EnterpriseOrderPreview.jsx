@@ -27,13 +27,11 @@ const EnterpriseOrderPreview = () => {
     URL.createObjectURL(orderCustomerDetails?.file[0]) || null
   );
 
-  console.log("orderCustomerDetails",orderCustomerDetails)
   const [isAddressAdd, setIsAddressAdd] = useState(false);
-  
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    
+
     navigate("/enterprise/payment", {
       state: {
         order,
@@ -41,12 +39,45 @@ const EnterpriseOrderPreview = () => {
         isAddressAdd,
       },
     });
-   
   };
 
-  const handleSaveAddress=(e)=>{
-    setIsAddressAdd(!isAddressAdd)
-  }
+  const handleSaveAddress = (e) => {
+    setIsAddressAdd(!isAddressAdd);
+  };
+
+  const getOrderAddress = (serviceTypeId, order) => {
+    if (serviceTypeId == 2) {
+      return buildAddress(
+        order?.selectedBranch.address,
+        order?.selectedBranch.city,
+        order?.selectedBranch.state,
+        order?.selectedBranch.country,
+        order?.selectedBranch.postal_code
+      );
+    } else {
+      return (
+        order?.addPickupLocation?.address +
+        "," +
+        order?.addPickupLocation?.city +
+        "," +
+        order?.addPickupLocation?.state +
+        "," +
+        order?.addPickupLocation?.country +
+        "-" +
+        order?.addPickupLocation?.postal_code
+      );
+    }
+  };
+  const getDropoffLocation = (location) => {
+    const result = getLocation(location, location.lat, location.lng);
+    return buildAddress(
+      result.address,
+      result.city,
+      result.state,
+      result.country,
+      result.postal_code
+    );
+  };
   return (
     <>
       <CommonHeader userData={user} />
@@ -78,24 +109,42 @@ const EnterpriseOrderPreview = () => {
                       className={Styles.pickupOrderPreviewLocationIcon}
                       icon={faLocationDot}
                     />
-                    <p className={Styles.pickuporderPreviewPickupAddressText}>
-                    {order?.addPickupLocation?.address + ","} {order?.addPickupLocation?.city + ","+order?.addPickupLocation?.state+","+order?.addPickupLocation?.country+"-"+order?.addPickupLocation?.postal_code}
 
+                    <p className={Styles.pickuporderPreviewPickupAddressText}>
+                      {getOrderAddress(order?.serviceType?.id, order)}
                     </p>
                   </div>
 
                   <div className={Styles.PickupOrderPreviewBorderShowOff} />
 
-                  <div className={Styles.pickupOrderPreviewPickupAddressCard}>
-                    <FontAwesomeIcon
-                      className={Styles.pickupOrderPreviewLocationIcon}
-                      icon={faLocationCrosshairs}
-                    />
-                    <p className={Styles.pickuporderPreviewPickupAddressText}>
-                    {order?.addDestinationLocation?.address + ","} {order?.addDestinationLocation?.city + ","+order?.addDestinationLocation?.state+","+order?.addDestinationLocation?.country+"-"+order?.addDestinationLocation?.postal_code}
-
-                    </p>
-                  </div>
+                  {order?.serviceType?.id === 2 ? (
+                    order?.dropoffLocation?.map((location, index) => (
+                      <div
+                        key={index}
+                        className={Styles.pickupOrderPreviewPickupAddressCard}
+                      >
+                        <FontAwesomeIcon
+                          className={Styles.pickupOrderPreviewLocationIcon}
+                          icon={faLocationCrosshairs}
+                        />
+                        <p
+                          className={Styles.pickuporderPreviewPickupAddressText}
+                        >
+                          {getDropoffLocation(location)}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={Styles.pickupOrderPreviewPickupAddressCard}>
+                      <FontAwesomeIcon
+                        className={Styles.pickupOrderPreviewLocationIcon}
+                        icon={faLocationCrosshairs}
+                      />
+                      <p className={Styles.pickuporderPreviewPickupAddressText}>
+                        {`${order?.addDestinationLocation?.address}, ${order?.addDestinationLocation?.city}, ${order?.addDestinationLocation?.state}, ${order?.addDestinationLocation?.country}-${order?.addDestinationLocation?.postal_code}`}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className={Styles.pickupOrderPreviewVehicleCard}>
@@ -260,21 +309,15 @@ const EnterpriseOrderPreview = () => {
                 </div>
 
                 <div>
-                  {checkboxTypes.map((type) => (
-                    <div
-                      key={`default-${type}`}
-                      className={`mb-3 ${Styles.checkboxCard}`}
-                    >
-                      <Form.Check
-                        type={type}
-                        id={`default-${type}`}
-                        label={"Save thes addresses for later"}
-                        checked={isAddressAdd}
-                        className={`${Styles.saveAddresslaterCheckBox}`}
-                        onClick={handleSaveAddress}
-                      />
-                    </div>
-                  ))}
+                  <div className={`mb-3 ${Styles.checkboxCard}`}>
+                    <Form.Check
+                      type="checkbox"
+                      id={`default-checkbox`}
+                      label={"Save these addresses for later"}
+                      defaultChecked={isAddressAdd}
+                      className={`${Styles.saveAddresslaterCheckBox}`}
+                    />
+                  </div>
                 </div>
 
                 <div className={Styles.addPickupDetailsBtnCard}>
@@ -289,7 +332,7 @@ const EnterpriseOrderPreview = () => {
                   <div
                     onClick={submitHandler}
                     className={Styles.addPickupDetailsNextBtn}
-                    style={{cursor:"pointer"}}
+                    style={{ cursor: "pointer" }}
                   >
                     Proceed to payment
                   </div>

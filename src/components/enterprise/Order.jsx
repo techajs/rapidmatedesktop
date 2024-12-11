@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -21,7 +21,7 @@ import { buildAddress } from "../../utils/Constants";
 import moment from "moment";
 import EnterpriseOrderFilterModal from "./common/EnterpriseOrderFilterModal";
 
-const OneTime = ({ orders, locations, vehicles, navigation }) => {
+const OneTime = memo(({ orders, locations, vehicles, navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [index, setIndex] = useState(0);
   const getLocationAddress = (locationId) => {
@@ -135,9 +135,9 @@ const OneTime = ({ orders, locations, vehicles, navigation }) => {
       </div>
     </section>
   );
-};
+});
 
-const MultipleTimeOrder = ({ orders, locations, vehicles, navigation }) => {
+const MultipleTimeOrder = memo(({ orders, locations, vehicles, navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [index, setIndex] = useState(0);
   const getLocationAddress = (locationId) => {
@@ -249,9 +249,9 @@ const MultipleTimeOrder = ({ orders, locations, vehicles, navigation }) => {
       </div>
     </section>
   );
-};
+});
 
-const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
+const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
   const getBranchName = (branchId) => {
     let result = branches.filter((branch) => branch.id == branchId);
     return result[0]?.branch_name;
@@ -366,9 +366,9 @@ const ShiftOrder = ({ orders, branches, vehicles, navigation }) => {
       </div>
     </section>
   );
-};
+});
 
-const PastOrder = ({ orders, locations, vehicles, navigation }) => {
+const PastOrder = memo(({ orders, locations, vehicles, navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [index, setIndex] = useState(0);
   const getLocationAddress = (locationId) => {
@@ -475,7 +475,7 @@ const PastOrder = ({ orders, locations, vehicles, navigation }) => {
       </div>
     </section>
   );
-};
+});
 const Order = () => {
   const user = useSelector((state) => state.auth.user);
   const { branches } = useSelector((state) => state.enterprise);
@@ -541,18 +541,17 @@ const Order = () => {
     if (newTab === "tab1") {
       params = { tab_id: 1 };
     } else if (newTab === "tab2") {
-      params = { tab_id: 4 };
+      params = { tab_id: 2 };
     } else if (newTab === "tab3") {
-      params = { tab_id: 5 };
+      params = { tab_id: 3 };
     } else if (newTab === "tab4") {
-      params = { tab_id: 6 };
+      params = { tab_id: 4 };
     }
 
     setParamList(params);
   };
 
   const searchFunction = (params) => {
-    console.log("param", params);
     params.enterprise_ext_id = user.userDetails.ext_id;
     setLoading(true);
     searchOrderApi(
@@ -560,7 +559,7 @@ const Order = () => {
       (successResponse) => {
         setLoading(false);
         if (successResponse[0]._success) {
-          if (params.tab_id == 2) {
+          if (params.tab_id == 3) {
             setEnterpriseOrderList(
               successResponse[0]._response.filter(
                 (item) => item.slots.length > 0

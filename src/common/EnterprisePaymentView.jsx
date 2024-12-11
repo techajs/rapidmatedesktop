@@ -20,12 +20,26 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "./CommonHeader";
 import { useSelector } from "react-redux";
 import getImage from "../components/consumer/common/GetImage";
-import { addPayment, checkPromoCode, createEnterpriseOrder, createPickupOrder } from "../data_manager/dataManage";
+import {
+  addPayment,
+  checkPromoCode,
+  createEnterpriseOrder,
+  createPickupOrder,
+} from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
-import { addLocation, BASE_URL, buildAddress, getLocation, localToUTC, uploadImage } from "../utils/Constants";
+import {
+  addLocation,
+  BASE_URL,
+  buildAddress,
+  getLocation,
+  localToUTC,
+  uploadImage,
+} from "../utils/Constants";
 
-const stripePromise = loadStripe("pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e");
+const stripePromise = loadStripe(
+  "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
+);
 
 const PaymentPage = ({
   clientSecret,
@@ -36,7 +50,7 @@ const PaymentPage = ({
 }) => {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
-  const  navigate= useNavigate();
+  const navigate = useNavigate();
 
   const { order, orderCustomerDetails } = location.state || {};
   const stripe = useStripe();
@@ -50,24 +64,63 @@ const PaymentPage = ({
   const [sourceLocationId, setSourceLocationId] = useState("");
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [packageImageId, setPackageImageId] = useState(null);
-  console.log("order",order)
-  console.log("ordercus",orderCustomerDetails)
+  // console.log("order", order);
+  // console.log("ordercus", orderCustomerDetails);
+
+  const getOrderAddress = (serviceTypeId, order) => {
+    if (serviceTypeId == 2) {
+      return buildAddress(
+        order?.selectedBranch.address,
+        order?.selectedBranch.city,
+        order?.selectedBranch.state,
+        order?.selectedBranch.country,
+        order?.selectedBranch.postal_code
+      );
+    } else {
+      return (
+        order?.addPickupLocation?.address +
+        "," +
+        order?.addPickupLocation?.city +
+        "," +
+        order?.addPickupLocation?.state +
+        "," +
+        order?.addPickupLocation?.country +
+        "-" +
+        order?.addPickupLocation?.postal_code
+      );
+    }
+  };
+  const getDropoffLocation = (location) => {
+    const result = getLocation(location, location.lat, location.lng);
+    return buildAddress(
+      result.address,
+      result.city,
+      result.state,
+      result.country,
+      result.postal_code
+    );
+  };
 
   const handleSubmit = async (event) => {
+
     event.preventDefault();
+    if(order?.serviceType.id==2){
+      showErrorToast('Multiple deliveries not available service for this moment.')
+      return
+    }
     setLoading(true);
     if (!stripe || !elements) return;
 
     try {
-      const pickupLocationParam=order?.addPickupLocation
-      const dropoffLocationParam=order?.addDestinationLocation
+      const pickupLocationParam = order?.addPickupLocation;
+      const dropoffLocationParam = order?.addDestinationLocation;
       const pickupLocatiId = await addLocation(pickupLocationParam);
       const dropoffLocatiId = await addLocation(dropoffLocationParam);
-      if (pickupLocatiId=="false") {
+      if (pickupLocatiId == "false") {
         showErrorToast("Something went wrong.");
         return true;
       }
-      if (dropoffLocatiId=="false") {
+      if (dropoffLocatiId == "false") {
         showErrorToast("Something went wrong.");
         return true;
       }
@@ -85,25 +138,27 @@ const PaymentPage = ({
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
-    const callPlaceOrder = async () =>{
-      await placePickUpOrder()
-    }
-    if(sourceLocationId && destinationLocationId && packageImageId){
-      callPlaceOrder()
+    const callPlaceOrder = async () => {
+      await placePickUpOrder();
+    };
+    if (sourceLocationId && destinationLocationId && packageImageId) {
+      callPlaceOrder();
     }
     // callPlaceOrder()
-  }, [sourceLocationId, destinationLocationId,packageImageId]); 
+  }, [sourceLocationId, destinationLocationId, packageImageId]);
   const placePickUpOrder = async () => {
     if (!user?.userDetails) {
       showErrorToast("Consumer extended ID missing");
       return;
     }
-  
+
     const distance = order?.distance;
-    const floatDistance = distance ? parseFloat(distance.replace(" km", "")) : 0;
-  
+    const floatDistance = distance
+      ? parseFloat(distance.replace(" km", ""))
+      : 0;
+
     let requestParams = {
       enterprise_ext_id: user.userDetails.ext_id,
       branch_id: order?.selectedBranch?.id,
@@ -125,28 +180,28 @@ const PaymentPage = ({
       total_amount: parseFloat(paymentAmount),
       pickup_notes: order?.orderCustomerDetails?.pickup_notes,
     };
-  
+
     if (order?.serviceType?.id !== 1) {
       // Add alternative logic for other service types here if needed
       requestParams = {
         // Provide appropriate fallback or adjustments for `requestParams`
       };
     }
-  
+
     if (promoCodeResponse) {
       requestParams.promo_code = promoCodeResponse.promoCode;
       requestParams.promo_value = promoCodeResponse.discount;
       requestParams.order_amount = parseFloat(totalAmount);
     }
-  
+
     try {
       setLoading(true);
-  
+
       createEnterpriseOrder(
         requestParams,
         (successResponse) => {
           setLoading(false);
-  
+
           if (successResponse[0]?._success) {
             console.log("createEnterpriseOrder", successResponse[0]._response);
             setOrderNumber(successResponse[0]._response[0]?.order_number);
@@ -156,8 +211,11 @@ const PaymentPage = ({
         },
         (errorResponse) => {
           setLoading(false);
-  
-          const err = errorResponse?.errors?.msg?.[0]?.msg || errorResponse[0]?._errors?.message || "An error occurred";
+
+          const err =
+            errorResponse?.errors?.msg?.[0]?.msg ||
+            errorResponse[0]?._errors?.message ||
+            "An error occurred";
           showErrorToast(err);
         }
       );
@@ -167,27 +225,27 @@ const PaymentPage = ({
       showErrorToast("An unexpected error occurred. Please try again.");
     }
   };
-  
 
   const doPayment = async () => {
     setLoading(true);
-    const { error,paymentIntent} = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         payment_method_data: {
           billing_details: {
-            name: user?.userDetails.first_name +" "+ user?.userDetails?.last_name,
-            email: user?.userDetails.email || '',
+            name:
+              user?.userDetails.first_name + " " + user?.userDetails?.last_name,
+            email: user?.userDetails.email || "",
             address: {
               line1: order?.addPickupLocation?.address,
               city: order?.addPickupLocation?.city,
               postal_code: order?.addPickupLocation?.postal_code,
-              country:order?.addPickupLocation?.country,
-            }
-          }
-        }
+              country: order?.addPickupLocation?.country,
+            },
+          },
+        },
       },
-      redirect: "if_required", 
+      redirect: "if_required",
     });
 
     if (error) {
@@ -196,9 +254,11 @@ const PaymentPage = ({
 
     if (paymentIntent?.status === "succeeded") {
       setMessage("Payment successful!");
-      await createPayment()
+      await createPayment();
     } else {
-      showErrorToast(`Payment not successful. Current status: ${paymentIntent?.status}`);
+      showErrorToast(
+        `Payment not successful. Current status: ${paymentIntent?.status}`
+      );
     }
 
     setLoading(false);
@@ -215,7 +275,6 @@ const PaymentPage = ({
       offerDiscount > 0 &&
         setPaymentAmount(calculateFinalPrice(paymentAmount, offerDiscount));
     }
-    
   }, []);
 
   const handleApplyCoupon = () => {
@@ -261,7 +320,7 @@ const PaymentPage = ({
         if (successResponse[0]._success) {
           navigate("/consumer/find-driver", {
             state: {
-              orderNumber:orderNumber
+              orderNumber: orderNumber,
             },
           });
         }
@@ -271,19 +330,19 @@ const PaymentPage = ({
           order_number: orderNumber,
           status: "Payment Failed",
         };
-       showErrorToast('Payment Failed.')
+        showErrorToast("Payment Failed.");
       }
     );
   };
 
-  const pickupLocation =buildAddress(
+  const pickupLocation = buildAddress(
     order?.addPickupLocation?.address,
     order?.addPickupLocation?.city,
     order?.addPickupLocation?.state,
     order?.addPickupLocation?.country,
     order?.addPickupLocation?.postal_code
-  );;
-  const dropOffLocation =buildAddress(
+  );
+  const dropOffLocation = buildAddress(
     order?.addDestinationLocation?.address,
     order?.addDestinationLocation?.city,
     order?.addDestinationLocation?.state,
@@ -380,22 +439,40 @@ const PaymentPage = ({
                             Pickup
                           </p>
                           <p className={Styles.paymentMainDetailsText}>
-                            {pickupLocation?.length <= 27
-                              ? pickupLocation
-                              : `${pickupLocation.substring(0, 27)}...`}
+                            {getOrderAddress(order?.serviceType?.id, order)
+                              ?.length <= 27
+                              ? getOrderAddress(order?.serviceType?.id, order)
+                              : `${getOrderAddress(
+                                  order?.serviceType?.id,
+                                  order
+                                ).substring(0, 27)}...`}
                           </p>
                         </div>
-
-                        <div className={Styles.paymentInvoiceDetailsText}>
-                          <p className={Styles.paymentAddressDetailText}>
-                            Drop-off
-                          </p>
-                          <p className={Styles.paymentMainDetailsText}>
-                            {dropOffLocation?.length <= 27
-                              ? dropOffLocation
-                              : `${dropOffLocation.substring(0, 27)}...`}
-                          </p>
-                        </div>
+                        {order?.serviceType?.id === 2 ? (
+                          order?.dropoffLocation?.map((location, index) => (
+                            <div className={Styles.paymentInvoiceDetailsText}>
+                            <p className={Styles.paymentAddressDetailText}>
+                              Drop-off
+                            </p>
+                            <p className={Styles.paymentMainDetailsText}>
+                              {getDropoffLocation(location)?.length <= 27
+                                ? getDropoffLocation(location)
+                                : `${getDropoffLocation(location).substring(0, 27)}...`}
+                            </p>
+                          </div>
+                          ))
+                        ) : (
+                          <div className={Styles.paymentInvoiceDetailsText}>
+                            <p className={Styles.paymentAddressDetailText}>
+                              Drop-off
+                            </p>
+                            <p className={Styles.paymentMainDetailsText}>
+                              {dropOffLocation?.length <= 27
+                                ? dropOffLocation
+                                : `${dropOffLocation.substring(0, 27)}...`}
+                            </p>
+                          </div>
+                        )}
 
                         <div className={Styles.paymentInvoiceDetailsText}>
                           <p className={Styles.paymentAddressDetailText}>
@@ -470,7 +547,7 @@ function EnterprisePaymentView() {
   const { order } = useLocation().state || {};
   const [totalAmount, setTotalAmount] = useState(0);
   const [paymentAmount, setPaymentAmount] = useState(0);
-  const  navigate= useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (order?.selectedVehiclePrice) {
@@ -482,11 +559,11 @@ function EnterprisePaymentView() {
       setTotalAmount(calculatedTotalAmount);
       setPaymentAmount(calculatedTotalAmount);
     }
-    setTimeout(()=>{
-      if(!order){
-        navigate('/consumer/dashboard')
+    setTimeout(() => {
+      if (!order) {
+        navigate("/consumer/dashboard");
       }
-    },2000)
+    }, 2000);
   }, [order]);
 
   useEffect(() => {
@@ -546,7 +623,6 @@ function EnterprisePaymentView() {
           <CommonHeader userData={user} />
           <p>Loading...</p>
         </>
-       
       )}
       <ToastContainer />
     </div>
