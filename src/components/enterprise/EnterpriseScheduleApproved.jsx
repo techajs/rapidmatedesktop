@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import Styles from "../../assets/css/home.module.css";
-import Timeline from "../../assets/images/Signup-loader.png";
+import Timeline from "../../assets/images/Signup-Loader.png";
 import CommonHeader from "../../common/CommonHeader";
 import { useSelector } from "react-redux";
 import SideComponent from "./common/SideComponent";
