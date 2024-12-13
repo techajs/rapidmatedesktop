@@ -70,7 +70,8 @@ const PickupPaymentMethods = () => {
               </div>
 
               <div className={Styles.paymentMethodWalletActionBtn}>
-                <button className={Styles.paymentMethodWithdrawBtn}>Withdraw</button>
+                
+                {user?.role =="DELIVERY_BOY" && <button className={Styles.paymentMethodWithdrawBtn}>Withdraw</button> }
                 {user?.role !=="DELIVERY_BOY" && <button className={Styles.paymentMethodWithdrawBtn}>Add funds</button>}
                 
               </div>

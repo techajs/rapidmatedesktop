@@ -51,10 +51,11 @@ import { showErrorToast } from "../../utils/Toastify";
 import { setBookings, setBranches } from "../../redux/enterpriseSlice";
 import moment from "moment";
 import OrderCardBox from "./common/OrderCardBox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Spinners from "../../common/Loader";
 function CommonDashboard() {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user);
   const {vehicleType} = useSelector((state) => state.commonData.commonData);
   const { bookings, branches } = useSelector((state) => state.enterprise);
@@ -167,24 +168,6 @@ function CommonDashboard() {
     { label: "This year", value: "This year" },
   ];
 
-  const getLocationsData = () => {
-    setLocationList([]);
-    getLocations(
-      null,
-      (successResponse) => {
-        if (successResponse[0]._success) {
-          let tempOrderList = successResponse[0]._response;
-          setLocationList(tempOrderList);
-        }
-      },
-      (errorResponse) => {
-        if (errorResponse[0]._errors.message) {
-          setLocationList([]);
-        }
-      }
-    );
-  };
-
   const getEnterprisePlans = (dateString) => {
     let params = {
       enterprise_ext_id: user.userDetails.ext_id,
@@ -243,7 +226,6 @@ function CommonDashboard() {
     }
     getEnterprisePlans(currentDate);
     if (branches) {
-      // console.log('chatdat',chartData)
       displayChartData(branches[0]);
     }
     
@@ -266,6 +248,11 @@ function CommonDashboard() {
   if(loading){
     return <Spinners />
   
+  }
+
+  const navigateHandler =(e)=>{
+    e.preventDefault()
+    navigate('/enterprise/orders')
   }
   return (
     <>
@@ -340,7 +327,7 @@ function CommonDashboard() {
                   </div>
 
                   <div className="col-md-4">
-                    <div className={Styles.enterpriseHomeActiveBookingCard}>
+                    <div className={`${Styles.enterpriseHomeActiveBookingCard}`} style={{cursor:"pointer"}} onClick={navigateHandler}>
                       <button className={Styles.enterpriseHomeInfoButton}>
                         <FontAwesomeIcon icon={faCircleInfo} />
                       </button>
@@ -421,9 +408,15 @@ function CommonDashboard() {
                     </div>
                   </div>
                 </div>
+                <div className="d-flex justify-content-between">
                 <p className={Styles.enterpriseCompanyLocationsText}>
                   Company locations
                 </p>
+                 <p className={`${Styles.enterpriseCompanyLocationsText}`}>
+                  <Link to="/enterprise/all-company-location" className={Styles.textColor}>See All</Link>
+                 </p>
+                </div>
+                
                 {branches?.slice(0, 3).map((company, index) => (
                   <div
                     key={index}

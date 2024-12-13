@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
-const ResetPasswordModal = ({ show, handleClose }) => {
+const ResetPasswordModal = ({ show, handleClose,email,otp }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 

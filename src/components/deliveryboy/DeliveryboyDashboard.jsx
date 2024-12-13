@@ -35,7 +35,7 @@ function DeliveryboyDashboard() {
           getCompanyConnectionList(),
         ]);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,7 @@ function DeliveryboyDashboard() {
         }
       },
       (errorResponse) => {
-        console.error("Error fetching company list:", errorResponse);
+        // console.error("Error fetching company list:", errorResponse);
         setLoading(false);
       }
     );
@@ -68,7 +68,7 @@ function DeliveryboyDashboard() {
         }
       },
       (errorResponse) => {
-        console.error("Error fetching locations:", errorResponse);
+        // console.error("Error fetching locations:", errorResponse);
       }
     );
   };
@@ -92,7 +92,7 @@ function DeliveryboyDashboard() {
         }
       },
       (errorResponse) => {
-        console.error("Error fetching orders:", errorResponse);
+        // console.error("Error fetching orders:", errorResponse);
       }
     );
   };

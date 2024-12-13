@@ -58,6 +58,8 @@ import DeliveryboyProfile from "../components/consumer/account/DeliveryboyProfil
 import ManageCompanyLocation from "../components/consumer/account/ManageCompanyLocation"
 import MultipleDelivery from "../components/enterprise/MultipleDelivery"
 import EnterprisePaymentView from "./EnterprisePaymentView"
+import AllCompanyLocations from "../components/enterprise/common/AllCompanyLocations";
+import NotificationLists from "./Notifications"
 export {
     Home,
     HomeHeader,
@@ -118,5 +120,7 @@ export {
     EnterpriseOrderPreview,
     DeliveryboyProfile,
     ManageCompanyLocation,
-    EnterprisePaymentView
+    EnterprisePaymentView,
+    AllCompanyLocations,
+    NotificationLists
 }

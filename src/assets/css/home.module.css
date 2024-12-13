@@ -1785,8 +1785,8 @@ a {
 }
 
 .paymentInvoiveTruckIcon {
-  width: 126px;
-  height: 72px;
+  width: auto;
+  height: 90px;
 }
 
 .paymentInvoiceCardMain {
@@ -4200,6 +4200,9 @@ a {
 }
 
 .selected .enterpriseSelectVehicleCircleIcon {
+  color: var(--secondary-color);
+}
+.textColor{
   color: var(--secondary-color);
 }
 

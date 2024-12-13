@@ -92,6 +92,7 @@ export const API = {
   enterprisePaymentMethodUrl: BASE_URL + 'enterprise/paymentmethod',
   searchOrder: BASE_URL + 'enterprise/order/search',
   calendarPlanDate: BASE_URL + 'order/deliveryboy/plan/calendar/data/',
+  deleteNotification:BASE_URL + 'notification/'
 };
 
 export const formatDate = (dateString) => {
@@ -191,3 +192,14 @@ export const buildAddress = (...parts) => parts.filter(Boolean).join(",");
 export const localToUTC=(date=new Date(),timezone,format='YYYY-MM-DD HH:mm:ss')=>{
   return moment(date,timezone || Intl.DateTimeFormat().resolvedOptions().timeZone).utc().format(format)
 }
+
+export const maskEmail = (email) => {
+  const [localPart, domain] = email.split("@");
+  if (localPart.length <= 3) {
+    // For short local parts, show fewer characters
+    return `${localPart.charAt(0)}***@${domain}`;
+  }
+  const visiblePart = localPart.substring(0, 3);
+  const maskedPart = "*".repeat(localPart.length - 3);
+  return `${visiblePart}${maskedPart}@${domain}`;
+};

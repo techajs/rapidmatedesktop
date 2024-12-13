@@ -55,7 +55,7 @@ const ServiceTypeSelection = ({
 
       {enterpriseServiceType?.map((item, key) => (
         <div
-          className={Styles.enterpriseselectServicesOptionCard}
+          className={`${Styles.enterpriseselectServicesOptionCard} py-2`}
           onClick={() =>handleServiceTypeClick(item?.id, 2)} 
           key={key}
         >

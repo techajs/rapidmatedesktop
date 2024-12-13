@@ -10,8 +10,9 @@ import {
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import ResetPasswordModal from "./ResetPasswordModal";
+import { maskEmail } from "../utils/Constants";
 
-const ForgotPasswordOTPModal = ({ show, handleClose }) => {
+const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
@@ -76,7 +77,7 @@ const ForgotPasswordOTPModal = ({ show, handleClose }) => {
             <h2 className={Styles.forgotPasswordTitle}>Forgot password</h2>
             <p className={Styles.forgotPasswordSubtitle}>
               We have sent a 6 digit code to your email address{" "}
-              <b> joh***********@gmail.com</b>, please confirm the code below
+              <b> {maskEmail(email)}</b>, please confirm the code below
             </p>
           </div>
 
@@ -117,6 +118,8 @@ const ForgotPasswordOTPModal = ({ show, handleClose }) => {
       <ResetPasswordModal
         show={showResetPasswordModal}
         handleClose={handleCloseResetPasswordModal}
+        email={email}
+        otp={otp}
       />
     </>
   );

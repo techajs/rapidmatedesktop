@@ -835,6 +835,24 @@ export const deleteAddressBookforEnterprise = (
   );
 };
 
+export const deleteNotificationList = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.deleteNotification + param.id,
+    HTTPMethod.DELETE,
+    param,
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
 export const getConsumerWallet = (param, successCallback, errorCallback) => {
   axiosCall(
     API.consumerWalletUrl + param,

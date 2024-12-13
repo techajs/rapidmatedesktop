@@ -8,7 +8,6 @@ import DriverProfiles from "../assets/images/DriverLoader-Profiles.png";
 import PickupCancellationReasonModal from "./PickupCancellationReasonModal";
 import { ToastContainer } from "react-toastify";
 import { getAllocatedDeliveryBoy, getLocations } from "../data_manager/dataManage";
-import { showErrorToast } from "../utils/Toastify";
 
 const SearchDriver = () => {
   const navigate = useNavigate();
@@ -18,7 +17,6 @@ const SearchDriver = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState(null); 
   const [searchMessage, setSearchMessage] = useState("please wait, we are looking for a driver to pick up and deliver your order..");
-  console.log("orderId",orderNumber)
   const openModal = () => {
     setShowModal(true);
   };
@@ -54,13 +52,13 @@ const SearchDriver = () => {
             console.log(successResponse[0]._response)
               },
               errorResponse => {
-                showErrorToast(errorResponse[0]._errors.message)
+                console.log(errorResponse[0]._errors.message)
               },
             );
           }
         },
         errorResponse => {
-          showErrorToast(errorResponse[0]._errors.message)
+          console.log(errorResponse[0]._errors.message)
         },
       );
     };

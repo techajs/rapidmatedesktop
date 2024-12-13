@@ -39,6 +39,8 @@ import {
   ManageCompanyLocation,
   SelectBranch,
   EnterprisePaymentView,
+  AllCompanyLocations,
+  NotificationLists,
 } from "../common/pages";
 import {
   Navigate,
@@ -60,8 +62,7 @@ import SetNewSchedule from "../components/enterprise/SetNewSchedule";
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
   const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
-   
- 
+
   return (
     <Router>
       <Routes>
@@ -80,37 +81,22 @@ function MainRoutes() {
         <Route path="/ecommerce" element={<Ecommerce />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
-        <Route path="/request-pending" element={<RequestPending baseUrl={baseUrl} />} />
+        <Route
+          path="/request-pending"
+          element={<RequestPending baseUrl={baseUrl} />}
+        />
         {/* auth route */}
-        <Route
-          path={`/${baseUrl}/dashboard`}
-          element={
-            <ProtectedRoute requiredRole={userRole}>
-              <CommonDashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path={`/${baseUrl}/dashboard`} element={<ProtectedRoute requiredRole={userRole}><CommonDashboard /></ProtectedRoute>} />
         {/* enterprise */}
-        <Route
-          path={`/${baseUrl}/planing`}
-          element={
-            <ProtectedRoute requiredRole={userRole}>
-              <EnterprisePlanning />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={`/${baseUrl}/schedules`}
+        <Route path={`/${baseUrl}/planing`} element={<ProtectedRoute requiredRole={userRole}><EnterprisePlanning /></ProtectedRoute>}/>
+        <Route path={`/${baseUrl}/schedules`}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <EnterprisesNewSchedule />
             </ProtectedRoute>
           }
         />
-        <Route
-          path={`/enterprise/select-branch`}
-          element={<SelectBranch />}
-        />
+        <Route path={`/enterprise/select-branch`} element={<SelectBranch />} />
         <Route
           path={`/enterprise/one-time-delivery`}
           element={<OneTimeDelivery />}
@@ -123,10 +109,7 @@ function MainRoutes() {
           path={`/enterprise/create-shift`}
           element={<EnterpriseCreateShiftSelectServiceType />}
         />
-        <Route
-          path={`/enterprise/set-schedule`}
-          element={<SetNewSchedule />}
-        />
+        <Route path={`/enterprise/set-schedule`} element={<SetNewSchedule />} />
         <Route
           path={`/enterprise/enterprises-multiple-deliveries-selectlocation`}
           element={<EnterpriseMultipleDeliverySelectLocation />}
@@ -143,24 +126,14 @@ function MainRoutes() {
           path="/enterprise/order-preview"
           element={<EnterpriseOrderPreview />}
         />
+        <Route
+          path="/enterprise/all-company-location"
+          element={<AllCompanyLocations />}
+        />
         {/* end here */}
         {/* consumer */}
-        <Route
-          path={`/${baseUrl}/pickup-details`}
-          element={
-            <ProtectedRoute requiredRole={userRole}>
-              <AddPickupDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={`/consumer/order-preview`}
-          element={
-            <ProtectedRoute requiredRole={userRole}>
-              <OrderView />
-            </ProtectedRoute>
-          }
-        />
+        <Route path={`/${baseUrl}/pickup-details`} element={<ProtectedRoute requiredRole={userRole}><AddPickupDetails /></ProtectedRoute>} />
+        <Route path={`/consumer/order-preview`} element={<ProtectedRoute requiredRole={userRole}><OrderView /></ProtectedRoute>}/>
         <Route
           path={`/consumer/payment`}
           element={
@@ -211,7 +184,7 @@ function MainRoutes() {
         />
 
         <Route
-          path={'/enterprise/schedule-request'}
+          path={"/enterprise/schedule-request"}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <EnterpriseScheduleApproved />
@@ -234,29 +207,32 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         >
+          
           <Route index element={<PickupAddressBook />} />
-          <Route path="pickup-address-book" element={<PickupAddressBook />} />
+          <Route path="pickup-address-book" element={<ProtectedRoute requiredRole={userRole}>
+                <PickupAddressBook />
+              </ProtectedRoute>} />
           <Route
             path="pickup-notification-settings"
-            element={<PickupNotificationSettings />}
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <PickupNotificationSettings />
+              </ProtectedRoute>
+            }
           />
-          <Route
-            path="pickup-payment-methods"
-            element={<PickupPaymentMethods />}
-          />
-          <Route
-            path="pickup-change-password"
-            element={<PickupChangePassword />}
-          />
-          <Route
-            path="delivery-profile-type"
-            element={<DeliveryboyProfile />}
-          />
-          <Route
-            path="manage-company-location"
-            element={<ManageCompanyLocation />}
-          />
+          <Route path="pickup-payment-methods" element={<ProtectedRoute requiredRole={userRole}> <PickupPaymentMethods /></ProtectedRoute>} />
+          <Route path="pickup-change-password" element={<ProtectedRoute requiredRole={userRole}><PickupChangePassword /></ProtectedRoute>}/>
+          <Route path="delivery-profile-type" element={<ProtectedRoute requiredRole={userRole}><DeliveryboyProfile /></ProtectedRoute>} />
+          <Route path="manage-company-location" element={<ProtectedRoute requiredRole={userRole}><ManageCompanyLocation /></ProtectedRoute>} />
         </Route>
+        <Route
+            path={`/${baseUrl}/notifications`}
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <NotificationLists />
+              </ProtectedRoute>
+            }
+          ></Route>
         {/*deliveryboy*/}
         <Route
           path={`/${baseUrl}/add-vehicle`}

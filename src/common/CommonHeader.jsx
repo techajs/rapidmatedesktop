@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import Styles from "../assets/css/PickupHeader.module.css";
 import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
 import Logo from "../assets/images/Logo-icon.png";
 import Profile from "../assets/images/PickupHead-Profile.png";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGear,
   faUser,
   faRightToBracket,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { EnterpriseNotificationModal } from "./pages";
@@ -24,7 +25,13 @@ import {
 } from "../utils/RoutePath";
 import { persistor } from "../redux/store";
 
-const CommonHeader = ({ userData }) => {
+const CommonHeader = memo(({ userData }) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const isDashboard = ["/dashboard", "/schedules"].some((route) =>
+    currentPath.includes(route)
+  );
+  const isNotification = currentPath.includes("notifications");
   const { userDetails, userInfo } = { ...userData };
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -88,22 +95,28 @@ const CommonHeader = ({ userData }) => {
           <div className={Styles.loginNavList}>
             {userDetails?.role !== "DELIVERY_BOY" && (
               <>
-                <li>
-                  <button className={Styles.pickupHomeSettingsBtn}>
-                    <FontAwesomeIcon icon={faGear} />
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={openModal}
-                    className={Styles.pickupHomeSettingsBtn}
-                  >
-                    <FontAwesomeIcon icon={faBell} />
-                  </button>
-                </li>
+                {userDetails?.role == "ENTERPRISE" && isDashboard == false && (
+                  <li>
+                    <Link
+                      to="/enterprise/schedules"
+                      className={Styles.pickupHomeSettingsBtn}
+                    >
+                      <FontAwesomeIcon icon={faPlus} /> New schedule
+                    </Link>
+                  </li>
+                )}
               </>
             )}
-
+            {isNotification == false && (
+              <li>
+                <button
+                  onClick={openModal}
+                  className={Styles.pickupHomeSettingsBtn}
+                >
+                  <FontAwesomeIcon icon={faBell} />
+                </button>
+              </li>
+            )}
             <li>
               <Dropdown>
                 <Dropdown.Toggle
@@ -112,7 +125,10 @@ const CommonHeader = ({ userData }) => {
                 >
                   <img
                     className={Styles.pickupHeaderProfileImg}
-                    src={API.viewImageUrl + userDetails?.profile_pic?.replace(/\.png$/, "")}
+                    src={
+                      API.viewImageUrl +
+                      userDetails?.profile_pic?.replace(/\.png$/, "")
+                    }
                     alt="Profile"
                   />
                 </Dropdown.Toggle>
@@ -160,6 +176,6 @@ const CommonHeader = ({ userData }) => {
       />
     </div>
   );
-};
+});
 
 export default CommonHeader;

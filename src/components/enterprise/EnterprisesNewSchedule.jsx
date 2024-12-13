@@ -79,6 +79,7 @@ function EnterprisesNewSchedule() {
                       className={Styles.enterpriseNewScheduleLinkCard}
                       key={key}
                       onClick={() => PageHandler(servicetype)}
+                      style={{cursor:"pointer"}}
                     >
                       <img
                         className={Styles.enterpriseNewScheduleOneTimeImg}
