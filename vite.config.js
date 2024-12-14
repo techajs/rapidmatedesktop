@@ -14,12 +14,12 @@ export default defineConfig({
   //     },
   //   },
   // },
-  // build: {
-  //   rollupOptions: {
-  //     output: {
-  //       // Avoid chunk file name issues by not generating multiple chunks.
-  //       manualChunks: undefined,
-  //     },
-  //   },
-  // },
+  build: {
+    rollupOptions: {
+      output: {
+        // Avoid chunk file name issues by not generating multiple chunks.
+        manualChunks: undefined,
+      },
+    },
+  },
 });
