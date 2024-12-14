@@ -7,8 +7,12 @@ import { API } from "../../../utils/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/authSlice";
 import localforage from "localforage";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Setting() {
   const user = useSelector((state) => state.auth.user);
+  const userRole = useSelector((state) => state.auth.role);
+    const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
   const location = useLocation();
   const currentPath = location.pathname;
   const dispatch = useDispatch();
@@ -18,6 +22,10 @@ function Setting() {
     localforage.clear();
     navigate("/login");
   };
+
+  const updateProfile =() =>{
+    navigate(`/${baseUrl}/setting/update-profile`)
+  }
   return (
     <>
       <CommonHeader userData={user} />
@@ -34,9 +42,14 @@ function Setting() {
                   }
                   alt="Profile"
                 />
+                <div className={Styles.updateProfileCard} onClick={updateProfile}>
+                <FontAwesomeIcon  className={Styles.updateProfileImg} icon={faPlus} color="green"/> 
+
+
+                </div>
                 <div>
                   <h5 className={Styles.pickupAccountHeaderUserName}>
-                    {user?.userDetails?.first_name}
+                    {user?.userDetails?.first_name} {user?.userDetails.last_name}
                   </h5>
                   <p className={Styles.pickupAccountHeaderUserEmail}>
                     {user?.userDetails?.email}
@@ -88,7 +101,7 @@ function Setting() {
                 {user?.userDetails?.role == "ENTERPRISE" && (
                   <div
                     className={`${Styles.pickupAccountSideNavBtns} ${
-                      currentPath.includes("delivery-profile-type")
+                      currentPath.includes("manage-company-location")
                         ? Styles.active
                         : ""
                     }`}

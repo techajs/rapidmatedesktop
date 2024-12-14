@@ -1,31 +1,35 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
 import styled from "styled-components";
 import Logo from "../assets/images/Logo-icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Styles from "../assets/css/PasswordModal.module.css"
+import Styles from "../assets/css/PasswordModal.module.css";
 import {
   faArrowLeft,
-  faEye,
-  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import ResetPasswordModal from "./ResetPasswordModal";
 import { maskEmail } from "../utils/Constants";
 
-const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
-  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
+  const [isResetModalVisible, setIsResetModalVisible] = useState(false);
+  const [test,setTest]=useState(false)
   const inputRefs = useRef([]);
-
-  const handleShowResetPasswordModal = () => setShowResetPasswordModal(true);
-  const handleCloseResetPasswordModal = () => setShowResetPasswordModal(false);
-
+ const showModal =()=>setIsResetModalVisible(true)
+  // Function to handle OTP submission
   const handleOtpSubmit = () => {
-    console.log("OTP submitted");
-    handleShowResetPasswordModal();
-    handleClose();
+    console.log("OTP submitted:", otp);
+    showModal();
+    handleClose(); // Close the OTP modal
   };
 
+  // Function to handle closing the ResetPasswordModal
+  const handleCloseResetPasswordModal = () => {
+    console.log("Closing ResetPasswordModal");
+    setIsResetModalVisible(false); // Close the reset password modal
+  };
+
+  // Function to handle input changes for OTP fields
   const handleInputChange = (index, event) => {
     const value = event.target.value;
     if (!isNaN(value) && value.length <= 1) {
@@ -38,18 +42,18 @@ const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
     }
   };
 
+  // Function to handle pasting into OTP fields
   const handleInputPaste = (event) => {
     event.preventDefault();
     const pasteData = event.clipboardData.getData("Text").trim();
     if (pasteData.length === otp.length) {
-      const newOTP = [...otp];
-      for (let i = 0; i < pasteData.length; i++) {
-        newOTP[i] = pasteData[i];
-      }
-      setOTP(newOTP);
+      setOTP([...pasteData.split("")]);
     }
   };
-
+  // console.log('test',test)
+  useEffect(()=>{
+     console.log("csdfsfs",isResetModalVisible)
+  },[isResetModalVisible])
   return (
     <>
       <Modal
@@ -76,8 +80,8 @@ const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
           <div className={Styles.forgotTitleHeaderCard}>
             <h2 className={Styles.forgotPasswordTitle}>Forgot password</h2>
             <p className={Styles.forgotPasswordSubtitle}>
-              We have sent a 6 digit code to your email address{" "}
-              <b> {maskEmail(email)}</b>, please confirm the code below
+              We have sent a 6-digit code to your email address{" "}
+              <b>{maskEmail(email)}</b>. Please enter the code below.
             </p>
           </div>
 
@@ -90,7 +94,7 @@ const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
                 maxLength="1"
                 value={digit}
                 onChange={(e) => handleInputChange(index, e)}
-                onPaste={(e) => handleInputPaste(e)}
+                onPaste={handleInputPaste}
                 placeholder="0"
               />
             ))}
@@ -107,40 +111,43 @@ const ForgotPasswordOTPModal = ({ show, handleClose,email }) => {
             <button
               className={Styles.modalEmailSubmitBtn}
               onClick={handleOtpSubmit}
-              type="button" // Ensure this is type="button" to prevent form submission
+              type="button"
             >
               Submit
             </button>
           </div>
         </Modal.Footer>
       </Modal>
-      {/* Render ResetPasswordModal conditionally based on showResetPasswordModal state */}
-      <ResetPasswordModal
-        show={showResetPasswordModal}
-        handleClose={handleCloseResetPasswordModal}
-        email={email}
-        otp={otp}
-      />
+
+      {/* Conditional ResetPasswordModal Rendering */}
+      {isResetModalVisible && (
+        <ResetPasswordModal
+          isShow={isResetModalVisible}
+          handleClose={handleCloseResetPasswordModal}
+          email={email}
+          otp={otp}
+        />
+      )}
     </>
   );
 };
 
+// Styled Components
 const OTPContainer = styled.div`
   display: flex;
   justify-content: center;
+  gap: 10px;
 `;
 
 const OTPInputBox = styled.input`
   width: 40px;
   height: 40px;
-  margin: 0 5px;
   font-size: 16px;
-  font-weight: 400;
   text-align: center;
   border: 2px solid #ccc;
   border-radius: 5px;
   ::placeholder {
-    color: #aaa; /* Placeholder text color */
+    color: #aaa;
   }
 `;
 

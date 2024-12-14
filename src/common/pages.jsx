@@ -60,6 +60,7 @@ import MultipleDelivery from "../components/enterprise/MultipleDelivery"
 import EnterprisePaymentView from "./EnterprisePaymentView"
 import AllCompanyLocations from "../components/enterprise/common/AllCompanyLocations";
 import NotificationLists from "./Notifications"
+import ProfileUpdate from "../components/consumer/account/ProfileUpdate"
 export {
     Home,
     HomeHeader,
@@ -122,5 +123,6 @@ export {
     ManageCompanyLocation,
     EnterprisePaymentView,
     AllCompanyLocations,
-    NotificationLists
+    NotificationLists,
+    ProfileUpdate,
 }

@@ -41,6 +41,7 @@ import {
   EnterprisePaymentView,
   AllCompanyLocations,
   NotificationLists,
+  ProfileUpdate,
 } from "../common/pages";
 import {
   Navigate,
@@ -221,6 +222,7 @@ function MainRoutes() {
             }
           />
           <Route path="pickup-payment-methods" element={<ProtectedRoute requiredRole={userRole}> <PickupPaymentMethods /></ProtectedRoute>} />
+          <Route path="update-profile" element={<ProtectedRoute requiredRole={userRole}> <ProfileUpdate /></ProtectedRoute>} />
           <Route path="pickup-change-password" element={<ProtectedRoute requiredRole={userRole}><PickupChangePassword /></ProtectedRoute>}/>
           <Route path="delivery-profile-type" element={<ProtectedRoute requiredRole={userRole}><DeliveryboyProfile /></ProtectedRoute>} />
           <Route path="manage-company-location" element={<ProtectedRoute requiredRole={userRole}><ManageCompanyLocation /></ProtectedRoute>} />

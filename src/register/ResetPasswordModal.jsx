@@ -1,106 +1,98 @@
+import { useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
+import styled from "styled-components"; // Ensure this is imported
 import Logo from "../assets/images/Logo-icon.png";
-import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Styles from "../assets/css/PasswordModal.module.css";
 import {
   faArrowLeft,
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { maskEmail } from "../utils/Constants";
 
-const ResetPasswordModal = ({ show, handleClose,email,otp }) => {
+const ResetPasswordModal = ({ isShow, handleClose,email,otp }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const toggleNewPassword = () => {
-    setNewPassword(prevState => !prevState);
-  };
 
-  const toggleConfirmPassword = () => {
-    setConfirmPassword(prevState => !prevState);
-  };
+  console.log(isShow)
+
+  
 
   return (
-    <Modal
-      show={show}
-      onHide={handleClose}
-      centered
-      dialogClassName="modal-main"
-    >
-      <Modal.Header>
-        <div className="modal-main-header">
-          <FontAwesomeIcon
-            className="modal-back-close"
-            onClick={handleClose}
-            icon={faArrowLeft}
-          />
-          <div className="logo-header-main-card">
-            <div className="logo-header-card">
-              <img className="logo-small" src={Logo} alt="Logo" />
+    <>
+      {/* Forgot Password Modal */}
+      <Modal
+        show={isShow} // Hide when ResetPasswordModal is shown
+        onHide={handleClose}
+        centered
+        dialogClassName="modal-main"
+      >
+        <Modal.Header>
+          <div className={Styles.modalMainHeader}>
+            <FontAwesomeIcon
+              className={Styles.modalBackClose}
+              onClick={handleClose}
+              icon={faArrowLeft}
+            />
+            <div className={Styles.logoHeaderMainCard}>
+              <div className={Styles.logoHeaderCard}>
+                <img className={Styles.logoSmall} src={Logo} alt="Logo" />
+              </div>
             </div>
           </div>
-        </div>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="forgot-title-header-card">
-          <h2 className="forgot-password-title">Reset Password</h2>
-          <p className="forgot-password-subtitle">
-            Thank you for confirming the code. You may now reset the password.
-          </p>
-        </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div className={Styles.forgotTitleHeaderCard}>
+            <h2 className={Styles.forgotPasswordTitle}>Forgot password</h2>
+            <p className={Styles.forgotPasswordSubtitle}>
+              We have sent a 6 digit code to your email address{" "}
+              
+            </p>
+          </div>
 
-        <Form>
-          <Form.Group className="mb-3" controlId="formNewPassword">
-            <Form.Label className="login-labels">New Password</Form.Label>
-            <div className="password-input-container">
-              <Form.Control
-                className="password-field login-inputs"
-                type={newPassword ? "text" : "password"}
-                placeholder="Type here.."
-                aria-label="New Password"
-              />
-              <FontAwesomeIcon
-                icon={newPassword ? faEyeSlash : faEye}
-                onClick={toggleNewPassword}
-                className="eye-icon"
-                aria-label={newPassword ? "Hide password" : "Show password"}
-              />
-            </div>
-          </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formConfirmPassword">
-            <Form.Label className="login-labels">Confirm Password</Form.Label>
-            <div className="password-input-container">
-              <Form.Control
-                className="password-field login-inputs"
-                type={confirmPassword ? "text" : "password"}
-                placeholder="Type here.."
-                aria-label="Confirm Password"
-              />
-              <FontAwesomeIcon
-                icon={confirmPassword ? faEyeSlash : faEye}
-                onClick={toggleConfirmPassword}
-                className="eye-icon"
-                aria-label={confirmPassword ? "Hide password" : "Show password"}
-              />
-            </div>
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <div className="modal-submit-btn-card">
-          <button
-            className="modal-email-submit-btn"
-            onClick={handleClose} // Close modal on submit, adjust as per your logic
-            type="button" // Ensure this is type="button" to prevent form submission
-          >
-            Submit
-          </button>
-        </div>
-      </Modal.Footer>
-    </Modal>
+          <div className={Styles.resendCodeCard}>
+            <button className={Styles.resendCodeBtn} type="button">
+              Resend code
+            </button>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className={Styles.modalSubmitBtnCard}>
+            <button
+              className={Styles.modalEmailSubmitBtn}
+              type="button"
+            >
+              Submit
+            </button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+
+      
+    </>
   );
 };
+
+const OTPContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const OTPInputBox = styled.input`
+  width: 40px;
+  height: 40px;
+  margin: 0 5px;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  ::placeholder {
+    color: #aaa; /* Placeholder text color */
+  }
+`;
 
 export default ResetPasswordModal;

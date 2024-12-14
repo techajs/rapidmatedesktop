@@ -15,8 +15,8 @@ import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 import { ToastContainer } from "react-toastify";
 const ForgotPasswordEmailModal = ({ show, handleClose }) => {
   const [showOtpModal, setShowOtpModal] = useState(false); // State to manage ResetPasswordModal visibility
-  const [emailText,setEmailText]=useState('')
-  const [loading,setLoading]=useState(false)
+  const [emailText, setEmailText] = useState("");
+  const [loading, setLoading] = useState(false);
   const handleShowOtpModal = () => setShowOtpModal(true);
   const handleCloseOtpModal = () => setShowOtpModal(false);
 
@@ -43,14 +43,12 @@ const ForgotPasswordEmailModal = ({ show, handleClose }) => {
 
   // Handle form submission
   const onSubmit = (data) => {
-
-    
     let params = {
       info: {
-        userName:data?.email
-      }
+        userName: data?.email,
+      },
     };
-    setEmailText(data?.email)
+    setEmailText(data?.email);
 
     // setLoading(true)
     // forgotPasswordApi(params, (successResponse) => {
@@ -73,6 +71,8 @@ const ForgotPasswordEmailModal = ({ show, handleClose }) => {
     //   showErrorToast(errorResponse[0]._errors.message);
     // })
     // Implement your email submission logic here
+    handleShowOtpModal();
+    handleClose();
   };
   return (
     <>
@@ -132,11 +132,10 @@ const ForgotPasswordEmailModal = ({ show, handleClose }) => {
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
-                <div className={`${Styles.modalSubmitBtnCard} d-flex justify-content-center`}>
-                  <button
-                    className={Styles.modalEmailSubmitBtn}
-                    type="submit"
-                  >
+                <div
+                  className={`${Styles.modalSubmitBtnCard} d-flex justify-content-center`}
+                >
+                  <button className={Styles.modalEmailSubmitBtn} type="submit">
                     Submit
                   </button>
                 </div>
