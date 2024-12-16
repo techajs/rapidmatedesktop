@@ -17,11 +17,14 @@ import { Form } from "react-bootstrap";
 import CalenderEvent from "./setting/CalenderEvent";
 import moment from "moment";
 import { showErrorToast } from "../../utils/Toastify";
-import { createEnterpriseOrder, searchOrderApi } from "../../data_manager/dataManage";
+import {
+  createEnterpriseOrder,
+  searchOrderApi,
+} from "../../data_manager/dataManage";
 import { deliveryboyRoute } from "../../utils/RoutePath";
 const SetNewSchedule = () => {
   const user = useSelector((state) => state.auth.user);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [currentData, setCurrentDate] = useState(
     moment(new Date()).format("MMMM D, YYYY")
@@ -33,8 +36,8 @@ const SetNewSchedule = () => {
   const [events, setEvents] = useState([]);
   const [repeatOrder, setRepeatOrder] = useState(false);
   const [slots, setSlots] = useState(null);
-  const [orders,setOrders]=useState([])
-  const [orderNumber,setOrderNumber]=useState(null)
+  const [orders, setOrders] = useState([]);
+  const [orderNumber, setOrderNumber] = useState(null);
   const handleRepeatOrder = (event) => {
     setRepeatOrder(event.target.checked);
   };
@@ -44,8 +47,8 @@ const SetNewSchedule = () => {
   // console.log("branch",branch)
   // console.log("deliveryType",deliveryType)
 
-     const currentMonth = moment().month();
-    const currentYear = moment().year();
+  const currentMonth = moment().month();
+  const currentYear = moment().year();
   //   const orders = [
   //     {
   //       title: 'Pickup on Jun 2, 2024 at 11:30 AM',
@@ -72,7 +75,7 @@ const SetNewSchedule = () => {
   //     enterprise_ext_id: user.userDetails.ext_id,
   //     delivery_type_id: 3,
   //   };
-  
+
   //   setLoading(true);
   //   searchOrderApi(
   //     params,
@@ -80,7 +83,7 @@ const SetNewSchedule = () => {
   //       setLoading(false);
   //       if (successResponse[0]._success) {
   //         const filteredOrders = successResponse[0]._response.filter((item) => item.slots.length > 0 && item.branch_id === branch?.id);
-  
+
   //         // Map the filtered orders into the desired structure
   //         const mappedOrders = filteredOrders.map((order,key) => ({
   //           title: "Created Shift" + key ,
@@ -89,7 +92,7 @@ const SetNewSchedule = () => {
   //           allDay: false,
   //           resource:order,
   //         }));
-  
+
   //         setEvents(mappedOrders); // Set the transformed orders into state
   //       }
   //     },
@@ -100,17 +103,17 @@ const SetNewSchedule = () => {
   //     }
   //   );
   // };
-  
+
   // useEffect(()=>{
   //   getOrder()
   // },[user])
-  console.log("order",orders)
+  console.log("order", orders);
   const [calendarDate, setCalendarDate] = useState(new Date());
 
   const handleGenerateRows = (e) => {
-    if(events.length >0){
-      showErrorToast('Create shift only one at time.')
-      return 
+    if (events.length > 0) {
+      showErrorToast("Create shift only one at time.");
+      return;
     }
     setNewEvent({ ...newEvent, end: e.target.value });
     const startDate = moment(newEvent.start);
@@ -174,10 +177,9 @@ const SetNewSchedule = () => {
   };
 
   const handleAddEvent = () => {
-    
-    if(events.length >0){
-      showErrorToast('Create shift only one at time.')
-      return 
+    if (events.length > 0) {
+      showErrorToast("Create shift only one at time.");
+      return;
     }
     if (!newEvent.start || !newEvent.end) {
       showErrorToast("Please provide all details for the event.");
@@ -210,29 +212,29 @@ const SetNewSchedule = () => {
     setSlots(slots);
     setRows([]);
   };
- 
+
   const continueHanger = () => {
     // setLoading(!loading);
-    if(events.length <=0 || slots==null){
-      showErrorToast('Please provide shift details.')
-      return 
+    if (events.length <= 0 || slots == null) {
+      showErrorToast("Please provide shift details.");
+      return;
     }
     let requestParams = {
       enterprise_ext_id: user?.userDetails.ext_id,
-      branch_id:branch?.id,
-      delivery_type_id:deliveryType?.id,
+      branch_id: branch?.id,
+      delivery_type_id: deliveryType?.id,
       service_type_id: serviceType?.id,
       vehicle_type_id: vehicletypeId,
-      shift_from_date: moment(new Date(events[0].start)).format('YYYY-MM-DD'),
-      shift_tp_date: moment(new Date(events[0].end)).format('YYYY-MM-DD'),
-      is_same_slot_all_days: repeatOrder ? 1: 0,
-      slots:slots
+      shift_from_date: moment(new Date(events[0].start)).format("YYYY-MM-DD"),
+      shift_tp_date: moment(new Date(events[0].end)).format("YYYY-MM-DD"),
+      is_same_slot_all_days: repeatOrder ? 1 : 0,
+      slots: slots,
     };
 
-   console.log('requestParam for createShift',requestParams)
+    console.log("requestParam for createShift", requestParams);
     try {
       setLoading(true);
-  
+
       createEnterpriseOrder(
         requestParams,
         (successResponse) => {
@@ -240,18 +242,21 @@ const SetNewSchedule = () => {
           if (successResponse[0]?._success) {
             console.log("createEnterpriseOrder", successResponse[0]._response);
             setOrderNumber(successResponse[0]._response[0]?.order_number);
-            navigate("/enterprise/schedule-request",{
-              state:{
-                orderNumber:successResponse[0]._response[0]?.order_number
-              }
-            })
+            navigate("/enterprise/schedule-request", {
+              state: {
+                orderNumber: successResponse[0]._response[0]?.order_number,
+              },
+            });
           } else {
             showErrorToast("Order creation failed. Please try again.");
           }
         },
         (errorResponse) => {
           setLoading(false);
-          const err = errorResponse?.errors?.msg?.[0]?.msg || errorResponse[0]?._errors?.message || "An error occurred";
+          const err =
+            errorResponse?.errors?.msg?.[0]?.msg ||
+            errorResponse[0]?._errors?.message ||
+            "An error occurred";
           showErrorToast(err);
         }
       );
@@ -260,22 +265,67 @@ const SetNewSchedule = () => {
       console.error("Error placing order:", error);
       showErrorToast("An unexpected error occurred. Please try again.");
     }
-    
   };
   return (
     <>
       <CommonHeader userData={user} />
-      <section className={Styles.enterprisenewScheduleSec}>
+      <section className={Styles.enterprisePreviewPageSec}>
         <div>
           <div className={`row ${Styles.manageRow}`}>
             <div className="col-md-3">
-              <SideComponent />
+              <div className={Styles.previewPageColGapping}>
+                <div>
+                  <div className={Styles.previewHeaderMainCard}>
+                    <h4 className={Styles.previewPageTitle}>Preview</h4>
+                    <div className={Styles.totalAboutCard}>
+                      <h4>
+                        Total hours: <span>70</span>
+                      </h4>
+                      <h4>
+                        Estimated cost: <span>€34</span>
+                      </h4>
+                    </div>
+                    <div className={Styles.previewDateMainCard}>
+                      <div className={Styles.startPreviewDateCard}>
+                        <h5>Start date</h5>
+                        <p>20/02/2024</p>
+                      </div>
+                      <div className={Styles.startPreviewDateCard}>
+                        <h5>Start date</h5>
+                        <p>20/02/2024</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={Styles.previewbottomMainCard}>
+                    <div className="mb-2">
+                      <p className={Styles.previewTimeDateText}>
+                        Tuesday 21 February, 2024
+                      </p>
+                      <div className={Styles.previewTimeCard}>
+                        <p>From Time</p>
+                        <p>To Time</p>
+                      </div>
+                    </div>
+
+                    <div className="mb-2">
+                      <p className={Styles.previewTimeDateText}>
+                        Friday 22 February, 2024
+                      </p>
+                      <div className={Styles.previewTimeCard}>
+                        <p>From Time</p>
+                        <p>To Time</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="col-md-9">
               <div className={`row ${Styles.manageRow}`}>
                 <div className="col-md-8">
-                  <div>
+                  <div className={Styles.previewPageColGapping}>
                     <div className={Styles.enterprisePlanningCalenderMain}>
                       <CalenderEvent
                         events={events}
@@ -284,6 +334,23 @@ const SetNewSchedule = () => {
                         setCalendarDate={setCalendarDate}
                         setSlots={setSlots}
                       />
+                    </div>
+                    <div className={Styles.enterprseShiftFinalBtnCard}>
+                      <button
+                        className={
+                          Styles.enterpriseCreateShiftSetavailabilitycancelBtn
+                        }
+                        onClick={() => navigate("/enterprise/dashboard")}
+                      >
+                        Cancel
+                      </button>
+                      <div
+                        onClick={continueHanger}
+                        className={Styles.enterpriseSelectServiceNextBtn}
+                        style={{ cursor: "pointer" }}
+                      >
+                        Create
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -324,44 +391,52 @@ const SetNewSchedule = () => {
                           Styles.enterpriseCreateShiftAvailabilityAddrowCard
                         }
                       >
-                        From date :
-                        <div
-                          className={
-                            Styles.enterpriseCreateShiftAvailabilityFromCard
-                          }
-                        >
-                          <input
-                            type="date"
-                            placeholder="Start"
-                            value={newEvent.start}
-                            onChange={(e) =>
-                              setNewEvent({
-                                ...newEvent,
-                                start: e.target.value,
-                              })
-                            }
+                        <div>
+                          <p className={Styles.createShiftAvailabilityText}>
+                            Start Date
+                          </p>
+                          <div
                             className={
-                              Styles.enterpriseCreateShiftAvailabilityFromInput
+                              Styles.enterpriseCreateShiftAvailabilityFromCard
                             }
-                            style={{ marginRight: "10px" }}
-                          />
+                          >
+                            <input
+                              type="date"
+                              placeholder="Start"
+                              value={newEvent.start}
+                              onChange={(e) =>
+                                setNewEvent({
+                                  ...newEvent,
+                                  start: e.target.value,
+                                })
+                              }
+                              className={
+                                Styles.enterpriseCreateShiftAvailabilityFromInput
+                              }
+                              style={{ marginRight: "10px" }}
+                            />
+                          </div>
                         </div>
-                        To
-                        <div
-                          className={
-                            Styles.enterpriseCreateShiftAvailabilityFromCard
-                          }
-                        >
-                          <input
-                            type="date"
-                            placeholder="End"
-                            value={newEvent.end}
-                            onChange={(e) => handleGenerateRows(e)}
-                            style={{ marginRight: "10px" }}
+                        <div>
+                          <p className={Styles.createShiftAvailabilityText}>
+                            End Date
+                          </p>
+                          <div
                             className={
-                              Styles.enterpriseCreateShiftAvailabilityFromInput
+                              Styles.enterpriseCreateShiftAvailabilityFromCard
                             }
-                          />
+                          >
+                            <input
+                              type="date"
+                              placeholder="End"
+                              value={newEvent.end}
+                              onChange={(e) => handleGenerateRows(e)}
+                              style={{ marginRight: "10px" }}
+                              className={
+                                Styles.enterpriseCreateShiftAvailabilityFromInput
+                              }
+                            />
+                          </div>
                         </div>
                         {/* <button className={Styles.enterpriseCreateShiftAvailabilityPasteSlot}>
                                     Paste time slots
@@ -394,7 +469,7 @@ const SetNewSchedule = () => {
                       </div>
                       <div>
                         {rows.map((row) => (
-                          <div key={row.date}>
+                          <div className="mb-2" key={row.date}>
                             <h4
                               className={
                                 Styles.enterpriseCreateShiftAvailabilityText
@@ -486,23 +561,6 @@ const SetNewSchedule = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div className={Styles.enterpriseSelectServiceNextBtnCard}>
-                <button
-                  className={
-                    Styles.enterpriseCreateShiftSetavailabilitycancelBtn
-                  }
-                  onClick={()=>navigate('/enterprise/dashboard')}
-                >
-                  Cancel
-                </button>
-                <div
-                  onClick={continueHanger}
-                  className={Styles.enterpriseSelectServiceNextBtn}
-                  style={{ cursor: "pointer" }}
-                >
-                  Create
                 </div>
               </div>
             </div>

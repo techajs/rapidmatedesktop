@@ -2505,6 +2505,8 @@ a {
 .pickupDeliveryDetailsMapCard {
   width: 100%;
   height: 250px;
+  margin-bottom: 15px;
+  margin-top: 5px;
 }
 
 .pickupDeliveryDetailDriverImg {
@@ -3814,7 +3816,6 @@ a {
   border-radius: 6px;
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-  margin: 15px 0px;
 }
 
 .enterprisePlanningCalenderMain .reactCalendar {
@@ -3897,6 +3898,11 @@ a {
 
 .enterprisenewScheduleSec {
   background-color: var(--mainbg-color);
+}
+
+.enterprisePreviewPageSec{
+  background-color: var(--mainbg-color);
+  padding: 15px 0px;
 }
 
 .enterpriseScheduleApprovedSec {
@@ -4171,6 +4177,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .enterpriseSelectServiceRepeatOrderCard
@@ -4417,9 +4424,8 @@ a {
 }
 
 .enterpriseCreateShiftAvailabilityText {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 5px;
+  font-size: 12px;
+  margin-bottom: 3px;
 }
 
 .enterpriseCreateShiftAvailabilityDate {
@@ -4434,7 +4440,6 @@ a {
   padding: 15px 15px;
   background-color: var(--primary-color);
   border-radius: 8px 8px 0px 0px;
-  margin-top: 15px;
   align-items: baseline;
 }
 
@@ -4465,6 +4470,9 @@ a {
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   margin: 0px 1px;
   border-radius: 0px 0px 8px 8px;
+  height: 80vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .enterpriseCreateShiftAvailabilityFromInput {
@@ -4502,6 +4510,7 @@ a {
   display: flex;
   align-items: center;
   margin: 10px 0px;
+  gap: 30px;
 }
 
 .enterpriseCreateShiftAvailabilityDeleteBtn {
@@ -4513,7 +4522,7 @@ a {
 }
 
 .enterpriseCreateShiftAvailabilityMainCard {
-  padding-right: 15px;
+  margin: 0px 10px;
 }
 
 .enterpriseCreateShiftAvailabilityFinish {
@@ -5646,4 +5655,141 @@ a {
   padding: 8px 55px;
   border-radius: 8px;
   background-color: transparent;
+}
+
+.startPreviewDateCard h5{
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.startPreviewDateCard p{
+  font-size: 12px;
+  margin: 0px;
+  padding: 5px 10px;
+  width: 120px;
+  background-color: var(--white-color);
+  border-radius: 6px;
+  border: 1px solid #a1a1a9;
+}
+
+.previewDateMainCard{
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.previewTimeCard{
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.previewTimeCard p{
+  font-size: 12px;
+  margin: 0px;
+  padding: 5px 10px;
+  width: 120px;
+  background-color: var(--white-color);
+  border-radius: 6px;
+  border: 1px solid #a1a1a9;
+}
+
+.previewTimeDateText{
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.previewHeaderMainCard{
+  background-color: var(--white-color);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  padding: 20px;
+  border-radius: 8px 8px 0px 0px;
+}
+
+.previewbottomMainCard{
+  padding: 20px;
+  height: 67vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border-radius: 0px 0px 8px 8px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+.previewbottomMainCard::-webkit-scrollbar {
+  width: 4px;
+}
+/* Track */
+.previewbottomMainCard::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 5px;
+}
+
+/* Handle */
+.previewbottomMainCard::-webkit-scrollbar-thumb {
+  background: #717172;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.previewbottomMainCard::-webkit-scrollbar-thumb:hover {
+  background: #717172;
+}
+
+.enterpriseCreateShiftAvailabilitySlotsMainCard::-webkit-scrollbar {
+  width: 4px;
+}
+/* Track */
+.enterpriseCreateShiftAvailabilitySlotsMainCard::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 5px;
+}
+
+/* Handle */
+.enterpriseCreateShiftAvailabilitySlotsMainCard::-webkit-scrollbar-thumb {
+  background: #717172;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.enterpriseCreateShiftAvailabilitySlotsMainCard::-webkit-scrollbar-thumb:hover {
+  background: #717172;
+}
+
+.previewPageTitle{
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.previewPageColGapping{
+  margin: 0px 10px;
+}
+
+.createShiftAvailabilityText{
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.totalAboutCard{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.totalAboutCard h4{
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 0px;
+}
+
+.totalAboutCard h4 span{
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.enterprseShiftFinalBtnCard{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
 }

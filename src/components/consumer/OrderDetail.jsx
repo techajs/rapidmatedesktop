@@ -22,14 +22,17 @@ import {
 } from "../../data_manager/dataManage";
 import { API } from "../../utils/Constants";
 import { useSelector } from "react-redux";
-const EnterpriseOrder = ({user,orderNumber,navigate}) => {
+import DeliveryDetailsMap from "../../common/DeliveryDetailsMap";
+
+const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
   const [orders, setOrders] = useState({});
   const [deliveryboy, setDeliveryboy] = useState({});
   const [destinationAddress, setDestinationAddress] = useState({});
   const [vehicleType, setVehicleType] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
- 
+  const [sourceAddress, setSourceAddress] = useState({});
+
   const goBack = () => {
     navigate(-1); // Navigate back to the previous page
   };
@@ -48,6 +51,10 @@ const EnterpriseOrder = ({user,orderNumber,navigate}) => {
           getDestinationAddress(
             successResponse[0]._response.order.dropoff_location
           );
+          getSourceAddress(
+            successResponse[0]._response.order.pickup_location
+          );
+          console.log("sajdhsajd", order.pickup_location)
           vehicleDetail(successResponse[0]._response.order.vehicle_type_id);
         }
       },
@@ -72,6 +79,26 @@ const EnterpriseOrder = ({user,orderNumber,navigate}) => {
       }
     );
   };
+
+  const getSourceAddress = async (locationId) => {
+    setLoading(true);
+    getLocationById(
+      locationId,
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._success) {
+          setSourceAddress(successResponse[0]._response[0]);
+        }
+      },
+      (errorResponse) => {
+        setLoading(false);
+        console.log("destination==>errorResponse", errorResponse[0]);
+        Alert.alert("Error Alert", errorResponse[0]._errors.message, [
+          { text: "OK", onPress: () => {} },
+        ]);
+      }
+    );
+  };
   const vehicleDetail = async (vehicleTypeId) => {
     setLoading(true);
     getAVehicleByTypeId(
@@ -88,7 +115,7 @@ const EnterpriseOrder = ({user,orderNumber,navigate}) => {
     );
   };
 
-   console.log('order',orders)
+  console.log("order", orders);
   return (
     <section className={Styles.pickupDeliveryDetails}>
       <div className="container">
@@ -112,7 +139,14 @@ const EnterpriseOrder = ({user,orderNumber,navigate}) => {
                 </button>
               </div>
               {/* Map  */}
-              <div className={Styles.pickupDeliveryDetailsMapCard}></div>
+              <div className={Styles.pickupDeliveryDetailsMapCard}>
+                <DeliveryDetailsMap
+                  addressData={{
+                    sourceAddress: sourceAddress,
+                    destinationAddress: destinationAddress,
+                  }}
+                />
+              </div>
 
               <div className={Styles.pickupDeliveryDetailDriverMainCard}>
                 <div className={Styles.pickupDeliveryDetailDrivernameCard}>
@@ -272,13 +306,14 @@ const EnterpriseOrder = ({user,orderNumber,navigate}) => {
   );
 };
 const ConsumerOrder = ({ user, order, navigate }) => {
-  const orderNumber=order?.order_number
+  const orderNumber = order?.order_number;
   const [orders, setOrders] = useState({});
   const [deliveryboy, setDeliveryboy] = useState({});
   const [destinationAddress, setDestinationAddress] = useState({});
   const [vehicleType, setVehicleType] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sourceAddress, setSourceAddress] = useState({});
 
   const goBack = () => {
     navigate(-1); // Navigate back to the previous page
@@ -297,6 +332,9 @@ const ConsumerOrder = ({ user, order, navigate }) => {
           setDeliveryboy(successResponse[0]._response.deliveryBoy);
           getDestinationAddress(
             successResponse[0]._response.order.dropoff_location_id
+          );
+          getSourceAddress(
+            successResponse[0]._response.order.pickup_location_id
           );
           vehicleDetail(successResponse[0]._response.order.vehicle_type_id);
         }
@@ -319,6 +357,26 @@ const ConsumerOrder = ({ user, order, navigate }) => {
       },
       (errorResponse) => {
         setLoading(false);
+      }
+    );
+  };
+
+  const getSourceAddress = async (locationId) => {
+    setLoading(true);
+    getLocationById(
+      locationId,
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._success) {
+          setSourceAddress(successResponse[0]._response[0]);
+        }
+      },
+      (errorResponse) => {
+        setLoading(false);
+        console.log("destination==>errorResponse", errorResponse[0]);
+        Alert.alert("Error Alert", errorResponse[0]._errors.message, [
+          { text: "OK", onPress: () => {} },
+        ]);
       }
     );
   };
@@ -361,7 +419,14 @@ const ConsumerOrder = ({ user, order, navigate }) => {
                 </button>
               </div>
               {/* Map  */}
-              <div className={Styles.pickupDeliveryDetailsMapCard}></div>
+              <div className={Styles.pickupDeliveryDetailsMapCard}>
+                <DeliveryDetailsMap
+                  addressData={{
+                    sourceAddress: sourceAddress,
+                    destinationAddress: destinationAddress,
+                  }}
+                />
+              </div>
 
               <div className={Styles.pickupDeliveryDetailDriverMainCard}>
                 <div className={Styles.pickupDeliveryDetailDrivernameCard}>
@@ -559,16 +624,16 @@ function OrderDetail() {
     );
   };
 
-   console.log("sdf",user?.userDetails.role)
+  console.log("sdf", user?.userDetails.role);
   return (
     <>
       <CommonHeader userData={user} />
-      {user?.userDetails.role == "CONSUMER" && 
+      {user?.userDetails.role == "CONSUMER" && (
         <ConsumerOrder user={user} order={order} navigate={navigate} />
-      }
-      {user?.userDetails.role == "ENTERPRISE" && 
+      )}
+      {user?.userDetails.role == "ENTERPRISE" && (
         <EnterpriseOrder user={user} orderNumber={order} navigate={navigate} />
-      }
+      )}
     </>
   );
 }
