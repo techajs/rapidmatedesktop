@@ -22,8 +22,6 @@ import moment from "moment";
 import EnterpriseOrderFilterModal from "./common/EnterpriseOrderFilterModal";
 
 const OneTime = memo(({ orders, locations, vehicles, navigation }) => {
-  const [searchText, setSearchText] = useState("");
-  const [index, setIndex] = useState(0);
   const getLocationAddress = (locationId) => {
     let result = locations.filter((location) => location.id == locationId);
     return buildAddress(
@@ -252,10 +250,7 @@ const MultipleTimeOrder = memo(({ orders, locations, vehicles, navigation }) => 
 });
 
 const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
-  const getBranchName = (branchId) => {
-    let result = branches.filter((branch) => branch.id == branchId);
-    return result[0]?.branch_name;
-  };
+  
 
   const getBranchAddress = (branchId) => {
     let result = branches.filter((branch) => branch.branch_id == branchId);
@@ -276,13 +271,23 @@ const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
     return result[0]?.vehicle_type;
   };
 
+  const detailShiftHandler = (order_number) =>{
+    navigation("/enterprise/shift-details", {
+      state: {
+        order: order_number,
+        branches:branches,
+      },
+    });
+  }
+
   return (
     <section id="content3">
       <div className="row">
         <div className="col-md-12">
           {orders.length > 0 ? (
             orders.map((item, index) => (
-              <div key={index} onClick={() => detailHandler(item.order_number)}>
+              <div key={index} onClick={() => detailShiftHandler(item.order_number)}>
+                {console.log(item.order_number)}
                 <div className={Styles.pickuphistoryMainCard}>
                   <div className={Styles.shiftOrderHeaderMainCard}>
                     <div className={Styles.pickupHistoryPackageCard}>
@@ -369,8 +374,6 @@ const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
 });
 
 const PastOrder = memo(({ orders, locations, vehicles, navigation }) => {
-  const [searchText, setSearchText] = useState("");
-  const [index, setIndex] = useState(0);
   const getLocationAddress = (locationId) => {
     let result = locations.filter((location) => location.id == locationId);
     return buildAddress(
@@ -489,8 +492,6 @@ const Order = () => {
 
   const [paramList, setParamList] = useState({ tab_id: 1 });
   const [enterpriseOrderList, setEnterpriseOrderList] = useState([]);
-  const [enterpriseBranches, setEnterpriseBranches] = useState(branches);
-  const [vehicleTypeList, setVehicleTypeList] = useState(vehicleType);
   const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = () => {

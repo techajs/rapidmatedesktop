@@ -54,7 +54,6 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
           getSourceAddress(
             successResponse[0]._response.order.pickup_location
           );
-          console.log("sajdhsajd", order.pickup_location)
           vehicleDetail(successResponse[0]._response.order.vehicle_type_id);
         }
       },
@@ -114,8 +113,6 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
       }
     );
   };
-
-  console.log("order", orders);
   return (
     <section className={Styles.pickupDeliveryDetails}>
       <div className="container">

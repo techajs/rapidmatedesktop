@@ -88,17 +88,31 @@ function MainRoutes() {
         <Route path="/payment-successful" element={<PaymentSuccessful />} />
         <Route path="/payment-unsuccessful" element={<PaymentUnsuccessful />} />
         <Route path="/driver-not-available" element={<DriverNotAvailable />} />
-        <Route path="/enterprise-shift-details" element={<EnterpriseShiftDetails />} />
         <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
         <Route
           path="/request-pending"
           element={<RequestPending baseUrl={baseUrl} />}
         />
         {/* auth route */}
-        <Route path={`/${baseUrl}/dashboard`} element={<ProtectedRoute requiredRole={userRole}><CommonDashboard /></ProtectedRoute>} />
+        <Route
+          path={`/${baseUrl}/dashboard`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <CommonDashboard />
+            </ProtectedRoute>
+          }
+        />
         {/* enterprise */}
-        <Route path={`/${baseUrl}/planing`} element={<ProtectedRoute requiredRole={userRole}><EnterprisePlanning /></ProtectedRoute>}/>
-        <Route path={`/${baseUrl}/schedules`}
+        <Route
+          path={`/${baseUrl}/planing`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <EnterprisePlanning />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/${baseUrl}/schedules`}
           element={
             <ProtectedRoute requiredRole={userRole}>
               <EnterprisesNewSchedule />
@@ -141,8 +155,22 @@ function MainRoutes() {
         />
         {/* end here */}
         {/* consumer */}
-        <Route path={`/${baseUrl}/pickup-details`} element={<ProtectedRoute requiredRole={userRole}><AddPickupDetails /></ProtectedRoute>} />
-        <Route path={`/consumer/order-preview`} element={<ProtectedRoute requiredRole={userRole}><OrderView /></ProtectedRoute>}/>
+        <Route
+          path={`/${baseUrl}/pickup-details`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <AddPickupDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={`/consumer/order-preview`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <OrderView />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path={`/consumer/payment`}
           element={
@@ -201,6 +229,15 @@ function MainRoutes() {
           }
         />
         <Route
+          path="/enterprise/shift-details"
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <EnterpriseShiftDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path={`/${baseUrl}/order-detail`}
           element={
             <ProtectedRoute requiredRole={userRole}>
@@ -216,11 +253,15 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         >
-          
           <Route index element={<PickupAddressBook />} />
-          <Route path="pickup-address-book" element={<ProtectedRoute requiredRole={userRole}>
+          <Route
+            path="pickup-address-book"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
                 <PickupAddressBook />
-              </ProtectedRoute>} />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="pickup-notification-settings"
             element={
@@ -229,20 +270,57 @@ function MainRoutes() {
               </ProtectedRoute>
             }
           />
-          <Route path="pickup-payment-methods" element={<ProtectedRoute requiredRole={userRole}> <PickupPaymentMethods /></ProtectedRoute>} />
-          <Route path="update-profile" element={<ProtectedRoute requiredRole={userRole}> <ProfileUpdate /></ProtectedRoute>} />
-          <Route path="pickup-change-password" element={<ProtectedRoute requiredRole={userRole}><PickupChangePassword /></ProtectedRoute>}/>
-          <Route path="delivery-profile-type" element={<ProtectedRoute requiredRole={userRole}><DeliveryboyProfile /></ProtectedRoute>} />
-          <Route path="manage-company-location" element={<ProtectedRoute requiredRole={userRole}><ManageCompanyLocation /></ProtectedRoute>} />
-        </Route>
-        <Route
-            path={`/${baseUrl}/notifications`}
+          <Route
+            path="pickup-payment-methods"
             element={
               <ProtectedRoute requiredRole={userRole}>
-                <NotificationLists />
+                {" "}
+                <PickupPaymentMethods />
               </ProtectedRoute>
             }
-          ></Route>
+          />
+          <Route
+            path="update-profile"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                {" "}
+                <ProfileUpdate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="pickup-change-password"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <PickupChangePassword />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="delivery-profile-type"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <DeliveryboyProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="manage-company-location"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <ManageCompanyLocation />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+        <Route
+          path={`/${baseUrl}/notifications`}
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <NotificationLists />
+            </ProtectedRoute>
+          }
+        ></Route>
         {/*deliveryboy*/}
         <Route
           path={`/${baseUrl}/add-vehicle`}

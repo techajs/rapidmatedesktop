@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,7 +6,7 @@ import {
   faGear,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Home from "../../assets/images/home-icon.png";
 import Driver from "../../assets/images/Driver-Image.jpeg";
 import Calender from "../../assets/images/Calender-withBg.png";
@@ -14,11 +14,65 @@ import CommonHeader from "../../common/CommonHeader";
 import MasterCard from "../../assets/images/MasterCard-Logo.png";
 import OrderTag from "../../assets/images/OrderFare-Tag.png";
 import Invoice from "../../assets/images/Invoice-Img.png";
+import { useSelector } from "react-redux";
+import { getAVehicleByTypeId, getLocationById, getViewEnterpriseOrderDetail } from "../../data_manager/dataManage";
+import { buildAddress } from "../../utils/Constants";
 
 const EnterpriseShiftDetails = () => {
+  const user = useSelector((state)=>state.auth.user)
+  const {vehicleType}=useSelector((state)=>state.commonData.commonData)
+  const location =useLocation()
+  const {order,branches}=location.state
+  const [orders, setOrders] = useState({});
+  const [deliveryboy, setDeliveryboy] = useState({});
+  const [destinationAddress, setDestinationAddress] = useState({});
+    const [sourceAddress, setSourceAddress] = useState({});
+    const [loading,setLoading]=useState(false)
+  
+  const getBranch = (branchId) => {
+    let result = branches.filter((branch) => branch.id == branchId);
+    return {
+      branch_name:result[0]?.branch_name,
+      address:buildAddress(result[0]?.address,result[0]?.city,result[0]?.state,result[0]?.country,result[0]?.postal_code)
+    }
+  };
+
+  const getVehicleType= (vehicleId) =>{
+    const vehicletype= vehicleType.filter((vehicle) => vehicle.id == vehicleId);
+    console.log(vehicleId)
+    return vehicletype
+  }
+
+
+
+  const orderDetail = async () => {
+      setLoading(true);
+      getViewEnterpriseOrderDetail(
+        order,
+        (successResponse) => {
+          setLoading(false);
+          if (successResponse[0]._success) {
+            setOrders(successResponse[0]._response.order);
+            setDeliveryboy(successResponse[0]._response.deliveryBoy);
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+        }
+      );
+  };
+
+
+
+  useEffect(()=>{
+    orderDetail()
+  },[order])
+ 
+
+  // console.log("order",orders)
   return (
     <>
-      <CommonHeader />
+      <CommonHeader userData={user}/>
       <section className={Styles.pickupHistorySec}>
         <div className="container">
           <div className="row">
@@ -43,7 +97,7 @@ const EnterpriseShiftDetails = () => {
                       alt="homeIcon"
                     />
                     <h4 className={Styles.enterpriseShiftDetailCompanyName}>
-                      North Street Franchise
+                      {getBranch(order?.branch_id)?.branch_name}
                     </h4>
                   </div>
                   <div className={Styles.enterpriseShiftDetailAddresCard}>
@@ -52,7 +106,7 @@ const EnterpriseShiftDetails = () => {
                       icon={faLocationDot}
                     />
                     <p className={Styles.enterpriseShiftDetailAddressText}>
-                      North Street, ABC
+                    {getBranch(order?.branch_id)?.address}
                     </p>
                   </div>
                 </div>
@@ -99,7 +153,7 @@ const EnterpriseShiftDetails = () => {
                     </p>
                   </div>
                   <p className={Styles.enterpriseShiftDetailVehiclenameType}>
-                    Motor Bike
+                    {getVehicleType(orders?.vehicle_type_id)?.vehicle_type} sdfsd
                   </p>
                 </div>
 
