@@ -61,6 +61,10 @@ import EnterprisePaymentView from "./EnterprisePaymentView"
 import AllCompanyLocations from "../components/enterprise/common/AllCompanyLocations";
 import NotificationLists from "./Notifications"
 import ProfileUpdate from "../components/consumer/account/ProfileUpdate"
+import PaymentSuccessful from "../common/PaymentSuccessful"
+import PaymentUnsuccessful from "../common/PaymentUnsuccessful"
+import DriverNotAvailable from "../common/DriverNotAvailable"
+import EnterpriseShiftDetails from "../components/enterprise/EnterpriseShiftDetails"
 export {
     Home,
     HomeHeader,
@@ -125,4 +129,8 @@ export {
     AllCompanyLocations,
     NotificationLists,
     ProfileUpdate,
+    PaymentSuccessful,
+    PaymentUnsuccessful,
+    DriverNotAvailable,
+    EnterpriseShiftDetails,
 }

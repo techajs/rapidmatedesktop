@@ -42,6 +42,10 @@ import {
   AllCompanyLocations,
   NotificationLists,
   ProfileUpdate,
+  PaymentSuccessful,
+  PaymentUnsuccessful,
+  DriverNotAvailable,
+  EnterpriseShiftDetails,
 } from "../common/pages";
 import {
   Navigate,
@@ -81,6 +85,10 @@ function MainRoutes() {
         <Route path="/gifts" element={<Gifts />} />
         <Route path="/ecommerce" element={<Ecommerce />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/payment-successful" element={<PaymentSuccessful />} />
+        <Route path="/payment-unsuccessful" element={<PaymentUnsuccessful />} />
+        <Route path="/driver-not-available" element={<DriverNotAvailable />} />
+        <Route path="/enterprise-shift-details" element={<EnterpriseShiftDetails />} />
         <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
         <Route
           path="/request-pending"

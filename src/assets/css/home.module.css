@@ -2640,7 +2640,7 @@ a {
   margin-bottom: 10px;
 }
 
-.pickupDeliveryDetailMastercard-Card {
+.pickupDeliveryDetailMastercardCard {
   display: flex;
   align-items: center;
 }
@@ -4781,7 +4781,7 @@ a {
   margin: 0px;
 }
 
-.enterpriseShiftDetailChiftDurationText {
+.enterpriseShiftDetailShiftDurationText {
   font-size: 14px;
   font-weight: 400;
   margin: 0px 20px 0px 0px;
@@ -5618,4 +5618,32 @@ a {
   background-color: rgba(255, 255, 255, 0.7);
   padding: 5px;
   border-radius: 50%;
+}
+
+.PaymentSuccessfulImage{
+  height: 150px;
+  width: auto;
+}
+
+.driverDotAvailableImg{
+  height: 350px;
+  width: auto;
+}
+
+.driverNotAvailableHeadCard{
+  display: flex;
+  align-items: baseline;
+  justify-content: end;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.driverFindCancelBtn {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  padding: 8px 55px;
+  border-radius: 8px;
+  background-color: transparent;
 }
