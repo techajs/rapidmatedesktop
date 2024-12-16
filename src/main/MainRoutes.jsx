@@ -63,6 +63,8 @@ import OneTimeDelivery from "../components/enterprise/OneTimeDelivery";
 import Order from "../components/enterprise/Order";
 import EnterpriseCreateShiftSelectServiceType from "../components/enterprise/EnterpriseCreateShiftSelectServiceType";
 import SetNewSchedule from "../components/enterprise/SetNewSchedule";
+import BillingAddressBook from "../common/BillingAddressBook";
+import BillingDetail from "../components/consumer/account/BillingDetail";
 
 function MainRoutes() {
   const userRole = useSelector((state) => state.auth.role);
@@ -236,6 +238,7 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         />
+        
 
         <Route
           path={`/${baseUrl}/order-detail`}
@@ -305,6 +308,14 @@ function MainRoutes() {
             }
           />
           <Route
+            path="billing-address"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <BillingDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="manage-company-location"
             element={
               <ProtectedRoute requiredRole={userRole}>
@@ -312,6 +323,7 @@ function MainRoutes() {
               </ProtectedRoute>
             }
           />
+         
         </Route>
         <Route
           path={`/${baseUrl}/notifications`}

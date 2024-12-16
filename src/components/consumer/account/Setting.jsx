@@ -122,15 +122,15 @@ function Setting() {
                 {user?.userDetails?.role !== "DELIVERY_BOY" && (
                   <div
                     className={`${Styles.pickupAccountSideNavBtns} ${
-                      currentPath.includes("billing-details")
+                      currentPath.includes("billing-address")
                         ? Styles.active
                         : ""
                     }`}
                   >
                     <Link
-                      to="#"
+                      to="billing-address"
                       className={`${Styles.pickupAccountNavLinkText} ${
-                        currentPath.includes("billing-details")
+                        currentPath.includes("billing-address")
                           ? Styles.activeLink
                           : ""
                       }`}
