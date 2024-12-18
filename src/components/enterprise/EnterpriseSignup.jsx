@@ -726,47 +726,6 @@ const EnterpriseSignup = () => {
                         )}
                       </div>
                     </div>
-                    <div className="col-md-12">
-                      <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
-                          <Controller
-                            name="termss"
-                            control={control}
-                            defaultValue={false}
-                            render={({ field }) => (
-                              <label
-                                style={{
-                                  marginBottom: "10px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: " center",
-                                  fontSize: "11px",
-                                }}
-                                htmlFor="termss"
-                              >
-                                <input
-                                  type="checkbox"
-                                  {...field}
-                                  style={{ marginRight: "10px" }}
-                                  className={
-                                    Styles.deliveryBoySignupCheckboxCard
-                                  }
-                                />
-                                We collect this data for the purposes of
-                                processing your application to become a courier.
-                                By clicking this box, you acknowledge that you
-                                have read and understood the
-                              </label>
-                            )}
-                          />
-                        </div>
-                        {errors.termss && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
-                            {errors.termss.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
                   </div>
                   {failedError && (
                     <div className={Styles.checkText}>

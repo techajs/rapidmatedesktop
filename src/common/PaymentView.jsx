@@ -15,15 +15,24 @@ import {
   faCheck,
   faCircleInfo,
   faClose,
+  faCircleCheck,
+  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
+import MasterCard from "../assets/images/MasterCard-Logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "./CommonHeader";
 import { useSelector } from "react-redux";
 import getImage from "../components/consumer/common/GetImage";
-import { addPayment, checkPromoCode, createPickupOrder } from "../data_manager/dataManage";
+import {
+  addPayment,
+  checkPromoCode,
+  createPickupOrder,
+} from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 import { addLocation, BASE_URL, uploadImage } from "../utils/Constants";
+import PickupAddPaymentMethodsModal from "../components/consumer/account/PickupAddPaymentMethodsModal";
 
 const stripePromise = loadStripe(
   "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
@@ -38,7 +47,7 @@ const PaymentPage = ({
 }) => {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
-  const  navigate= useNavigate();
+  const navigate = useNavigate();
 
   const { order, orderCustomerDetails, dropoffDetail } = location.state || {};
   const stripe = useStripe();
@@ -52,22 +61,32 @@ const PaymentPage = ({
   const [sourceLocationId, setSourceLocationId] = useState("");
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [packageImageId, setPackageImageId] = useState(null);
- 
+  const [isSelected, setIsSelected] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const openAddModal = () => {
+    setShowAddModal(true);
+  };
+
+  // Toggle the selected state when the div is clicked
+  const handleClick = () => {
+    setIsSelected((prevState) => !prevState);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     if (!stripe || !elements) return;
 
     try {
-      const pickupLocationParam=order?.addPickupLocation
-      const dropoffLocationParam=order?.addDestinationLocation
+      const pickupLocationParam = order?.addPickupLocation;
+      const dropoffLocationParam = order?.addDestinationLocation;
       const pickupLocatiId = await addLocation(pickupLocationParam);
       const dropoffLocatiId = await addLocation(dropoffLocationParam);
-      if (pickupLocatiId=="false") {
+      if (pickupLocatiId == "false") {
         showErrorToast("Something went wrong.");
         return true;
       }
-      if (dropoffLocatiId=="false") {
+      if (dropoffLocatiId == "false") {
         showErrorToast("Something went wrong.");
         return true;
       }
@@ -85,19 +104,18 @@ const PaymentPage = ({
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
-    const callPlaceOrder = async () =>{
-      await placePickUpOrder()
-    }
-    if(sourceLocationId && destinationLocationId && packageImageId){
-      callPlaceOrder()
+    const callPlaceOrder = async () => {
+      await placePickUpOrder();
+    };
+    if (sourceLocationId && destinationLocationId && packageImageId) {
+      callPlaceOrder();
     }
     // callPlaceOrder()
-  }, [sourceLocationId, destinationLocationId,packageImageId]); 
+  }, [sourceLocationId, destinationLocationId, packageImageId]);
   const placePickUpOrder = async () => {
     if (user.userDetails) {
-
       if (order.date) {
         var scheduleParam = {
           schedule_date_time: order?.date + " " + order?.time,
@@ -111,7 +129,7 @@ const PaymentPage = ({
         consumer_ext_id: user.userDetails.ext_id,
         service_type_id: order?.date ? 1 : 2,
         vehicle_type_id: order?.selectedVehicleDetails.id,
-        pickup_location_id: sourceLocationId ||  1,
+        pickup_location_id: sourceLocationId || 1,
         dropoff_location_id: destinationLocationId || 2,
         distance: floatDistance,
         total_amount: parseFloat(paymentAmount),
@@ -121,7 +139,7 @@ const PaymentPage = ({
         drop_first_name: dropoffDetail?.first_name || "",
         drop_last_name: dropoffDetail?.last_name || "",
         drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
-        package_photo:packageImageId,
+        package_photo: packageImageId,
         drop_company_name: dropoffDetail?.company || "",
         drop_notes: dropoffDetail?.dropoff_note || "",
         ...scheduleParam,
@@ -160,23 +178,24 @@ const PaymentPage = ({
 
   const doPayment = async () => {
     setLoading(true);
-    const { error,paymentIntent} = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         payment_method_data: {
           billing_details: {
-            name: user?.userDetails.first_name +" "+ user?.userDetails?.last_name,
-            email: user?.userDetails.email || '',
+            name:
+              user?.userDetails.first_name + " " + user?.userDetails?.last_name,
+            email: user?.userDetails.email || "",
             address: {
               line1: order?.addPickupLocation?.address,
               city: order?.addPickupLocation?.city,
               postal_code: order?.addPickupLocation?.postal_code,
-              country:order?.addPickupLocation?.country,
-            }
-          }
-        }
+              country: order?.addPickupLocation?.country,
+            },
+          },
+        },
       },
-      redirect: "if_required", 
+      redirect: "if_required",
     });
 
     if (error) {
@@ -185,9 +204,11 @@ const PaymentPage = ({
 
     if (paymentIntent?.status === "succeeded") {
       setMessage("Payment successful!");
-      await createPayment()
+      await createPayment();
     } else {
-      showErrorToast(`Payment not successful. Current status: ${paymentIntent?.status}`);
+      showErrorToast(
+        `Payment not successful. Current status: ${paymentIntent?.status}`
+      );
     }
 
     setLoading(false);
@@ -204,7 +225,6 @@ const PaymentPage = ({
       offerDiscount > 0 &&
         setPaymentAmount(calculateFinalPrice(paymentAmount, offerDiscount));
     }
-    
   }, []);
 
   const handleApplyCoupon = () => {
@@ -250,7 +270,7 @@ const PaymentPage = ({
         if (successResponse[0]._success) {
           navigate("/consumer/find-driver", {
             state: {
-              orderNumber:orderNumber
+              orderNumber: orderNumber,
             },
           });
         }
@@ -260,7 +280,7 @@ const PaymentPage = ({
           order_number: orderNumber,
           status: "Payment Failed",
         };
-       showErrorToast('Payment Failed.')
+        showErrorToast("Payment Failed.");
       }
     );
   };
@@ -342,6 +362,44 @@ const PaymentPage = ({
                       <p className={Styles.paymentDebitCreditCardsText}>
                         Credit & Debit Cards
                       </p>
+
+                      <div className={Styles.paymentAllCardsDataShow}>
+                        <div onClick={handleClick}>
+                          <div className={Styles.paymentMethodAddedCards}>
+                            <img
+                              className={Styles.paymentMethodMastercardsLogos}
+                              src={MasterCard}
+                              alt="card"
+                            />
+                            <div>
+                              <p className={Styles.paymentMethodCardName}>
+                                Axis Bank
+                              </p>
+                              <p className={Styles.paymentmethodUserEmail}>
+                                **** **** **** 1234
+                              </p>
+                            </div>
+                            <button
+                              className={Styles.paymentMethodEditBtn}
+                            >
+                              <FontAwesomeIcon
+                                icon={isSelected ? faCircleCheck : faCircle}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className={Styles.paymentAddCardMain}>
+                            <button onClick={openAddModal} className={Styles.paymentAddCardBtn}>
+                              <FontAwesomeIcon icon={faCirclePlus} />
+                            </button>
+                            <p className={Styles.paymentAddCardText}>
+                              Add New Card
+                            </p>
+                          </div>
+                        </div>
+                      </div>
 
                       <div className={Styles.paymentsOffCreaditCardInfo}>
                         <FontAwesomeIcon
@@ -454,6 +512,11 @@ const PaymentPage = ({
           </div>
         </div>
       </section>
+
+      <PickupAddPaymentMethodsModal
+        show={showAddModal}
+        handleClose={() => setShowAddModal(false)}
+      />
     </>
   );
 };
@@ -465,7 +528,7 @@ function PaymentView() {
   const { order } = useLocation().state || {};
   const [totalAmount, setTotalAmount] = useState(0);
   const [paymentAmount, setPaymentAmount] = useState(0);
-  const  navigate= useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (order?.selectedVehiclePrice) {
@@ -477,11 +540,11 @@ function PaymentView() {
       setTotalAmount(calculatedTotalAmount);
       setPaymentAmount(calculatedTotalAmount);
     }
-    setTimeout(()=>{
-      if(!order){
-        navigate('/consumer/dashboard')
+    setTimeout(() => {
+      if (!order) {
+        navigate("/consumer/dashboard");
       }
-    },2000)
+    }, 2000);
   }, [order]);
 
   useEffect(() => {
@@ -541,7 +604,6 @@ function PaymentView() {
           <CommonHeader userData={user} />
           <p>Loading...</p>
         </>
-       
       )}
       <ToastContainer />
     </div>

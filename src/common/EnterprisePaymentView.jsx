@@ -15,7 +15,11 @@ import {
   faCheck,
   faCircleInfo,
   faClose,
+  faCircleCheck,
+  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
+import MasterCard from "../assets/images/MasterCard-Logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "./CommonHeader";
 import { useSelector } from "react-redux";
@@ -36,6 +40,7 @@ import {
   localToUTC,
   uploadImage,
 } from "../utils/Constants";
+import PickupAddPaymentMethodsModal from "../components/consumer/account/PickupAddPaymentMethodsModal";
 
 const stripePromise = loadStripe(
   "pk_test_51PgiLhLF5J4TIxENPZOMh8xWRpEsBxheEx01qB576p0vUZ9R0iTbzBFz0QvnVaoCZUwJu39xkym38z6nfNmEgUMX00SSmS6l7e"
@@ -64,6 +69,16 @@ const PaymentPage = ({
   const [sourceLocationId, setSourceLocationId] = useState("");
   const [destinationLocationId, setDestinationLocationId] = useState("");
   const [packageImageId, setPackageImageId] = useState(null);
+  const [isSelected, setIsSelected] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const openAddModal = () => {
+    setShowAddModal(true);
+  };
+
+  // Toggle the selected state when the div is clicked
+  const handleClick = () => {
+    setIsSelected((prevState) => !prevState);
+  };
   // console.log("order", order);
   // console.log("ordercus", orderCustomerDetails);
 
@@ -102,11 +117,12 @@ const PaymentPage = ({
   };
 
   const handleSubmit = async (event) => {
-
     event.preventDefault();
-    if(order?.serviceType.id==2){
-      showErrorToast('Multiple deliveries not available service for this moment.')
-      return
+    if (order?.serviceType.id == 2) {
+      showErrorToast(
+        "Multiple deliveries not available service for this moment."
+      );
+      return;
     }
     setLoading(true);
     if (!stripe || !elements) return;
@@ -407,6 +423,45 @@ const PaymentPage = ({
                         Credit & Debit Cards
                       </p>
 
+                      <div className={Styles.paymentAllCardsDataShow}>
+                        <div onClick={handleClick}>
+                          <div className={Styles.paymentMethodAddedCards}>
+                            <img
+                              className={Styles.paymentMethodMastercardsLogos}
+                              src={MasterCard}
+                              alt="card"
+                            />
+                            <div>
+                              <p className={Styles.paymentMethodCardName}>
+                                Axis Bank
+                              </p>
+                              <p className={Styles.paymentmethodUserEmail}>
+                                **** **** **** 1234
+                              </p>
+                            </div>
+                            <button className={Styles.paymentMethodEditBtn}>
+                              <FontAwesomeIcon
+                                icon={isSelected ? faCircleCheck : faCircle}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className={Styles.paymentAddCardMain}>
+                            <button
+                              onClick={openAddModal}
+                              className={Styles.paymentAddCardBtn}
+                            >
+                              <FontAwesomeIcon icon={faCirclePlus} />
+                            </button>
+                            <p className={Styles.paymentAddCardText}>
+                              Add New Card
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className={Styles.paymentsOffCreaditCardInfo}>
                         <FontAwesomeIcon
                           className={Styles.paymentsCardsInfoCircle}
@@ -451,15 +506,18 @@ const PaymentPage = ({
                         {order?.serviceType?.id === 2 ? (
                           order?.dropoffLocation?.map((location, index) => (
                             <div className={Styles.paymentInvoiceDetailsText}>
-                            <p className={Styles.paymentAddressDetailText}>
-                              Drop-off
-                            </p>
-                            <p className={Styles.paymentMainDetailsText}>
-                              {getDropoffLocation(location)?.length <= 27
-                                ? getDropoffLocation(location)
-                                : `${getDropoffLocation(location).substring(0, 27)}...`}
-                            </p>
-                          </div>
+                              <p className={Styles.paymentAddressDetailText}>
+                                Drop-off
+                              </p>
+                              <p className={Styles.paymentMainDetailsText}>
+                                {getDropoffLocation(location)?.length <= 27
+                                  ? getDropoffLocation(location)
+                                  : `${getDropoffLocation(location).substring(
+                                      0,
+                                      27
+                                    )}...`}
+                              </p>
+                            </div>
                           ))
                         ) : (
                           <div className={Styles.paymentInvoiceDetailsText}>
@@ -536,6 +594,10 @@ const PaymentPage = ({
           </div>
         </div>
       </section>
+      <PickupAddPaymentMethodsModal
+        show={showAddModal}
+        handleClose={() => setShowAddModal(false)}
+      />
     </>
   );
 };

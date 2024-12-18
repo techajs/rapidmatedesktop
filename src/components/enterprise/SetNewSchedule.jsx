@@ -374,7 +374,7 @@ const SetNewSchedule = () => {
                             Styles.enterpriseCreateShiftAvailabilityDate
                           }
                         >
-                          Set availability of
+                          Planning
                         </h4>
                       </div>
                       <button className={Styles.enterprisePlannigDateCloseIcon}>

@@ -8,8 +8,9 @@ import {
   faDownload,
   faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
-import Driver from "../../assets/images/Driver-Image.jpeg";
+import PackagePickup from "../../assets/images/Pickup-Package-Icon.png";
 import PackageDrop from "../../assets/images/PackageDrop.png";
+import Package from "../../assets/images/Package.png";
 import OrderTag from "../../assets/images/OrderFare-Tag.png";
 import MasterCard from "../../assets/images/MasterCard-Logo.png";
 import Invoice from "../../assets/images/Invoice-Img.png";
@@ -32,6 +33,7 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sourceAddress, setSourceAddress] = useState({});
+  const [vehicle, setVehicle] = useState({});
 
   const goBack = () => {
     navigate(-1); // Navigate back to the previous page
@@ -48,12 +50,13 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
         if (successResponse[0]._success) {
           setOrders(successResponse[0]._response.order);
           setDeliveryboy(successResponse[0]._response.deliveryBoy);
+          if (successResponse[0]._response.vehicle) {
+            setVehicle(successResponse[0]._response.vehicle);
+          }
           getDestinationAddress(
             successResponse[0]._response.order.dropoff_location
           );
-          getSourceAddress(
-            successResponse[0]._response.order.pickup_location
-          );
+          getSourceAddress(successResponse[0]._response.order.pickup_location);
           vehicleDetail(successResponse[0]._response.order.vehicle_type_id);
         }
       },
@@ -152,9 +155,14 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
                     src={API.viewImageUrl + deliveryboy?.profile_pic}
                     alt="driver"
                   />
-                  <h4 className={Styles.pickupDeliveryDetailDriverName}>
-                    {deliveryboy?.first_name} {deliveryboy?.last_name}
-                  </h4>
+                  <div>
+                    <h4 className={Styles.pickupDeliveryDetailDriverName}>
+                      {deliveryboy?.first_name} {deliveryboy?.last_name}
+                    </h4>
+                    <p className={Styles.pickupDeliveryNumberplate}>
+                      {vehicle?.plat_no}
+                    </p>
+                  </div>
                 </div>
                 <p className={Styles.pickupDevliveryDetailVehicleNumber}>
                   <Link
@@ -172,6 +180,29 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
               <div className={Styles.pickupDeliveryDetailPackageCard}>
                 <img
                   className={Styles.pickupDeliveryDetailPackage}
+                  src={PackagePickup}
+                  alt="package"
+                />
+                <div>
+                  <p className={Styles.pickupDeliveryDetailDropInfo}>
+                    Pickup information
+                  </p>
+                  <h4 className={Styles.pickupDeliverDetailCompanyName}>
+                    {orders?.company_name ? orders?.company_name : ""}
+                  </h4>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {sourceAddress.address}, {sourceAddress.city},{" "}
+                    {sourceAddress.state}
+                  </p>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {orders?.pickup_notes ? orders?.pickup_notes : ""}
+                  </p>
+                </div>
+              </div>
+
+              <div className={Styles.pickupDeliveryDetailPackageCard}>
+                <img
+                  className={Styles.pickupDeliveryDetailPackage}
                   src={PackageDrop}
                   alt="package"
                 />
@@ -180,12 +211,68 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
                     Drop off information
                   </p>
                   <h4 className={Styles.pickupDeliverDetailCompanyName}>
-                    {orders?.company_name ? orders?.company_name : ""}
+                    {orders?.company_name ? orders?.drop_company_name : ""}
                   </h4>
                   <p className={Styles.pickupDeliveryDetailCompanyAddress}>
                     {destinationAddress.address}, {destinationAddress.city},{" "}
                     {destinationAddress.state}
                   </p>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {orders?.drop_notes ? orders?.drop_notes : ""}
+                  </p>
+                </div>
+              </div>
+
+              <div className={Styles.pickupDeliveryDetailOrderfareMainCard}>
+                <div>
+                  <div className={Styles.pickupDeliveryDetailOrderPrice}>
+                    <div className={Styles.pickupDeliveryDetailPickupCard}>
+                      <img
+                        className={Styles.pickupDeliveryDetailPackageImg}
+                        src={Package}
+                        alt="icon"
+                      />
+                      <p className={Styles.pickupDeliveryDetailOrderfareText}>
+                        Package Informatiom
+                      </p>
+                    </div>
+                  </div>
+                  <div className={Styles.pickupDeliveryDetailPickuppriceCard}>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Order Id:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {orders?.order_number ? orders?.order_number : ""}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Vehicle:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {vehicleType?.vehicle_type
+                          ? vehicleType?.vehicle_type
+                          : ""}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Pickup OTP:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {/* {route.params?.orderItem?.otp} */}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Delivered OTP:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {/* {route.params?.orderItem?.delivered_otp} */}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -262,24 +349,6 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
                 </div>
               </div>
 
-              <div
-                className={Styles.pickupDeliveryDetailPackageInformaitionCard}
-              >
-                <p className={Styles.pickupDeliveryDetailsPackageInfoText}>
-                  Package information
-                </p>
-
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Order ID: <b>{orders.order_number}</b>
-                </p>
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Comments: <b>{orders.pickup_notes}</b>
-                </p>
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Vehicle: <b>{vehicleType.vehicle_type}</b>
-                </p>
-              </div>
-
               <div className={Styles.pickupDeliveryDetailInvoiceCard}>
                 <div className={Styles.pickupDeliveryDetailInvoiceTextCard}>
                   <img
@@ -307,6 +376,7 @@ const ConsumerOrder = ({ user, order, navigate }) => {
   const [orders, setOrders] = useState({});
   const [deliveryboy, setDeliveryboy] = useState({});
   const [destinationAddress, setDestinationAddress] = useState({});
+  const [vehicle, setVehicle] = useState({});
   const [vehicleType, setVehicleType] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -327,6 +397,9 @@ const ConsumerOrder = ({ user, order, navigate }) => {
         if (successResponse[0]._success) {
           setOrders(successResponse[0]._response.order);
           setDeliveryboy(successResponse[0]._response.deliveryBoy);
+          if (successResponse[0]._response.vehicle) {
+            setVehicle(successResponse[0]._response.vehicle);
+          }
           getDestinationAddress(
             successResponse[0]._response.order.dropoff_location_id
           );
@@ -432,9 +505,14 @@ const ConsumerOrder = ({ user, order, navigate }) => {
                     src={API.viewImageUrl + deliveryboy?.profile_pic}
                     alt="driver"
                   />
-                  <h4 className={Styles.pickupDeliveryDetailDriverName}>
-                    {deliveryboy?.first_name} {deliveryboy?.last_name}
-                  </h4>
+                  <div>
+                    <h4 className={Styles.pickupDeliveryDetailDriverName}>
+                      {deliveryboy?.first_name} {deliveryboy?.last_name}
+                    </h4>
+                    <p className={Styles.pickupDeliveryNumberplate}>
+                      {vehicle?.plat_no}
+                    </p>
+                  </div>
                 </div>
                 <p className={Styles.pickupDevliveryDetailVehicleNumber}>
                   <Link
@@ -452,6 +530,29 @@ const ConsumerOrder = ({ user, order, navigate }) => {
               <div className={Styles.pickupDeliveryDetailPackageCard}>
                 <img
                   className={Styles.pickupDeliveryDetailPackage}
+                  src={PackagePickup}
+                  alt="package"
+                />
+                <div>
+                  <p className={Styles.pickupDeliveryDetailDropInfo}>
+                    Pickup information
+                  </p>
+                  <h4 className={Styles.pickupDeliverDetailCompanyName}>
+                    {orders?.company_name ? orders?.company_name : ""}
+                  </h4>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {sourceAddress.address}, {sourceAddress.city},{" "}
+                    {sourceAddress.state}
+                  </p>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {orders?.pickup_notes ? orders?.pickup_notes : ""}
+                  </p>
+                </div>
+              </div>
+
+              <div className={Styles.pickupDeliveryDetailPackageCard}>
+                <img
+                  className={Styles.pickupDeliveryDetailPackage}
                   src={PackageDrop}
                   alt="package"
                 />
@@ -460,12 +561,68 @@ const ConsumerOrder = ({ user, order, navigate }) => {
                     Drop off information
                   </p>
                   <h4 className={Styles.pickupDeliverDetailCompanyName}>
-                    {orders?.company_name ? orders?.company_name : ""}
+                    {orders?.company_name ? orders?.drop_company_name : ""}
                   </h4>
                   <p className={Styles.pickupDeliveryDetailCompanyAddress}>
                     {destinationAddress.address}, {destinationAddress.city},{" "}
                     {destinationAddress.state}
                   </p>
+                  <p className={Styles.pickupDeliveryDetailCompanyAddress}>
+                    {orders?.drop_notes ? orders?.drop_notes : ""}
+                  </p>
+                </div>
+              </div>
+
+              <div className={Styles.pickupDeliveryDetailOrderfareMainCard}>
+                <div>
+                  <div className={Styles.pickupDeliveryDetailOrderPrice}>
+                    <div className={Styles.pickupDeliveryDetailPickupCard}>
+                      <img
+                        className={Styles.pickupDeliveryDetailPackageImg}
+                        src={Package}
+                        alt="icon"
+                      />
+                      <p className={Styles.pickupDeliveryDetailOrderfareText}>
+                        Package Informatiom
+                      </p>
+                    </div>
+                  </div>
+                  <div className={Styles.pickupDeliveryDetailPickuppriceCard}>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Order Id:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {orders?.order_number ? orders?.order_number : ""}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Vehicle:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {vehicleType?.vehicle_type
+                          ? vehicleType?.vehicle_type
+                          : ""}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Pickup OTP:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {/* {route.params?.orderItem?.otp} */}
+                      </p>
+                    </div>
+                    <div className={Styles.pickupDeliveryDetailsAllPriceCard}>
+                      <p className={Styles.pickupDeliveryDetailOrderfaretext}>
+                        Delivered OTP:
+                      </p>
+                      <p className={Styles.pickupDeliveryDetailPricesText}>
+                        {/* {route.params?.orderItem?.delivered_otp} */}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -540,24 +697,6 @@ const ConsumerOrder = ({ user, order, navigate }) => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div
-                className={Styles.pickupDeliveryDetailPackageInformaitionCard}
-              >
-                <p className={Styles.pickupDeliveryDetailsPackageInfoText}>
-                  Package information
-                </p>
-
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Order ID: <b>{orders.order_number}</b>
-                </p>
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Comments: <b>{orders.pickup_notes}</b>
-                </p>
-                <p className={Styles.pickupDeliveryDetailOrderId}>
-                  Vehicle: <b>{vehicleType.vehicle_type}</b>
-                </p>
               </div>
 
               <div className={Styles.pickupDeliveryDetailInvoiceCard}>
