@@ -4,23 +4,19 @@ import styled from "styled-components";
 import Logo from "../assets/images/Logo-icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Styles from "../assets/css/PasswordModal.module.css";
-import {
-  faArrowLeft,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import ResetPasswordModal from "./ResetPasswordModal";
 import { maskEmail } from "../utils/Constants";
 
 const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
   const [isResetModalVisible, setIsResetModalVisible] = useState(false);
-  const [test,setTest]=useState(false)
   const inputRefs = useRef([]);
- const showModal =()=>setIsResetModalVisible(true)
+
   // Function to handle OTP submission
   const handleOtpSubmit = () => {
     console.log("OTP submitted:", otp);
-    showModal();
-    handleClose(); // Close the OTP modal
+    setIsResetModalVisible(true); // Show the reset password modal
   };
 
   // Function to handle closing the ResetPasswordModal
@@ -42,22 +38,11 @@ const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
     }
   };
 
-  // Function to handle pasting into OTP fields
-  const handleInputPaste = (event) => {
-    event.preventDefault();
-    const pasteData = event.clipboardData.getData("Text").trim();
-    if (pasteData.length === otp.length) {
-      setOTP([...pasteData.split("")]);
-    }
-  };
-  // console.log('test',test)
-  useEffect(()=>{
-     console.log("csdfsfs",isResetModalVisible)
-  },[isResetModalVisible])
   return (
     <>
+      {/* OTP Modal */}
       <Modal
-        show={show}
+        show={show && !isResetModalVisible} // Show OTP Modal only when ResetPasswordModal is not visible
         onHide={handleClose}
         centered
         dialogClassName="modal-main"
@@ -94,7 +79,6 @@ const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
                 maxLength="1"
                 value={digit}
                 onChange={(e) => handleInputChange(index, e)}
-                onPaste={handleInputPaste}
                 placeholder="0"
               />
             ))}
@@ -110,7 +94,7 @@ const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
           <div className={Styles.modalSubmitBtnCard}>
             <button
               className={Styles.modalEmailSubmitBtn}
-              onClick={handleOtpSubmit}
+              onClick={handleOtpSubmit} // Trigger OTP submit
               type="button"
             >
               Submit
@@ -119,7 +103,7 @@ const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
         </Modal.Footer>
       </Modal>
 
-      {/* Conditional ResetPasswordModal Rendering */}
+      {/* Reset Password Modal */}
       {isResetModalVisible && (
         <ResetPasswordModal
           isShow={isResetModalVisible}

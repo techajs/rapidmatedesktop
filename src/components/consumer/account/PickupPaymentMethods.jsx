@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faLocationDot,
-  faPen,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import WalletLogo from "../../../assets/images/Wallet-Logo.png";
 import PayPal from "../../../assets/images/PayPal-Logo.png";
@@ -80,24 +80,24 @@ const PickupPaymentMethods = () => {
             <div>
               <p className={Styles.paymentMethodCardsText}>Cards</p>
 
-              <div className={Styles.paymentMethodAddedCards}>
-                <p className={Styles.paymentmethodUserEmail} style={{textAlign:'center',width:"100%"}}>Data not found.</p>
-              </div>
-
               {/* <div className={Styles.paymentMethodAddedCards}>
+                <p className={Styles.paymentmethodUserEmail} style={{textAlign:'center',width:"100%"}}>Data not found.</p>
+              </div> */}
+
+              <div className={Styles.paymentMethodAddedCards}>
                 <img
                   className={Styles.paymentMethodMastercardsLogos}
                   src={MasterCard}
-                  alt="PayPal"
+                  alt="card"
                 />
                 <div>
                   <p className={Styles.paymentMethodCardName}>Axis Bank</p>
                   <p className={Styles.paymentmethodUserEmail}>**** **** **** 1234</p>
                 </div>
                 <button className={Styles.paymentMethodEditBtn}>
-                  <FontAwesomeIcon icon={faPen} />
+                  <FontAwesomeIcon icon={faTrash} />
                 </button>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>

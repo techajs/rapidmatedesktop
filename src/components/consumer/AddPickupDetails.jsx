@@ -127,7 +127,7 @@ const AddPickupDetails = () => {
         phone: data?.dphoneNumber,
         email: data?.demail,
         company: data?.dcompany,
-        dropoff_note: data?.dropoff_note,
+        dropoff_note: data?.dropoffnote,
       };
       setValue("dropoffdetail", true);
     } else {
