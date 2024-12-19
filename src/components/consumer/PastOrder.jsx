@@ -9,9 +9,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
 import RenderItem from "./common/RenderItem";
-import { getLocations } from "../../data_manager/dataManage";
+import { getConsumerViewOrdersListBySearch, getLocations } from "../../data_manager/dataManage";
 import { getOrderList } from "../../utils/getOrderList";
 import { useSelector } from "react-redux";
+import Spinners from "../../common/Loader";
 
 const PastOrder = () => {
   const user = useSelector((state)=>state.auth.user)
@@ -60,18 +61,65 @@ const PastOrder = () => {
     );
   };
   const handleInputChange = (event) => {
-    setSearchTerm(event.target.value);
+    const value = event.target.value;
+    setSearchTerm(value);
+    if (value.trim().length === 0) {
+      // If the search term is empty, fetch the original lists
+      getOrder("current");
+      getOrder("past");
+      return;
+    }
+    setLoading(true);
+    try {
+      getOrderListinSearch(value, selectedTab === "tab1" ? "current" : "past");
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTabChange = (event) => {
     setSelectedTab(event.target.id); // Set the selected tab based on the clicked tab's ID
   };
+
+  const getOrderListinSearch = (searchValue,status) => {
+    let postParams = {
+      extentedId: user.userDetails.ext_id,
+      status,
+      orderNumber: searchValue,
+    };
+    getConsumerViewOrdersListBySearch(
+      postParams,
+      successResponse => {
+        if (successResponse[0]._success) {
+          let tempOrderList = successResponse[0]._response;
+          if(status=='past'){
+            setPastOrderList(tempOrderList)
+          }else{
+            setOrderList(tempOrderList)
+          }
+        }
+      },
+      errorResponse => {
+        if(status=='past'){
+          setPastOrderList([])
+        }else{
+          setOrderList([])
+        }
+      },
+    );
+  };
+
+
+  
   return (
     <>
       {/* Header Start Here  */}
       <CommonHeader userData={user} />
       {/* Header End Here  */}
       <section className={Styles.pickupHistorySec}>
+        {loading && <Spinners /> }
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -100,9 +148,9 @@ const PastOrder = () => {
                         onChange={handleInputChange}
                       />
                     </div>
-                    <button className={Styles.pickupHistoryFillterIcon}>
+                    {/* <button className={Styles.pickupHistoryFillterIcon}>
                       <FontAwesomeIcon icon={faFilter} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 
@@ -122,12 +170,12 @@ const PastOrder = () => {
                     onChange={handleTabChange}
                   />
                   <ul>
-                    <li title="Ongoing order">
+                    <li title="Ongoing order"  className={`${selectedTab == "tab1" ? "activetab" : ""}`}>
                       <label htmlFor="tab1" role="button" className="tab-label">
                         <span>Ongoing</span>
                       </label>
                     </li>
-                    <li title="Past order ">
+                    <li title="Past order "  className={`${selectedTab == "tab2" ? "activetab" : ""}`}>
                       <label htmlFor="tab2" role="button" className="tab-label">
                         <span>Past</span>
                       </label>
@@ -138,7 +186,10 @@ const PastOrder = () => {
                     <RenderItem status="current" locationList={locationList} orderList={orderList} />
 
                     {/* Past Orders Start Here  */}
-                    <RenderItem status="current" locationList={locationList} orderList={pastOrderList} />
+                    <RenderItem status="past" locationList={locationList} orderList={pastOrderList} />
+                  </div>
+                  <div className="d-flex justify-content-end item-center">
+                    
                   </div>
                 </div>
               </div>

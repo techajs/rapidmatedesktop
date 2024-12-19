@@ -8,11 +8,11 @@ import {
   faLocationDot,
   faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
-import { formatDate } from "../../../utils/Constants";
+import { formatDate, titleFormat } from "../../../utils/Constants";
 import { useSelector } from "react-redux";
 
-function RenderItem({ status = "",locationList=[],orderList=[]}) {
-  const user = useSelector((state)=>state.auth.user)
+function RenderItem({ status = "", locationList = [], orderList = [] }) {
+  const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const getLocationAddress = (locationId) => {
     let result = locationList.filter((location) => location.id == locationId);
@@ -43,8 +43,15 @@ function RenderItem({ status = "",locationList=[],orderList=[]}) {
                       alt="icon"
                     />
                     <h4 className={Styles.pickupHistoryDeliveredText}>
-                     
-                       {item?.consumer_order_title}
+                      {item?.consumer_order_title}{" "}
+                      {item.is_show_datetime_in_title == 1
+                        ? item.order_status === "ORDER_PLACED"
+                          ? titleFormat(
+                              item.schedule_date_time ||
+                                item.order_date
+                            )
+                          : titleFormat(item.updated_on)
+                        : ""}
                     </h4>
                   </div>
 

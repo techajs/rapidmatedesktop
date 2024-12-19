@@ -10,19 +10,21 @@ import { maskEmail } from "../utils/Constants";
 
 const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
+  const [sendOtp,setSendOtp]=useState(null)
   const [isResetModalVisible, setIsResetModalVisible] = useState(false);
   const inputRefs = useRef([]);
 
   // Function to handle OTP submission
   const handleOtpSubmit = () => {
-    console.log("OTP submitted:", otp);
+    const optNumber = Number(otp.join(''));
+    setSendOtp(optNumber);
     setIsResetModalVisible(true); // Show the reset password modal
   };
 
   // Function to handle closing the ResetPasswordModal
   const handleCloseResetPasswordModal = () => {
-    console.log("Closing ResetPasswordModal");
-    setIsResetModalVisible(false); // Close the reset password modal
+    setIsResetModalVisible(false);
+    handleClose()
   };
 
   // Function to handle input changes for OTP fields
@@ -109,7 +111,7 @@ const ForgotPasswordOTPModal = ({ show, handleClose, email }) => {
           isShow={isResetModalVisible}
           handleClose={handleCloseResetPasswordModal}
           email={email}
-          otp={otp}
+          otp={sendOtp}
         />
       )}
     </>

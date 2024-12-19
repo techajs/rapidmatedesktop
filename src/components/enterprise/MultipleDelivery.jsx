@@ -21,7 +21,8 @@ import ServiceTypeSelection from "./common/ServiceTypeSelection";
 import { useSelector } from "react-redux";
 import LocationInputs from "./common/LocationInputs";
 import { showErrorToast } from "../../utils/Toastify";
-
+import DropoffMarker from "../../assets/images/dropoff-marker.png";
+import PickupMarker from "../../assets/images/Location-Icon.png";
 const libraries = ["places"];
 
 function MultipleDelivery() {
@@ -55,13 +56,15 @@ function MultipleDelivery() {
     ),
     ...center,
   });
-  const [dropoffLocation, setDropoffLocation] = useState([{ 
-    address:"",
-    displayedAddress:"",
-    lat:null,
-    lng:null,
-    components: [],
-  }]);
+  const [dropoffLocation, setDropoffLocation] = useState([
+    {
+      address: "",
+      displayedAddress: "",
+      lat: null,
+      lng: null,
+      components: [],
+    },
+  ]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [map, setMap] = useState(null);
@@ -316,7 +319,13 @@ function MultipleDelivery() {
             >
               {/* Pickup location marker */}
               {pickupLocation && (
-                <Marker position={pickupLocation} label="Pickup" />
+                <Marker
+                  position={pickupLocation}
+                  icon={{
+                    url: PickupMarker,
+                    scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  }}
+                />
               )}
 
               {/* Multiple drop-off location markers */}
@@ -326,16 +335,30 @@ function MultipleDelivery() {
                   <Marker
                     key={index}
                     position={{ lat: dropoff.lat, lng: dropoff.lng }}
-                    label={`Dropoff ${index + 1}`} // Dynamic label for multiple dropoffs
+                    icon={{
+                      url: DropoffMarker,
+                      scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                    }} // Dynamic label for multiple dropoffs
                   />
                 ))}
 
               {/* Current location marker */}
-              {currentLocation && <Marker position={currentLocation} />}
+              {currentLocation && (
+                <Marker
+                  position={currentLocation}
+                  icon={{
+                    url: PickupMarker,
+                    scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  }}
+                />
+              )}
 
               {/* Directions Renderer for the route */}
               {directionsResponse && (
-                <DirectionsRenderer directions={directionsResponse} />
+                <DirectionsRenderer
+                  directions={directionsResponse}
+                  options={{ suppressMarkers: true }}
+                />
               )}
             </GoogleMap>
           </div>

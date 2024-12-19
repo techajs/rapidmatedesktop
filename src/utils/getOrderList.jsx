@@ -1,7 +1,7 @@
 import React from "react";
 import { getConsumerViewOrdersList } from "../data_manager/dataManage";
 
-export const getOrderList = (extentedId, status) => {
+export const getOrderList = (extentedId, status,searchText='') => {
   return new Promise((resolve, reject) => {
     let postParams = {
       extentedId,

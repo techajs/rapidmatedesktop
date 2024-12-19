@@ -22,14 +22,16 @@ import { useSelector } from "react-redux";
 import LocationInputs from "./common/LocationInputs";
 import { showErrorToast } from "../../utils/Toastify";
 import OneLocation from "./common/OneLocation";
+import DropoffMarker from "../../assets/images/dropoff-marker.png";
+import PickupMarker from "../../assets/images/Location-Icon.png";
 
 const libraries = ["places"];
 
 function OneTimeDelivery() {
   const navigate = useNavigate();
-  const location = useLocation()
-  const {serviceType,selectedBranch}=location.state
-  const user = useSelector((state)=>state.auth.user)
+  const location = useLocation();
+  const { serviceType, selectedBranch } = location.state;
+  const user = useSelector((state) => state.auth.user);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
   const [selectedVehiclePrice, setSelectedVehiclePrice] = useState(null);
@@ -58,7 +60,7 @@ function OneTimeDelivery() {
   const { enterpriseServiceType } = useSelector(
     (state) => state.commonData.commonData
   );
-  
+
   useEffect(() => {
     setLoading(true);
     const getAllVehiclesType = () => {
@@ -97,8 +99,6 @@ function OneTimeDelivery() {
         }
       );
     }
-   
-    
   }, []);
 
   useEffect(() => {
@@ -144,16 +144,28 @@ function OneTimeDelivery() {
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
-      const pickup = getLocation(pickupLocation,pickupLocation.lat,pickupLocation.lng)
-      setAddPickupLocation(pickup)
-      const dropoff=getLocation(dropoffLocation,dropoffLocation.lat,dropoffLocation.lng)
-      setAddDestinationLocation(dropoff)
-
+      const pickup = getLocation(
+        pickupLocation,
+        pickupLocation.lat,
+        pickupLocation.lng
+      );
+      setAddPickupLocation(pickup);
+      const dropoff = getLocation(
+        dropoffLocation,
+        dropoffLocation.lat,
+        dropoffLocation.lng
+      );
+      setAddDestinationLocation(dropoff);
     }
   };
 
   const handleContinue = () => {
-    if (!pickupLocation || !dropoffLocation || !selectedVehicle || !selectedServiceType) {
+    if (
+      !pickupLocation ||
+      !dropoffLocation ||
+      !selectedVehicle ||
+      !selectedServiceType
+    ) {
       showErrorToast("Please fill all fields.");
       return;
     }
@@ -190,7 +202,7 @@ function OneTimeDelivery() {
 
   return (
     <>
-      <CommonHeader  userData={user}/>
+      <CommonHeader userData={user} />
       <section className={Styles.requestPickupSec}>
         <div className={`row ${Styles.manageRow}`}>
           <div className="col-md-3">
@@ -283,14 +295,37 @@ function OneTimeDelivery() {
               onLoad={(map) => setMap(map)}
             >
               {pickupLocation && (
-                <Marker position={pickupLocation} label="Pickup" />
+                <Marker
+                  position={pickupLocation}
+                  icon={{
+                    url: PickupMarker,
+                    scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  }}
+                />
               )}
               {dropoffLocation && (
-                <Marker position={dropoffLocation} label="Dropoff" />
+                <Marker
+                  position={dropoffLocation}
+                  icon={{
+                    url: DropoffMarker,
+                    scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  }}
+                />
               )}
-              {currentLocation && <Marker position={currentLocation} />}
+              {currentLocation && (
+                <Marker
+                  position={currentLocation}
+                  icon={{
+                    url: PickupMarker,
+                    scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  }}
+                />
+              )}
               {directionsResponse && (
-                <DirectionsRenderer directions={directionsResponse} />
+                <DirectionsRenderer
+                  directions={directionsResponse}
+                  options={{ suppressMarkers: true }}
+                />
               )}
             </GoogleMap>
           </div>

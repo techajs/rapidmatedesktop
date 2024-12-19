@@ -26,13 +26,7 @@ const ForgotPasswordEmailModal = ({ show, handleClose }) => {
       .required("Email is required")
       .email("Please enter a valid email"),
   });
-  const handleEmailSubmit = () => {
-    // Handle email submission logic here
-    // For demo purposes, let's just open the ResetPasswordModal and close the current modal
-    handleShowOtpModal();
-    handleClose();
-  };
-
+ 
   const {
     control,
     handleSubmit,
@@ -48,31 +42,30 @@ const ForgotPasswordEmailModal = ({ show, handleClose }) => {
         userName: data?.email,
       },
     };
-    setEmailText(data?.email);
-
-    // setLoading(true)
-    // forgotPasswordApi(params, (successResponse) => {
-    //   if(successResponse[0]._success){
-    //     if(successResponse[0]._response) {
-    //       if(successResponse[0]._response.name == 'NotAuthorizedException') {
-    //         setLoading(false)
-    //         showErrorToast(successResponse[0]._response.name);
-    //       } else {
-    //         // showSuccessToast(successResponse[0]._response?.response.message)
-    //         setLoading(false)
-    //         setEmailText(data?.email)
-    //         handleShowOtpModal();
-    //         handleClose();
-    //       }
-    //     }
-    //   }
-    // }, (errorResponse)=> {
-    //   setLoading(false)
-    //   showErrorToast(errorResponse[0]._errors.message);
-    // })
+    
+    setLoading(true)
+    forgotPasswordApi(params, (successResponse) => {
+      if(successResponse[0]._success){
+        if(successResponse[0]._response) {
+          if(successResponse[0]._response.name == 'NotAuthorizedException') {
+            setLoading(false)
+            showErrorToast(successResponse[0]._response.name);
+          } else {
+            // showSuccessToast(successResponse[0]._response?.response.message)
+            setLoading(false)
+            setEmailText(data?.email)
+            handleShowOtpModal();
+            handleClose();
+          }
+        }
+      }
+    }, (errorResponse)=> {
+      setLoading(false)
+      showErrorToast(errorResponse[0]._errors.message);
+    })
     // Implement your email submission logic here
-    handleShowOtpModal();
-    handleClose();
+    // handleShowOtpModal();
+    // handleClose();
   };
   return (
     <>

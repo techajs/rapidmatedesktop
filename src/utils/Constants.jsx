@@ -92,7 +92,12 @@ export const API = {
   enterprisePaymentMethodUrl: BASE_URL + 'enterprise/paymentmethod',
   searchOrder: BASE_URL + 'enterprise/order/search',
   calendarPlanDate: BASE_URL + 'order/deliveryboy/plan/calendar/data/',
-  deleteNotification:BASE_URL + 'notification/'
+  deleteNotification:BASE_URL + 'notification/',
+
+  notificationCount:BASE_URL + 'notification/count/',
+
+  deliveryBoyBillingAddressUpdate:BASE_URL + 'deliveryboy/billing/address/update/',
+  deliveryBoyBillingAddressGet: BASE_URL + 'deliveryboy/billing/address/get/'
 };
 
 export const formatDate = (dateString) => {
@@ -203,3 +208,12 @@ export const maskEmail = (email) => {
   const maskedPart = "*".repeat(localPart.length - 3);
   return `${visiblePart}${maskedPart}@${domain}`;
 };
+
+
+export const titleFormat=(date=new Date())=>{
+  return moment(date).format(DATE_FORMAT.titleFormat);
+}
+
+export const DATE_FORMAT ={
+  titleFormat:'MMM DD, YYYY [at] hh:mm A'
+}

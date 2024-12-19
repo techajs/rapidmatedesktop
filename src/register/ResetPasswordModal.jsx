@@ -1,26 +1,77 @@
-import { useRef, useState } from "react";
-import { Form, Modal } from "react-bootstrap";
+import {useState } from "react";
+import { Form, Modal, Spinner } from "react-bootstrap";
 import styled from "styled-components";
 import Logo from "../assets/images/Logo-icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Styles from "../assets/css/PasswordModal.module.css";
-import {
-  faArrowLeft,
-  faEye,
-  faEyeSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {faArrowLeft,faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons";
+import { resetPasswordApi } from "../data_manager/dataManage";
+import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 
 const ResetPasswordModal = ({ isShow, handleClose, email, otp }) => {
+  const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const toggleNewPassword = () => {
     setNewPassword((prevState) => !prevState);
   };
-
   const toggleConfirmPassword = () => {
     setConfirmPassword((prevState) => !prevState);
   };
+
+  const schema = yup.object().shape({
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters long"),
+    confirmPassword: yup
+      .string()
+      .required("Confirm password is required")
+      .oneOf([yup.ref("password")], "Passwords must match"),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data) => {
+    let params = {
+      info: {
+        userName: `${email}`,
+        verificationCode: `${otp}`,
+        newPassword: data.password,
+
+      },
+    };
+    setLoading(true);
+    resetPasswordApi(
+      params, 
+      (successResponse) => {
+        setLoading(false);
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response){
+            if (successResponse[0]._response.name == "CodeMismatchException") {showErrorToast(successResponse[0]._response.name);} 
+            else if (successResponse[0]._response.name == "LimitExceededException"){showErrorToast(successResponse[0]._response.name);} 
+            else if (successResponse[0]._response.name == "SerializationException"){showErrorToast(successResponse[0]._response.name);}
+            else if(successResponse[0]._response.name=='ExpiredCodeException'){showErrorToast(successResponse[0]._response.name)} 
+            else {handleClose();showSuccessToast("Reset password successfully done.");}
+          }
+        }
+      },(errorResponse)=>{
+        setLoading(false);
+        showErrorToast(errorResponse[0]._errors.message);
+        handleClose();
+      }
+    );
+  };
+
   return (
     <Modal
       show={isShow} // Toggle visibility based on isShow
@@ -49,15 +100,24 @@ const ResetPasswordModal = ({ isShow, handleClose, email, otp }) => {
             Thanks you for confirming the code, you may now reset the password.
           </p>
         </div>
-        <Form>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className="mb-3" controlId="formNewPassword">
             <Form.Label className={Styles.loginLabels}>New Password</Form.Label>
             <div className={Styles.passwordInputContainer}>
-              <Form.Control
-                className={Styles.loginInputs}
-                type={newPassword ? "text" : "password"}
-                placeholder="Type here.."
-                aria-label="New Password"
+              <Controller
+                name="password"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    type={newPassword ? "text" : "password"}
+                    placeholder="Type here.."
+                    className={Styles.loginInputs}
+                    isInvalid={!!errors.password}
+                    aria-label="New Password"
+                  />
+                )}
               />
               <FontAwesomeIcon
                 icon={newPassword ? faEye : faEyeSlash}
@@ -66,6 +126,11 @@ const ResetPasswordModal = ({ isShow, handleClose, email, otp }) => {
                 aria-label={newPassword ? "Hide password" : "Show password"}
               />
             </div>
+            {errors.password && (
+              <p className={Styles.termsCheck} style={{ fontSize: "13px" }}>
+                {errors.password.message}
+              </p>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formConfirmPassword">
@@ -73,11 +138,20 @@ const ResetPasswordModal = ({ isShow, handleClose, email, otp }) => {
               Confirm Password
             </Form.Label>
             <div className={Styles.passwordInputContainer}>
-              <Form.Control
-                className={Styles.loginInputs}
-                type={confirmPassword ? "text" : "password"}
-                placeholder="Type here.."
-                aria-label="Confirm Password"
+              <Controller
+                name="confirmPassword"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    type={confirmPassword ? "text" : "password"}
+                    placeholder="Type here.."
+                    className={Styles.loginInputs}
+                    isInvalid={!!errors.confirmPassword}
+                    aria-label="Confirm Password"
+                  />
+                )}
               />
               <FontAwesomeIcon
                 icon={confirmPassword ? faEye : faEyeSlash}
@@ -86,14 +160,25 @@ const ResetPasswordModal = ({ isShow, handleClose, email, otp }) => {
                 aria-label={confirmPassword ? "Hide password" : "Show password"}
               />
             </div>
+            {errors.confirmPassword && (
+              <p className={Styles.termsCheck} style={{ fontSize: "13px" }}>
+                {errors.confirmPassword.message}
+              </p>
+            )}
           </Form.Group>
+          <div
+            className={`${Styles.modalSubmitBtnCard} d-flex justify-content-center`}
+          >
+            <button
+              disabled={loading}
+              className={Styles.modalEmailSubmitBtn}
+              type="submit"
+            >
+              {loading ? <Spinner /> : "Submit"}
+            </button>
+          </div>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
-        <button onClick={handleClose} className={Styles.modalEmailSubmitBtn}>
-          Close
-        </button>
-      </Modal.Footer>
     </Modal>
   );
 };

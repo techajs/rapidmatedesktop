@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
-import { extractAddress, getLocation, MAPS_API_KEY } from "../../utils/Constants";
+import {
+  extractAddress,
+  getLocation,
+  MAPS_API_KEY,
+} from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +23,8 @@ import LocationInput from "../consumer/common/LocationInput";
 import DateTimePicker from "./common/DateTimePicker";
 import VehicleSelection from "./common/VehicleSelection";
 import { ToastContainer } from "react-toastify";
+import DropoffMarker from "../../assets/images/dropoff-marker.png";
+import PickupMarger from "../../assets/images/Location-Icon.png";
 
 const libraries = ["places"];
 
@@ -132,12 +138,18 @@ function ConsumerDashboard() {
       setDirectionsResponse(results);
       setDistance(results.routes[0].legs[0].distance.text);
       setDuration(results.routes[0].legs[0].duration.text);
-      console.log("Pickup Details:", pickupLocation);
-      const pickup = getLocation(pickupLocation,pickupLocation.lat,pickupLocation.lng)
-      setAddPickupLocation(pickup)
-      const dropoff=getLocation(dropoffLocation,dropoffLocation.lat,dropoffLocation.lng)
-      setAddDestinationLocation(dropoff)
-
+      const pickup = getLocation(
+        pickupLocation,
+        pickupLocation.lat,
+        pickupLocation.lng
+      );
+      setAddPickupLocation(pickup);
+      const dropoff = getLocation(
+        dropoffLocation,
+        dropoffLocation.lat,
+        dropoffLocation.lng
+      );
+      setAddDestinationLocation(dropoff);
     }
   };
 
@@ -268,14 +280,37 @@ function ConsumerDashboard() {
             onLoad={(map) => setMap(map)}
           >
             {pickupLocation && (
-              <Marker position={pickupLocation} label="Pickup" />
+              <Marker
+                position={pickupLocation}
+                icon={{
+                  url: PickupMarger,
+                  scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                }}
+              />
             )}
             {dropoffLocation && (
-              <Marker position={dropoffLocation} label="Dropoff" />
+              <Marker
+                position={dropoffLocation}
+                icon={{
+                  url: DropoffMarker,
+                  scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                }}
+              />
             )}
-            {currentLocation && <Marker position={currentLocation} />}
+            {currentLocation && (
+              <Marker
+                position={currentLocation}
+                icon={{
+                  url: PickupMarger,
+                  scaledSize: new window.google.maps.Size(40, 40),
+                }}
+              />
+            )}
             {directionsResponse && (
-              <DirectionsRenderer directions={directionsResponse} />
+              <DirectionsRenderer
+                directions={directionsResponse}
+                options={{ suppressMarkers: true }}
+              />
             )}
           </GoogleMap>
         </div>
