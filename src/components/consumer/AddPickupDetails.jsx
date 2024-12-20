@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { faPaperclip, faTrash, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 const AddPickupDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   const { order } = location.state || {};
 
   const [selectedOption, setSelectedOption] = useState("Myself");
@@ -385,6 +385,26 @@ const AddPickupDetails = () => {
                             objectFit: "contain",
                           }}
                         />
+                        <button
+                          type="button"
+                          className={Styles.removeImageButton}
+                          onClick={() => {
+                            setImagePreview(null); // Clear the image preview
+                            resetField("file"); // Reset the file input field in react-hook-form
+                          }}
+                          style={{
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            border: "none",
+                            padding: "5px 10px",
+                            cursor: "pointer",
+                            position:"absolute",
+                            marginLeft:"-16px",
+                            borderRadius:"50%"
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
                       </div>
                     ) : (
                       // Show the upload UI when no image has been uploaded
@@ -491,8 +511,7 @@ const AddPickupDetails = () => {
                     alignItems: "center",
                     justifyContent: "space-start",
                   }}
-                >
-                </div>
+                ></div>
                 {selectCheckOption == "custom" && (
                   <div className={`row ${Styles.manageRow}`}>
                     <div className="col-md-6">

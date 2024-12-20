@@ -119,7 +119,7 @@ function ConsumerDashboard() {
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: MAPS_API_KEY,
-    libraries: libraries,
+    libraries,
   });
 
   if (!isLoaded) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperclip, faRepeat } from "@fortawesome/free-solid-svg-icons";
+import { faPaperclip, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
@@ -117,23 +117,17 @@ const EnterpriseAddPickupDetails = () => {
       .nullable(),
     until: yup.date().typeError("Invalid date format"),
 
-    selectedDays: yup
-      .object()
-      .shape({
-        Monday: yup.boolean(),
-        Tuesday: yup.boolean(),
-        Wednesday: yup.boolean(),
-        Thursday: yup.boolean(),
-        Friday: yup.boolean(),
-        Saturday: yup.boolean(),
-        Sunday: yup.boolean(),
-      }),
-    onDay: yup
-      .string()
-      .nullable(),
-    onThe: yup
-      .string()
-      .nullable(),
+    selectedDays: yup.object().shape({
+      Monday: yup.boolean(),
+      Tuesday: yup.boolean(),
+      Wednesday: yup.boolean(),
+      Thursday: yup.boolean(),
+      Friday: yup.boolean(),
+      Saturday: yup.boolean(),
+      Sunday: yup.boolean(),
+    }),
+    onDay: yup.string().nullable(),
+    onThe: yup.string().nullable(),
   });
   const handleCheckboxChange = (event) => {
     const seletedValue = event.target.value;
@@ -158,7 +152,7 @@ const EnterpriseAddPickupDetails = () => {
     resolver: yupResolver(schema),
     defaultValues: {
       selectCheckOption: "",
-      repeatEvery:1,
+      repeatEvery: 1,
       pickupDate: new Date(),
       until: new Date(),
     },
@@ -251,8 +245,13 @@ const EnterpriseAddPickupDetails = () => {
                       >
                         Company :
                       </label>
-                      <TextInput control={control} name="company"  placeholder="Company" error={errors.company}  defaultValue={defaultCompany}/>
-
+                      <TextInput
+                        control={control}
+                        name="company"
+                        placeholder="Company"
+                        error={errors.company}
+                        defaultValue={defaultCompany}
+                      />
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -263,8 +262,13 @@ const EnterpriseAddPickupDetails = () => {
                       >
                         Email:
                       </label>
-                      <TextInput control={control} name="email"  placeholder="Email" error={errors.email}  defaultValue={defaultEmail}/>
-
+                      <TextInput
+                        control={control}
+                        name="email"
+                        placeholder="Email"
+                        error={errors.email}
+                        defaultValue={defaultEmail}
+                      />
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -330,6 +334,26 @@ const EnterpriseAddPickupDetails = () => {
                             objectFit: "contain",
                           }}
                         />
+                        <button
+                          type="button"
+                          className={Styles.removeImageButton}
+                          onClick={() => {
+                            setImagePreview(null); // Clear the image preview
+                            resetField("file"); // Reset the file input field in react-hook-form
+                          }}
+                          style={{
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            border: "none",
+                            padding: "5px 10px",
+                            cursor: "pointer",
+                            position: "absolute",
+                            marginLeft: "-16px",
+                            borderRadius: "50%",
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
                       </div>
                     ) : (
                       // Show the upload UI when no image has been uploaded
@@ -380,8 +404,14 @@ const EnterpriseAddPickupDetails = () => {
                       >
                         Package ID
                       </label>
-                     
-                      <TextInput control={control} name="packageId"  placeholder="Package Id ..." error={errors.packageId}  defaultValue=""/>
+
+                      <TextInput
+                        control={control}
+                        name="packageId"
+                        placeholder="Package Id ..."
+                        error={errors.packageId}
+                        defaultValue=""
+                      />
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -392,8 +422,13 @@ const EnterpriseAddPickupDetails = () => {
                       >
                         Pickup notes
                       </label>
-                      <TextInput control={control} name="pickupnote"  placeholder="type here ..." error={errors.pickupnote}  defaultValue=""/>
-
+                      <TextInput
+                        control={control}
+                        name="pickupnote"
+                        placeholder="type here ..."
+                        error={errors.pickupnote}
+                        defaultValue=""
+                      />
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -569,63 +604,194 @@ const EnterpriseAddPickupDetails = () => {
                       </div>
 
                       {selectedOption === "Daily" && (
-                        <div className={Styles.enterpriseSelectServiceRepeatEveryCard}>
-                          <div className={Styles.enterpriseSelectServiceDayilyCard}>
-                            <FontAwesomeIcon className={Styles.enterpriseSelectServiceRepeatCircle} icon={faRepeat} />
-                            <p  className={Styles.enterpriseSelectServiceRepeatEveryText}>Repeat every</p>
+                        <div
+                          className={
+                            Styles.enterpriseSelectServiceRepeatEveryCard
+                          }
+                        >
+                          <div
+                            className={Styles.enterpriseSelectServiceDayilyCard}
+                          >
+                            <FontAwesomeIcon
+                              className={
+                                Styles.enterpriseSelectServiceRepeatCircle
+                              }
+                              icon={faRepeat}
+                            />
+                            <p
+                              className={
+                                Styles.enterpriseSelectServiceRepeatEveryText
+                              }
+                            >
+                              Repeat every
+                            </p>
                           </div>
-                          <RepeatEverySelect control={control} name="repeatEvery" error={errors.repeatEvery} />
-                          <div className={Styles.enterpriseSelectServiceUntilCard}>
-                            <p className={Styles.enterpriseSelectServiceUntilText}>until</p>
-                            <DatePickerField control={control} name="until" selectedDate={untilDate} error={errors.until} />
+                          <RepeatEverySelect
+                            control={control}
+                            name="repeatEvery"
+                            error={errors.repeatEvery}
+                          />
+                          <div
+                            className={Styles.enterpriseSelectServiceUntilCard}
+                          >
+                            <p
+                              className={
+                                Styles.enterpriseSelectServiceUntilText
+                              }
+                            >
+                              until
+                            </p>
+                            <DatePickerField
+                              control={control}
+                              name="until"
+                              selectedDate={untilDate}
+                              error={errors.until}
+                            />
                           </div>
 
                           <div>
-                            <p className={Styles.enterpriseSelectServiceOccursday}> {" "} Occurs every day until{" "}
-                              <span  className={Styles.enterpriseSelectServiceOccursSpan}>{untilDate}</span>
+                            <p
+                              className={
+                                Styles.enterpriseSelectServiceOccursday
+                              }
+                            >
+                              {" "}
+                              Occurs every day until{" "}
+                              <span
+                                className={
+                                  Styles.enterpriseSelectServiceOccursSpan
+                                }
+                              >
+                                {untilDate}
+                              </span>
                             </p>
                           </div>
                         </div>
                       )}
                       {selectedOption === "Weekly" && (
                         <div>
-                          <div className={Styles.enterpriseSelectServiceRepeatEveryCard}>
-                            <div className={Styles.enterpriseSelectServiceDayilyCard}>
-                              <FontAwesomeIcon className={Styles.enterpriseSelectServiceRepeatCircle} icon={faRepeat} />
-                              <p  className={Styles.enterpriseSelectServiceRepeatEveryText}>Repeat every</p>
+                          <div
+                            className={
+                              Styles.enterpriseSelectServiceRepeatEveryCard
+                            }
+                          >
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceDayilyCard
+                              }
+                            >
+                              <FontAwesomeIcon
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatCircle
+                                }
+                                icon={faRepeat}
+                              />
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatEveryText
+                                }
+                              >
+                                Repeat every
+                              </p>
                             </div>
-                            <RepeatEverySelect control={control} name="repeatEvery" error={errors.repeatEvery} />
-                           
-                            <DaysSelect control={control} error={errors.days} /> 
+                            <RepeatEverySelect
+                              control={control}
+                              name="repeatEvery"
+                              error={errors.repeatEvery}
+                            />
 
-                            <div className={Styles.enterpriseSelectServiceUntilCard}>
-                              <p className={Styles.enterpriseSelectServiceUntilText}>until</p>
-                              <DatePickerField control={control} name="until" selectedDate={untilDate} onChange={handleUntilChange} error={errors.until} />
+                            <DaysSelect control={control} error={errors.days} />
+
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceUntilCard
+                              }
+                            >
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceUntilText
+                                }
+                              >
+                                until
+                              </p>
+                              <DatePickerField
+                                control={control}
+                                name="until"
+                                selectedDate={untilDate}
+                                onChange={handleUntilChange}
+                                error={errors.until}
+                              />
                             </div>
                             <div>
-                              <p className={Styles.enterpriseSelectServiceOccursday}>
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceOccursday
+                                }
+                              >
                                 Occurs every day until{" "}
-                                <span className={Styles.enterpriseSelectServiceOccursSpan}>{untilDate}</span>
+                                <span
+                                  className={
+                                    Styles.enterpriseSelectServiceOccursSpan
+                                  }
+                                >
+                                  {untilDate}
+                                </span>
                               </p>
                             </div>
                           </div>
-                          <WeekDaysSelect control={control} selectedDays={selectedDays} />
+                          <WeekDaysSelect
+                            control={control}
+                            selectedDays={selectedDays}
+                          />
                         </div>
                       )}
 
                       {selectedOption === "Monthly" && (
                         <div>
-                          <div className={Styles.enterpriseSelectServiceRepeatEveryCard}>
-                            <div className={Styles.enterpriseSelectServiceDayilyCard}>
-                              <FontAwesomeIcon className={Styles.enterpriseSelectServiceRepeatCircle} icon={faRepeat} />
-                              <p className={Styles.enterpriseSelectServiceRepeatEveryText}>Repeat every</p>
+                          <div
+                            className={
+                              Styles.enterpriseSelectServiceRepeatEveryCard
+                            }
+                          >
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceDayilyCard
+                              }
+                            >
+                              <FontAwesomeIcon
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatCircle
+                                }
+                                icon={faRepeat}
+                              />
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatEveryText
+                                }
+                              >
+                                Repeat every
+                              </p>
                             </div>
-                            <RepeatEverySelect control={control} name="repeatEvery" error={errors.repeatEvery} />
-                           
-                            <DaysSelect control={control} error={errors.days} /> 
+                            <RepeatEverySelect
+                              control={control}
+                              name="repeatEvery"
+                              error={errors.repeatEvery}
+                            />
 
-                            <div className={Styles.enterpriseSelectServiceDayilyCard}>
-                              <p className={Styles.enterpriseSelectServiceRepeatEveryText}>On Day</p>
+                            <DaysSelect control={control} error={errors.days} />
+
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceDayilyCard
+                              }
+                            >
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatEveryText
+                                }
+                              >
+                                On Day
+                              </p>
                             </div>
                             <div className="me-2">
                               <Controller
@@ -655,8 +821,18 @@ const EnterpriseAddPickupDetails = () => {
                                 </p>
                               )}
                             </div>
-                            <div className={Styles.enterpriseSelectServiceDayilyCard}>
-                              <p className={Styles.enterpriseSelectServiceRepeatEveryText}>On the</p>
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceDayilyCard
+                              }
+                            >
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceRepeatEveryText
+                                }
+                              >
+                                On the
+                              </p>
                             </div>
                             <div className="me-2">
                               <Controller
@@ -683,20 +859,49 @@ const EnterpriseAddPickupDetails = () => {
                                 </p>
                               )}
                             </div>
-                            <div className={Styles.enterpriseSelectServiceUntilCard}>
-                              <p className={Styles.enterpriseSelectServiceUntilText}>until</p>
-                              <DatePickerField control={control} name="until" selectedDate={untilDate} onChange={handleUntilChange} error={errors.until} />
+                            <div
+                              className={
+                                Styles.enterpriseSelectServiceUntilCard
+                              }
+                            >
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceUntilText
+                                }
+                              >
+                                until
+                              </p>
+                              <DatePickerField
+                                control={control}
+                                name="until"
+                                selectedDate={untilDate}
+                                onChange={handleUntilChange}
+                                error={errors.until}
+                              />
                             </div>
 
                             <div>
-                              <p className={Styles.enterpriseSelectServiceOccursday}> {" "} Occurs every day until{" "}
-                                <span  className={Styles.enterpriseSelectServiceOccursSpan}>{untilDate}</span>
+                              <p
+                                className={
+                                  Styles.enterpriseSelectServiceOccursday
+                                }
+                              >
+                                {" "}
+                                Occurs every day until{" "}
+                                <span
+                                  className={
+                                    Styles.enterpriseSelectServiceOccursSpan
+                                  }
+                                >
+                                  {untilDate}
+                                </span>
                               </p>
                             </div>
                           </div>
-                          <WeekDaysSelect control={control} selectedDays={selectedDays} />
-                          
-
+                          <WeekDaysSelect
+                            control={control}
+                            selectedDays={selectedDays}
+                          />
                         </div>
                       )}
                     </>
@@ -721,8 +926,13 @@ const EnterpriseAddPickupDetails = () => {
                         >
                           First name:
                         </label>
-                        <TextInput control={control} name="dname" placeholder="First name" error={errors.dname} defaultValue=""/>
-
+                        <TextInput
+                          control={control}
+                          name="dname"
+                          placeholder="First name"
+                          error={errors.dname}
+                          defaultValue=""
+                        />
                       </div>
                     </div>
 
@@ -734,7 +944,13 @@ const EnterpriseAddPickupDetails = () => {
                         >
                           Last name:
                         </label>
-                          <TextInput control={control} name="dlastname" placeholder="Last name" error={errors.dlastname} defaultValue=""/>
+                        <TextInput
+                          control={control}
+                          name="dlastname"
+                          placeholder="Last name"
+                          error={errors.dlastname}
+                          defaultValue=""
+                        />
                       </div>
                     </div>
 
@@ -746,8 +962,13 @@ const EnterpriseAddPickupDetails = () => {
                         >
                           Company :
                         </label>
-                        <TextInput control={control} name="dcompany" placeholder="Company name" error={errors.dcompany} defaultValue=""/>
-
+                        <TextInput
+                          control={control}
+                          name="dcompany"
+                          placeholder="Company name"
+                          error={errors.dcompany}
+                          defaultValue=""
+                        />
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -758,8 +979,13 @@ const EnterpriseAddPickupDetails = () => {
                         >
                           Email:
                         </label>
-                        <TextInput control={control} name="demail" placeholder="email" error={errors.demail} defaultValue=""/>
-
+                        <TextInput
+                          control={control}
+                          name="demail"
+                          placeholder="email"
+                          error={errors.demail}
+                          defaultValue=""
+                        />
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -807,8 +1033,13 @@ const EnterpriseAddPickupDetails = () => {
                         >
                           Dropoff notes
                         </label>
-                        <TextInput control={control} name="dropoffnote" placeholder="Type here ..." error={errors.dropoffnote} defaultValue=""/>
-
+                        <TextInput
+                          control={control}
+                          name="dropoffnote"
+                          placeholder="Type here ..."
+                          error={errors.dropoffnote}
+                          defaultValue=""
+                        />
                       </div>
                     </div>
                   </div>
