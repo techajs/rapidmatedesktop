@@ -115,7 +115,7 @@ function LiveTracking() {
     "A driver is assigned to you",
     "The company is preparing your order",
     "Your order has been picked up for delivery",
-    "Order arriving soon!",
+    "Order arriving soon!!",
   ];
 
   return (
