@@ -122,7 +122,7 @@ const PastOrder = () => {
         {loading && <Spinners /> }
         <div className="container">
           <div className="row">
-            <div className="col-md-12">
+            <div className={Styles.max75}>
               <div>
                 <div className={Styles.pickupHistoryHeaderCard}>
                   <div className={Styles.pickupHistoryTitleHeaderCard}>

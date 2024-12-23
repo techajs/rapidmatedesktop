@@ -470,7 +470,7 @@ const ConsumerOrder = ({ user, order, navigate }) => {
     <section className={Styles.pickupDeliveryDetails}>
       <div className="container">
         <div className="row">
-          <div className="col-md-12">
+          <div className={Styles.max75}>
             <div>
               <div className={Styles.pickupDeliveryDetailsHead}>
                 <div className={Styles.pickupDeliveryDetailsHeaderCard}>

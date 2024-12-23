@@ -65,7 +65,7 @@ const NotificationLists = () => {
       <section className={Styles.pickupNotificationsSec}>
         <div className="container">
           <div className="row">
-            <div className="col-md-12">
+            <div className={Styles.max75}>
               <div>
                 <h4 className={Styles.pickupNotificationHeadText}>
                   All notifications

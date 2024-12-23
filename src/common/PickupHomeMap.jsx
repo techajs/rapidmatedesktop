@@ -51,7 +51,7 @@ function PickupHomeMap({ latitude, longitude }) {
   calculateRoute(latitude, longitude);
 
   return (
-    <div style={{ position: "relative", height: "93vh", width: "100%" }}>
+    <div style={{ position: "relative", height: "100vh", width: "100%" }}>
       <div
         style={{
           position: "absolute",

@@ -2,6 +2,7 @@ import {
   faCopy,
   faLocationCrosshairs,
   faLocationDot,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -20,44 +21,65 @@ import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 import { API, buildAddress } from "../utils/Constants";
 
 function LiveTracking() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [timeLeft30, setTimeLeft30] = useState(30 * 60); // 30 minutes in seconds
   const [timeLeft15, setTimeLeft15] = useState(15 * 60); // 15 minutes in seconds
   const [showModal, setShowModal] = useState(false);
   const user = useSelector((state) => state.auth.user);
   const commonData = useSelector((state) => state.commonData);
   const location = useLocation();
-  const {driverDetails,locationList} = location.state || {};
+  const { driverDetails, locationList } = location.state || {};
   const [locationLists, setLocationLists] = useState(locationList);
-  const [order,setOrder]=useState(driverDetails?.order)
-  const [deliveryBoy,setDeliveryBoy]=useState(driverDetails?.deliveryBoy)
-  const [vehicle,setVehicle]=useState(driverDetails?.vehicle)
+  const [order, setOrder] = useState(driverDetails?.order);
+  const [deliveryBoy, setDeliveryBoy] = useState(driverDetails?.deliveryBoy);
+  const [vehicle, setVehicle] = useState(driverDetails?.vehicle);
+  const [driverPhone, setDriverPhone] = useState(
+    driverDetails?.deliveryBoy.phone
+  );
+  const [copiedField, setCopiedField] = useState(null);
+
+  useEffect(() => {
+    if (driverDetails?.deliveryBoy?.phone) {
+      setDriverPhone(driverDetails.deliveryBoy.phone);
+    }
+  }, [driverDetails]);
+
   const openModal = () => {
     setShowModal(true);
   };
- 
-  
-  const getLocationAddress = locationId => {
-    let result = locationLists?.filter(location => location.id == locationId);
-    return buildAddress(result[0]?.address,result[0]?.city,result[0]?.state,result[0]?.country,result[0]?.postal_code);
-  };
 
-  const getOrigin = locationId =>{
-    let result = locationLists?.filter(location => location.id == locationId);
-    const params = {
-      lat:result[0].latitude,
-      lng:result[0]?.longitude
-    }
-    return params;
-  }
-
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(
-      () => showSuccessToast("Copied to clipboard!"),
-      (err) => showErrorToast("Failed to copy text: "+err)
+  const getLocationAddress = (locationId) => {
+    let result = locationLists?.filter((location) => location.id == locationId);
+    return buildAddress(
+      result[0]?.address,
+      result[0]?.city,
+      result[0]?.state,
+      result[0]?.country,
+      result[0]?.postal_code
     );
   };
+
+  const getOrigin = (locationId) => {
+    let result = locationLists?.filter((location) => location.id == locationId);
+    const params = {
+      lat: result[0].latitude,
+      lng: result[0]?.longitude,
+    };
+    return params;
+  };
+
+  const copyToClipboard = (text, field) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 3000);
+      },
+      () => {
+        // Handle clipboard failure if needed (e.g., log error)
+      }
+    );
+  };
+
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -87,14 +109,12 @@ function LiveTracking() {
         return prevTime - 1;
       });
     }, 1000);
-    
+
     return () => {
       clearInterval(interval30);
       clearInterval(interval15);
     };
   }, []);
-
- 
 
   const ProgressStep = ({ stepNumber, stepText, isActive, isCompleted }) => {
     return (
@@ -113,7 +133,7 @@ function LiveTracking() {
 
   const steps = [
     "A driver is assigned to you",
-    "The company is preparing your order",
+    "Pickup in Progress",
     "Your order has been picked up for delivery",
     "Order arriving soon!!",
   ];
@@ -133,7 +153,7 @@ function LiveTracking() {
                     icon={faLocationDot}
                   />
                   <p className={Styles.pickupOrderTrackingAddressText}>
-                  {getLocationAddress(order?.pickup_location_id)}
+                    {getLocationAddress(order?.pickup_location_id)}
                   </p>
                 </div>
                 <div className={Styles.pickuporderTrackingBorderShowOff} />
@@ -143,8 +163,7 @@ function LiveTracking() {
                     icon={faLocationCrosshairs}
                   />
                   <p className={Styles.pickupOrderTrackingAddressText}>
-                  {getLocationAddress(order?.dropoff_location_id)}
-
+                    {getLocationAddress(order?.dropoff_location_id)}
                   </p>
                 </div>
               </div>
@@ -152,45 +171,69 @@ function LiveTracking() {
               <div className={Styles.PickupOrderTrackingDeliveryInfoCard}>
                 <div>
                   <h4 className={Styles.pickupOrdertrackingDeliveryStatus}>
-                  {order?.consumer_order_title}
+                    Order Confirmed
                   </h4>
-                  <div className={Styles.pickupOrderTrackingOrderIdCard}>
-                    <p className={Styles.pickupOrderTrackingOrderId}>
-                      Order ID: <b>{order?.order_number}</b>
-                    </p>
-                    <FontAwesomeIcon
-                      className={Styles.pickupOrderTrackingCopyIcon}
-                      icon={faCopy}
-                      onClick={() => copyToClipboard(order?.order_number)}
-                    />
-                  </div>
-                  <div className={Styles.pickupOrderTrackingOrderIdCard}>
-                    <p className={Styles.pickupOrderTrackingOrderId}>
-                      OTP: <b>{order?.otp}</b>
-                    </p>
-                    <FontAwesomeIcon
-                      className={Styles.pickupOrderTrackingCopyIcon}
-                      icon={faCopy}
-                      onClick={() => copyToClipboard(order?.otp)}
-                    />
-                  </div>
                   <div>
+                    <div className={Styles.pickupOrderTrackingOrderIdCard}>
+                      <p className={Styles.pickupOrderTrackingOrderId}>
+                        Order ID: <b>{order?.order_number}</b>
+                      </p>
+                      <FontAwesomeIcon
+                        className={Styles.pickupOrderTrackingCopyIcon}
+                        icon={copiedField === "order_number" ? faCheck : faCopy}
+                        onClick={() =>
+                          copyToClipboard(order?.order_number, "order_number")
+                        }
+                      />
+                    </div>
+                    <div className={Styles.pickupOrderOtpCard}>
+                      <div className={Styles.pickupOrderTrackingOrderIdCard}>
+                        <p className={Styles.pickupOrderTrackingOrderId}>
+                          Pickup OTP: <b>{order?.otp}</b>
+                        </p>
+                        <FontAwesomeIcon
+                          className={Styles.pickupOrderTrackingCopyIcon}
+                          icon={copiedField === "otp" ? faCheck : faCopy}
+                          onClick={() => copyToClipboard(order?.otp, "otp")}
+                        />
+                      </div>
+
+                      <div className={Styles.pickupOrderTrackingOrderIdCard}>
+                        <p className={Styles.pickupOrderTrackingOrderId}>
+                          Delivered OTP: <b>{order?.delivered_otp}</b>
+                        </p>
+                        <FontAwesomeIcon
+                          className={Styles.pickupOrderTrackingCopyIcon}
+                          icon={
+                            copiedField === "delivered_otp" ? faCheck : faCopy
+                          }
+                          onClick={() =>
+                            copyToClipboard(
+                              order?.delivered_otp,
+                              "delivered_otp"
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {/* <div>
                     <p className={Styles.pickupOrderTrackingTimerCondown}>
                       Pickup in: <b>{formatTime(timeLeft30)}</b>
                     </p>
-                  </div>
+                  </div> */}
                   <div className={Styles.pickupOrderTrackingPackageImgCard}>
                     <img
                       className={Styles.pickupOrderTrackingPackageImg}
                       src={Package}
                       alt="Package"
                     />
-                    <h4 className={Styles.pickuporderTrackingEstimatedTime}>
+                    {/* <h4 className={Styles.pickuporderTrackingEstimatedTime}>
                       {formatTime(timeLeft15)}
                     </h4>
                     <p className={Styles.pickupOrderTrackingEstimateText}>
                       Estimated delivery time
-                    </p>
+                    </p> */}
                   </div>
                   <div>
                     <div className="progress-container">
@@ -216,41 +259,59 @@ function LiveTracking() {
                     <div className={Styles.pickupOrderTrackingDriverTruckCard}>
                       <img
                         className={Styles.pickupOrderTrackingDriverImg}
-                        src={deliveryBoy?.profile_pic ? API.viewImageUrl + deliveryBoy?.profile_pic?.replace(/\.(png|jpg|jpeg|webp)$/, "") : Driver}
+                        src={
+                          deliveryBoy?.profile_pic
+                            ? API.viewImageUrl +
+                              deliveryBoy?.profile_pic?.replace(
+                                /\.(png|jpg|jpeg|webp)$/,
+                                ""
+                              )
+                            : Driver
+                        }
                         alt="Driver"
-                      />
-                      <img
-                        className={Styles.pickupOrderTrackingTruckImg}
-                        src={Truck}
-                        alt="Truck"
                       />
                     </div>
                     <div>
                       <h4 className={Styles.pickupOrderTrackingDriverName}>
-                        {deliveryBoy?.first_name + " "+deliveryBoy?.last_name}
+                        {deliveryBoy?.first_name + " " + deliveryBoy?.last_name}
                       </h4>
                       <p className={Styles.pickupOrderTrackingTruckInfo}>
-                        {vehicle?.modal}  {vehicle?.plat_no}
+                        {vehicle?.modal} {vehicle?.plat_no}
                       </p>
                     </div>
                     <div className={Styles.pickupOrderTrackingButtonCard}>
-                      <button className={Styles.pickupOrderTrackingChatButton}>
+                      <button
+                        onClick={() => {
+                          if (driverPhone) {
+                            window.location.href = `tel:${driverPhone}`;
+                          } else {
+                            alert("Phone number not available");
+                          }
+                        }}
+                        className={Styles.pickupOrderTrackingChatButton}
+                      >
                         <img
                           className={Styles.pickupOrderTrackingChatIcon}
                           src={Chat}
                           alt="chat"
                         />
                       </button>
-                      <Link
-                        to="/pickup-feedback"
+                      <button
                         className={Styles.pickupOrderTrackingChatButton}
+                        onClick={() => {
+                          if (driverPhone) {
+                            window.location.href = `tel:${driverPhone}`;
+                          } else {
+                            alert("Phone number not available");
+                          }
+                        }}
                       >
                         <img
                           className={Styles.pickupOrderTrackingCallIcon}
                           src={Call}
                           alt="call"
                         />
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -258,10 +319,15 @@ function LiveTracking() {
             </div>
           </div>
           <div className="col-md-9">
-            <div><PickupHomeMap latitude={getOrigin(order?.pickup_location_id)} longitude={getOrigin(order?.dropoff_location_id)}/></div>
+            <div>
+              <PickupHomeMap
+                latitude={getOrigin(order?.pickup_location_id)}
+                longitude={getOrigin(order?.dropoff_location_id)}
+              />
+            </div>
           </div>
         </div>
-        <ToastContainer/>
+        <ToastContainer />
       </section>
     </>
   );

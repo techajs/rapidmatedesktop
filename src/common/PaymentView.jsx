@@ -326,94 +326,6 @@ const PaymentPage = ({
 
                 <div className="row">
                   <div className="col-md-8">
-                    <div>
-                      <div className={Styles.promoCodeCardPayments}>
-                        <FontAwesomeIcon
-                          className={Styles.paymentPromoCodeIcon}
-                          icon={faPercent}
-                        />
-                        <Form.Control
-                          className={Styles.promoCodeInputPayment}
-                          type="text"
-                          placeholder="Promo code"
-                          value={promoCode}
-                          disabled={promoCodeResponse ? true : false}
-                          onChange={(e) => setPromoCode(e.target.value)}
-                        />
-                        {promoCodeResponse ? (
-                          <button
-                            className={Styles.paymentApplyCouponBtn}
-                            onClick={() => {
-                              setPromoCodeResponse(null);
-                              setPaymentAmount(totalAmount);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faClose} />
-                          </button>
-                        ) : (
-                          <button
-                            className={Styles.paymentApplyCouponBtn}
-                            onClick={handleApplyCoupon}
-                          >
-                            <FontAwesomeIcon icon={faCheck} />
-                          </button>
-                        )}
-                      </div>
-                      <p className={Styles.paymentDebitCreditCardsText}>
-                        Credit & Debit Cards
-                      </p>
-
-                      <div className={Styles.paymentAllCardsDataShow}>
-                        <div onClick={handleClick}>
-                          <div className={Styles.paymentMethodAddedCards}>
-                            <img
-                              className={Styles.paymentMethodMastercardsLogos}
-                              src={MasterCard}
-                              alt="card"
-                            />
-                            <div>
-                              <p className={Styles.paymentMethodCardName}>
-                                Axis Bank
-                              </p>
-                              <p className={Styles.paymentmethodUserEmail}>
-                                **** **** **** 1234
-                              </p>
-                            </div>
-                            <button
-                              className={Styles.paymentMethodEditBtn}
-                            >
-                              <FontAwesomeIcon
-                                icon={isSelected ? faCircleCheck : faCircle}
-                              />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className={Styles.paymentAddCardMain}>
-                            <button onClick={openAddModal} className={Styles.paymentAddCardBtn}>
-                              <FontAwesomeIcon icon={faCirclePlus} />
-                            </button>
-                            <p className={Styles.paymentAddCardText}>
-                              Add New Card
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={Styles.paymentsOffCreaditCardInfo}>
-                        <FontAwesomeIcon
-                          className={Styles.paymentsCardsInfoCircle}
-                          icon={faCircleInfo}
-                        />
-                        <p className={Styles.paymentCreditCardOfferText}>
-                          20% off on city bank credit card!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-4">
                     <div className={Styles.paymentInvoiceCardMain}>
                       <div className={Styles.paymentInvoiceTruckImageCard}>
                         <img
@@ -487,6 +399,106 @@ const PaymentPage = ({
                         </div>
                       </div>
                     </div>
+                    <div>
+                      <div className={Styles.promoCodeCardPayments}>
+                        <FontAwesomeIcon
+                          className={Styles.paymentPromoCodeIcon}
+                          icon={faPercent}
+                        />
+                        <Form.Control
+                          className={Styles.promoCodeInputPayment}
+                          type="text"
+                          placeholder="Promo code"
+                          value={promoCode}
+                          disabled={promoCodeResponse ? true : false}
+                          onChange={(e) => setPromoCode(e.target.value)}
+                        />
+                        {promoCodeResponse ? (
+                          <button
+                            className={Styles.paymentApplyCouponBtn}
+                            onClick={() => {
+                              setPromoCodeResponse(null);
+                              setPaymentAmount(totalAmount);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faClose} />
+                          </button>
+                        ) : (
+                          <button
+                            className={Styles.paymentApplyCouponBtn}
+                            onClick={handleApplyCoupon}
+                          >
+                            <FontAwesomeIcon icon={faCheck} />
+                          </button>
+                        )}
+                      </div>
+                      <p className={Styles.paymentDebitCreditCardsText}>
+                        Credit & Debit Cards
+                      </p>
+
+                      <div className={Styles.paymentAllCardsDataShow}>
+                        <div onClick={handleClick}>
+                          <div className={Styles.paymentMethodAddedCards}>
+                            <img
+                              className={Styles.paymentMethodMastercardsLogos}
+                              src={MasterCard}
+                              alt="card"
+                            />
+                            <div>
+                              <p className={Styles.paymentMethodCardName}>
+                                Axis Bank
+                              </p>
+                              <p className={Styles.paymentmethodUserEmail}>
+                                **** **** **** 1234
+                              </p>
+                            </div>
+                            <button className={Styles.paymentMethodEditBtn}>
+                              <FontAwesomeIcon
+                                icon={isSelected ? faCircleCheck : faCircle}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className={Styles.paymentAddCardMain}>
+                            <button
+                              onClick={openAddModal}
+                              className={Styles.paymentAddCardBtn}
+                            >
+                              <FontAwesomeIcon icon={faCirclePlus} />
+                            </button>
+                            <p className={Styles.paymentAddCardText}>
+                              Add New Card
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={Styles.paymentsOffCreaditCardInfo}>
+                        <FontAwesomeIcon
+                          className={Styles.paymentsCardsInfoCircle}
+                          icon={faCircleInfo}
+                        />
+                        <p className={Styles.paymentCreditCardOfferText}>
+                          20% off on city bank credit card!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <form onSubmit={handleSubmit}>
+                      <PaymentElement />
+                      <button
+                        type="submit"
+                        disabled={!stripe || loading}
+                        className={`${Styles.addPickupDetailsNextBtn} m-2`}
+                      >
+                        {loading ? "Processing..." : "Pay Now"}
+                      </button>
+                    </form>
+                    {message && <p>{showSuccessToast(message)}</p>}
                   </div>
                 </div>
 
@@ -494,18 +506,6 @@ const PaymentPage = ({
                   <button className={Styles.addPickupDetailsCancelBTn}>
                     Cancel
                   </button>
-
-                  <form onSubmit={handleSubmit}>
-                    <PaymentElement />
-                    <button
-                      type="submit"
-                      disabled={!stripe || loading}
-                      className={`${Styles.addPickupDetailsNextBtn} m-2`}
-                    >
-                      {loading ? "Processing..." : "Pay Now"}
-                    </button>
-                  </form>
-                  {message && <p>{showSuccessToast(message)}</p>}
                 </div>
               </div>
             </div>
