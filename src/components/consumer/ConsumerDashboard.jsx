@@ -309,7 +309,11 @@ function ConsumerDashboard() {
             {directionsResponse && (
               <DirectionsRenderer
                 directions={directionsResponse}
-                options={{ suppressMarkers: true }}
+                options={{  polylineOptions: {
+                  strokeColor: "#FF0058", // Blue color
+                  strokeOpacity: 0.9,    // 90% opacity
+                  strokeWeight: 5,       // 5px thick line
+                },suppressMarkers: true }}
               />
             )}
           </GoogleMap>

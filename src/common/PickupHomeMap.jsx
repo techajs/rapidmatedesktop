@@ -51,7 +51,7 @@ function PickupHomeMap({ latitude, longitude }) {
   calculateRoute(latitude, longitude);
 
   return (
-    <div style={{ position: "relative", height: "100vh", width: "100%" }}>
+    <div style={{ position: "relative", height: "92vh", width: "100%" }}>
       <div
         style={{
           position: "absolute",
@@ -76,7 +76,14 @@ function PickupHomeMap({ latitude, longitude }) {
         >
           <Marker position={center} />
           {directionsResponse && (
-            <DirectionsRenderer directions={directionsResponse} />
+            <DirectionsRenderer directions={directionsResponse} options={{
+              polylineOptions: {
+                strokeColor: "#FF0058", // Blue color
+                strokeOpacity: 0.9,    // 90% opacity
+                strokeWeight: 5,       // 5px thick line
+              },
+              suppressMarkers: false,   // Use your custom markers
+            }} />
           )}
         </GoogleMap>
       </div>

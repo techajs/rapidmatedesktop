@@ -87,7 +87,6 @@ function MainRoutes() {
         <Route path="/gifts" element={<Gifts />} />
         <Route path="/ecommerce" element={<Ecommerce />} />
         <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/payment-successful" element={<PaymentSuccessful />} />
         <Route path="/payment-unsuccessful" element={<PaymentUnsuccessful />} />
         <Route path="/driver-not-available" element={<DriverNotAvailable />} />
         <Route path="/thanks" element={<ThankPage baseUrl={baseUrl} />} />
@@ -238,7 +237,14 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         />
-        
+        <Route
+          path="/payment-successfull"
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <PaymentSuccessful />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path={`/${baseUrl}/order-detail`}
@@ -323,7 +329,6 @@ function MainRoutes() {
               </ProtectedRoute>
             }
           />
-         
         </Route>
         <Route
           path={`/${baseUrl}/notifications`}
@@ -350,7 +355,7 @@ function MainRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* <Route path="*" element={<Navigate to="/" />} /> */}
       </Routes>
     </Router>
   );

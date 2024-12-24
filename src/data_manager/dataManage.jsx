@@ -999,6 +999,24 @@ export const addConsumerPaymentMethod = (
   );
 };
 
+export const getConsumerPaymentMethod = (
+  param,
+  successCallback,
+  errorCallback,
+) => {
+  axiosCall(
+    API.consumerPaymentMethodUrl +'/'+ param,
+    HTTPMethod.GET,
+    {},
+    response => {
+      successCallback(response);
+    },
+    errorResponse => {
+      errorCallback(errorResponse);
+    },
+  );
+};
+
 export const addConsumerBillingDetails = (
   param,
   successCallback,

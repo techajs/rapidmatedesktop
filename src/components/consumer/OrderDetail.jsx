@@ -18,6 +18,7 @@ import CommonHeader from "../../common/CommonHeader";
 import {
   getAVehicleByTypeId,
   getLocationById,
+  getLocations,
   getViewEnterpriseOrderDetail,
   getViewOrderDetail,
 } from "../../data_manager/dataManage";
@@ -34,7 +35,6 @@ const EnterpriseOrder = ({ user, orderNumber, navigate }) => {
   const [loading, setLoading] = useState(false);
   const [sourceAddress, setSourceAddress] = useState({});
   const [vehicle, setVehicle] = useState({});
-
   const goBack = () => {
     navigate(-1); // Navigate back to the previous page
   };
@@ -388,6 +388,29 @@ const ConsumerOrder = ({ user, order, navigate }) => {
   useEffect(() => {
     orderDetail();
   }, []);
+
+  const goTracking = () => {
+    const getLocationsData = () => {
+      getLocations(
+        null,
+        (successResponse) => {
+          if (successResponse[0]._success) {
+            let tempOrderList = successResponse[0]._response;
+            navigate("/consumer/order-tracking", {
+              state: {
+                orderNumber: orderNumber,
+                locationList: tempOrderList,
+              },
+            });
+          }
+        },
+        (errorResponse) => {
+          console.log(errorResponse[0]._errors.message);
+        }
+      );
+    };
+    getLocationsData();
+  };
   const orderDetail = async () => {
     setLoading(true);
     getViewOrderDetail(
@@ -515,15 +538,16 @@ const ConsumerOrder = ({ user, order, navigate }) => {
                   </div>
                 </div>
                 <p className={Styles.pickupDevliveryDetailVehicleNumber}>
-                  <Link
-                    to={"#"}
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={goTracking}
                     className={Styles.pickupDeliveryDetailDownloadIcon}
                   >
                     <FontAwesomeIcon
                       className={Styles.pickupHomeLocationIcon}
                       icon={faLocationCrosshairs}
                     />
-                  </Link>
+                  </div>
                 </p>
               </div>
 

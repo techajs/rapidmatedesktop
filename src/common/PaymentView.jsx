@@ -28,6 +28,7 @@ import {
   addPayment,
   checkPromoCode,
   createPickupOrder,
+  getConsumerPaymentMethod,
 } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
@@ -63,13 +64,14 @@ const PaymentPage = ({
   const [packageImageId, setPackageImageId] = useState(null);
   const [isSelected, setIsSelected] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [paymentCard, setPaymentCard] = useState([]);
   const openAddModal = () => {
     setShowAddModal(true);
   };
 
   // Toggle the selected state when the div is clicked
-  const handleClick = () => {
-    setIsSelected((prevState) => !prevState);
+  const handleClick = (paymentcard) => {
+    setIsSelected(paymentcard);
   };
 
   const handleSubmit = async (event) => {
@@ -219,12 +221,27 @@ const PaymentPage = ({
       doPayment();
     }
   }, [orderNumber]);
-
+  const getPaymentCard = () => {
+    getConsumerPaymentMethod(
+      user?.userDetails.ext_id,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+         console.log(successResponse[0]._response)
+         setPaymentCard(successResponse[0]._response);
+        }
+      },
+      (errorResponse) => {
+        console.log(errorResponse[0]._errors.message);
+      }
+    );
+  };
   useEffect(() => {
     {
       offerDiscount > 0 &&
         setPaymentAmount(calculateFinalPrice(paymentAmount, offerDiscount));
     }
+    
+    getPaymentCard();
   }, []);
 
   const handleApplyCoupon = () => {
@@ -268,7 +285,7 @@ const PaymentPage = ({
       (successResponse) => {
         setLoading(false);
         if (successResponse[0]._success) {
-          navigate("/consumer/find-driver", {
+          navigate("/payment-successfull", {
             state: {
               orderNumber: orderNumber,
             },
@@ -305,7 +322,6 @@ const PaymentPage = ({
     order?.addDestinationLocation?.country +
     "-" +
     order?.addDestinationLocation?.postal_code;
-
   return (
     <>
       <CommonHeader userData={user} />
@@ -437,28 +453,30 @@ const PaymentPage = ({
                       </p>
 
                       <div className={Styles.paymentAllCardsDataShow}>
-                        <div onClick={handleClick}>
-                          <div className={Styles.paymentMethodAddedCards}>
-                            <img
-                              className={Styles.paymentMethodMastercardsLogos}
-                              src={MasterCard}
-                              alt="card"
-                            />
-                            <div>
-                              <p className={Styles.paymentMethodCardName}>
-                                Axis Bank
-                              </p>
-                              <p className={Styles.paymentmethodUserEmail}>
-                                **** **** **** 1234
-                              </p>
-                            </div>
-                            <button className={Styles.paymentMethodEditBtn}>
-                              <FontAwesomeIcon
-                                icon={isSelected ? faCircleCheck : faCircle}
+                        {paymentCard?.map((cardInfo, index) => (
+                          <div onClick={()=>handleClick(cardInfo)} key={index}>
+                            <div className={Styles.paymentMethodAddedCards}>
+                              <img
+                                className={Styles.paymentMethodMastercardsLogos}
+                                src={MasterCard}
+                                alt="card"
                               />
-                            </button>
+                              <div>
+                                <p className={Styles.paymentMethodCardName}>
+                                  {cardInfo?.card_holder_name}
+                                </p>
+                                <p className={Styles.paymentmethodUserEmail}>
+                                  {cardInfo.card_number?.replace(/\d(?=\d{4})/g, "*")}
+                                </p>
+                              </div>
+                              <button className={Styles.paymentMethodEditBtn}>
+                                <FontAwesomeIcon
+                                  icon={isSelected.id==cardInfo.id ? faCircleCheck : faCircle}
+                                />
+                              </button>
+                            </div>
                           </div>
-                        </div>
+                        ))}
 
                         <div>
                           <div className={Styles.paymentAddCardMain}>
@@ -516,6 +534,7 @@ const PaymentPage = ({
       <PickupAddPaymentMethodsModal
         show={showAddModal}
         handleClose={() => setShowAddModal(false)}
+        getPaymentCard={()=>getPaymentCard()}
       />
     </>
   );

@@ -19,6 +19,9 @@ import PickupHomeMap from "./PickupHomeMap";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
 import { API, buildAddress } from "../utils/Constants";
+import { getViewOrderDetail } from "../data_manager/dataManage";
+import Spinners from "./Loader";
+import Payment from "../assets/images/Payment-Successful-Icon.png";
 
 function LiveTracking() {
   const navigate = useNavigate();
@@ -26,23 +29,63 @@ function LiveTracking() {
   const [timeLeft15, setTimeLeft15] = useState(15 * 60); // 15 minutes in seconds
   const [showModal, setShowModal] = useState(false);
   const user = useSelector((state) => state.auth.user);
-  const commonData = useSelector((state) => state.commonData);
+  const commonData = useSelector((state)=>state.commonData.commonData)
+  
   const location = useLocation();
-  const { driverDetails, locationList } = location.state || {};
+  const { driverDetails, locationList, orderNumber } = location.state || {};
   const [locationLists, setLocationLists] = useState(locationList);
-  const [order, setOrder] = useState(driverDetails?.order);
-  const [deliveryBoy, setDeliveryBoy] = useState(driverDetails?.deliveryBoy);
-  const [vehicle, setVehicle] = useState(driverDetails?.vehicle);
-  const [driverPhone, setDriverPhone] = useState(
-    driverDetails?.deliveryBoy.phone
+  const [order, setOrder] = useState(null);
+  const [deliveryBoy, setDeliveryBoy] = useState(null);
+  const [vehicle, setVehicle] = useState(null);
+  const [driverPhone, setDriverPhone] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [markAsComplepleted, setMarkAsCompleted] = useState(false);
+  const [orderNum, setOrderNum] = useState(
+    driverDetails == undefined
+      ? orderNumber
+      : driverDetails?.order?.order_number
   );
-  const [copiedField, setCopiedField] = useState(null);
 
+  const [copiedField, setCopiedField] = useState(null);
   useEffect(() => {
-    if (driverDetails?.deliveryBoy?.phone) {
-      setDriverPhone(driverDetails.deliveryBoy.phone);
+    if (deliveryBoy?.phone) {
+      setDriverPhone(deliveryBoy.phone);
     }
-  }, [driverDetails]);
+    const orderDetail = async () => {
+      setLoading(true);
+      getViewOrderDetail(
+        orderNum,
+        (successResponse) => {
+          setLoading(false);
+          if (successResponse[0]._success) {
+            if (
+              successResponse[0]._response.order?.order_status == "COMPLETED"
+            ) {
+              setMarkAsCompleted(true);
+              setOrder(successResponse[0]._response.order);
+              setDeliveryBoy(successResponse[0]._response.deliveryBoy);
+              if (successResponse[0]._response.vehicle) {
+                setVehicle(successResponse[0]._response.vehicle);
+              }
+            } else {
+              setMarkAsCompleted(false);
+              setOrder(successResponse[0]._response.order);
+              setDeliveryBoy(successResponse[0]._response.deliveryBoy);
+              if (successResponse[0]._response.vehicle) {
+                setVehicle(successResponse[0]._response.vehicle);
+              }
+            }
+          }
+        },
+        (errorResponse) => {
+          setLoading(false);
+        }
+      );
+    };
+    if (orderNum) {
+      orderDetail();
+    }
+  }, [orderNum]);
 
   const openModal = () => {
     setShowModal(true);
@@ -90,31 +133,31 @@ function LiveTracking() {
     )}:${String(secs).padStart(2, "0")}`;
   };
 
-  useEffect(() => {
-    const interval30 = setInterval(() => {
-      setTimeLeft30((prevTime) => {
-        if (prevTime <= 0) {
-          clearInterval(interval30);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-    const interval15 = setInterval(() => {
-      setTimeLeft15((prevTime) => {
-        if (prevTime <= 0) {
-          clearInterval(interval15);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
+  // useEffect(() => {
+  //   const interval30 = setInterval(() => {
+  //     setTimeLeft30((prevTime) => {
+  //       if (prevTime <= 0) {
+  //         clearInterval(interval30);
+  //         return 0;
+  //       }
+  //       return prevTime - 1;
+  //     });
+  //   }, 1000);
+  //   const interval15 = setInterval(() => {
+  //     setTimeLeft15((prevTime) => {
+  //       if (prevTime <= 0) {
+  //         clearInterval(interval15);
+  //         return 0;
+  //       }
+  //       return prevTime - 1;
+  //     });
+  //   }, 1000);
 
-    return () => {
-      clearInterval(interval30);
-      clearInterval(interval15);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(interval30);
+  //     clearInterval(interval15);
+  //   };
+  // }, []);
 
   const ProgressStep = ({ stepNumber, stepText, isActive, isCompleted }) => {
     return (
@@ -129,7 +172,29 @@ function LiveTracking() {
     );
   };
 
-  const [currentStep, setCurrentStep] = useState(1);
+  
+  const getStep = (order) => {
+    switch (order?.order_status) {
+      case 'ON_THE_WAY_PICKUP':
+        return 2;
+      case 'OTP_VERIFIED':
+        return 3;
+      case 'ON_THE_WAY_DROP_OFF':
+        return 4;
+      case 'COMPLETED' :
+        return 4;
+      default:
+        return 1;
+    }
+  };
+  
+  // Ensure `getStep` is used consistently to initialize and update the step.
+  const [currentStep, setCurrentStep] = useState(() => getStep(order));
+  
+  // Update the current step if the `order` prop changes.
+  useEffect(() => {
+    setCurrentStep(getStep(order));
+  }, [order]);
 
   const steps = [
     "A driver is assigned to you",
@@ -137,11 +202,51 @@ function LiveTracking() {
     "Your order has been picked up for delivery",
     "Order arriving soon!!",
   ];
-
+  if (order == null) {
+    return <Spinners />;
+  }
+ 
+  if (markAsComplepleted) {
+    return (
+      <>
+        <CommonHeader userData={user} />
+        <section className={Styles.deliveryboyThankyouSec}>
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <div className={Styles.deliveryboyThankyoumainCard}>
+                  <div>
+                    <div className={Styles.deliveryboyThankyouLoaderImgCard}>
+                      <img
+                        className={Styles.PaymentSuccessfulImage}
+                        src={Payment}
+                        alt="Payment-Img"
+                      />
+                    </div>
+                    <div>
+                      <h4 className={Styles.deliveryboyThankyouSignupText}>
+                        Order has been completed!
+                      </h4>
+                      <Link
+                        className={`${Styles.addPickupDetailsCancelBTn} m-5`}
+                        style={{ color: "#000" }}
+                        to="/consumer/orders"
+                      >
+                        Go order Lists
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
   return (
     <>
       <CommonHeader userData={user} />
-
       <section>
         <div className={`row ${Styles.manageRow}`}>
           <div className="col-md-3">
@@ -171,7 +276,7 @@ function LiveTracking() {
               <div className={Styles.PickupOrderTrackingDeliveryInfoCard}>
                 <div>
                   <h4 className={Styles.pickupOrdertrackingDeliveryStatus}>
-                    Order Confirmed
+                    {order?.consumer_order_title}
                   </h4>
                   <div>
                     <div className={Styles.pickupOrderTrackingOrderIdCard}>

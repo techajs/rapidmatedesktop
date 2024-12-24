@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Styles from "../assets/css/home.module.css";
 import Payment from "../assets/images/Payment-Successful-Icon.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import CommonHeader from "./CommonHeader";
 
 const PaymentSuccessful = () => {
+  const user = useSelector((state) => state.auth.user);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const {orderNumber} = location.state || {};
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate("/consumer/find-driver", {
+        state: {
+          orderNumber: orderNumber,
+        },
+      });
+    }, 4000);
+
+    // Cleanup timer on component unmount
+    return () => clearTimeout(timer);
+  }, [navigate]);
   return (
     <>
+    <CommonHeader userData={user}/>
       <section className={Styles.deliveryboyThankyouSec}>
         <div className="container">
           <div className="row">
@@ -21,10 +40,10 @@ const PaymentSuccessful = () => {
                   </div>
                   <div>
                     <h4 className={Styles.deliveryboyThankyouSignupText}>
-                      Payment Successful!
+                      Payment Successfull!
                     </h4>
                     <p className={Styles.deliveryboyThankyouSignupDiscription}>
-                      Your payment was successful, let’s look for a delivery boy
+                      Your payment was successfull, let’s look for a delivery boy
                       now...
                     </p>
                   </div>
