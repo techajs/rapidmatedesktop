@@ -1492,8 +1492,14 @@ a {
 
 .addpickupDetailSidecardboxIcon {
   width: 100%;
-  height: 100vh;
+  height: 1200px;
 }
+
+.orderPreviewDetailSidecardboxIcon {
+  width: 100%;
+  height: 1000px;
+}
+
 .addPickupFileInput {
   position: absolute;
   width: 100%;
@@ -1794,6 +1800,7 @@ a {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   background-color: var(--white-color);
   border-radius: 10px;
+  margin-bottom: 20px;
 }
 
 .paymentInvoiceTruckImageCard {
@@ -1830,7 +1837,7 @@ a {
 .paymentTotalAmountCard {
   display: flex;
   justify-content: space-between;
-  margin: 80px 0px 0px;
+  margin: 10px 0px 0px;
 }
 
 .paymentTotalAmounttext {
@@ -2920,7 +2927,7 @@ a {
 }
 
 .pickupOrderTrackingAddressText {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-color);
   margin: 0px;
@@ -2931,8 +2938,8 @@ a {
 }
 
 .pickuporderTrackingBorderShowOff {
-  border: 1px dashed #000;
-  margin: 20px 0px;
+  border: 1px dashed #97989f;
+  margin: 10px 0px;
 }
 
 .pickupOrderTrackingLocCrosshairsIcon {
@@ -2941,7 +2948,7 @@ a {
 
 .pickuporderTrackingAddressCardMain {
   padding: 25px;
-  background-color: var(--primary-color);
+  background-color: var(--white-color);
 }
 
 .PickupOrderTrackingDeliveryInfoCard {
@@ -2985,7 +2992,7 @@ a {
 .pickupOrderTrackingPackageImg {
   width: 113px;
   height: 107px;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 }
 
 .pickupOrderTrackingPackageImgCard {
@@ -3901,7 +3908,7 @@ a {
   background-color: var(--mainbg-color);
 }
 
-.enterprisePreviewPageSec{
+.enterprisePreviewPageSec {
   background-color: var(--mainbg-color);
   padding: 15px 0px;
 }
@@ -4210,7 +4217,7 @@ a {
 .selected .enterpriseSelectVehicleCircleIcon {
   color: var(--secondary-color);
 }
-.textColor{
+.textColor {
   color: var(--secondary-color);
 }
 
@@ -5530,7 +5537,7 @@ a {
 }
 
 .oneTimeActiveText {
-  background: #27AE6012;
+  background: #27ae6012;
   color: var(--active-color);
   padding: 5px 10px;
   border-radius: 20px;
@@ -5545,11 +5552,11 @@ a {
   margin-bottom: 5px;
 }
 
-.shiftOrderHeaderMainCard{
+.shiftOrderHeaderMainCard {
   display: flex;
 }
 
-.shiftOrderhoursText{
+.shiftOrderhoursText {
   font-size: 15px;
   color: var(--text-color);
   font-weight: 700;
@@ -5557,8 +5564,8 @@ a {
   margin-left: auto;
 }
 
-.oneTimePendingText{
-  background: #F39C1212;
+.oneTimePendingText {
+  background: #f39c1212;
   color: var(--pending-color);
   padding: 5px 10px;
   border-radius: 20px;
@@ -5567,18 +5574,18 @@ a {
   font-weight: 600;
 }
 
-.pickupHistoryPastVehicleText{
+.pickupHistoryPastVehicleText {
   font-size: 12px;
   margin-top: 12px;
 }
 
-.updateProfileCard{
+.updateProfileCard {
   position: relative;
-  top:14px;
+  top: 14px;
   right: 33px;
   cursor: pointer;
 }
-.updateProfileImg{
+.updateProfileImg {
   width: 25px;
   height: 25px;
   border-radius: 100%;
@@ -5586,7 +5593,6 @@ a {
   background-color: var(--white-color);
   padding: 2px;
 }
-
 
 .pickupAccountUserProfileUpdate {
   width: 100px;
@@ -5630,17 +5636,17 @@ a {
   border-radius: 50%;
 }
 
-.PaymentSuccessfulImage{
+.PaymentSuccessfulImage {
   height: 150px;
   width: auto;
 }
 
-.driverDotAvailableImg{
+.driverDotAvailableImg {
   height: 350px;
   width: auto;
 }
 
-.driverNotAvailableHeadCard{
+.driverNotAvailableHeadCard {
   display: flex;
   align-items: baseline;
   justify-content: end;
@@ -5658,12 +5664,12 @@ a {
   background-color: transparent;
 }
 
-.startPreviewDateCard h5{
+.startPreviewDateCard h5 {
   font-size: 13px;
   margin-bottom: 3px;
 }
 
-.startPreviewDateCard p{
+.startPreviewDateCard p {
   font-size: 12px;
   margin: 0px;
   padding: 5px 10px;
@@ -5673,19 +5679,19 @@ a {
   border: 1px solid #a1a1a9;
 }
 
-.previewDateMainCard{
+.previewDateMainCard {
   display: flex;
   align-items: center;
   gap: 30px;
 }
 
-.previewTimeCard{
+.previewTimeCard {
   display: flex;
   align-items: center;
   gap: 30px;
 }
 
-.previewTimeCard p{
+.previewTimeCard p {
   font-size: 12px;
   margin: 0px;
   padding: 5px 10px;
@@ -5695,25 +5701,26 @@ a {
   border: 1px solid #a1a1a9;
 }
 
-.previewTimeDateText{
+.previewTimeDateText {
   font-size: 13px;
   margin-bottom: 3px;
 }
 
-.previewHeaderMainCard{
+.previewHeaderMainCard {
   background-color: var(--white-color);
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   padding: 20px;
   border-radius: 8px 8px 0px 0px;
 }
 
-.previewbottomMainCard{
+.previewbottomMainCard {
   padding: 20px;
   height: 67vh;
   overflow-y: scroll;
   overflow-x: hidden;
   border-radius: 0px 0px 8px 8px;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
 }
 
 .previewbottomMainCard::-webkit-scrollbar {
@@ -5756,77 +5763,89 @@ a {
   background: #717172;
 }
 
-.previewPageTitle{
+.previewPageTitle {
   font-size: 22px;
   font-weight: 600;
 }
 
-.previewPageColGapping{
+.previewPageColGapping {
   margin: 0px 10px;
 }
 
-.createShiftAvailabilityText{
+.createShiftAvailabilityText {
   font-size: 13px;
   margin-bottom: 3px;
 }
 
-.totalAboutCard{
+.totalAboutCard {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.totalAboutCard h4{
+.totalAboutCard h4 {
   font-size: 14px;
   font-weight: 400;
   margin-bottom: 0px;
 }
 
-.totalAboutCard h4 span{
+.totalAboutCard h4 span {
   font-weight: 600;
   color: var(--secondary-color);
 }
 
-.enterprseShiftFinalBtnCard{
+.enterprseShiftFinalBtnCard {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 30px;
 }
 
-.pickupDeliveryNumberplate{
+.pickupDeliveryNumberplate {
   font-size: 12px;
   margin-bottom: 0px;
 }
 
-.pickupDeliveryDetailPackageImg{
+.pickupDeliveryDetailPackageImg {
   height: 25px;
   width: 25px;
   margin-right: 10px;
 }
 
-.paymentAllCardsDataShow{
+.paymentAllCardsDataShow {
   background-color: var(--white-color);
   padding: 10px;
   margin-bottom: 20px;
 }
 
-.paymentAddCardBtn{
+.paymentAddCardBtn {
   background: transparent;
   border: none;
   font-size: 20px;
   color: var(--secondary-color);
 }
 
-.paymentAddCardText{
+.paymentAddCardText {
   font-size: 14px;
   margin-bottom: 0px;
   margin-top: 3px;
 }
 
-.paymentAddCardMain{
+.paymentAddCardMain {
   display: flex;
   align-items: center;
   gap: 7px;
+}
+
+.pickupOrderOtpCard{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.max75{
+  max-width: 75% !important;
+  margin: 0 auto;
 }

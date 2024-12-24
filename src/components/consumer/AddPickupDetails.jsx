@@ -28,7 +28,7 @@ const AddPickupDetails = () => {
     const seletedValue = event.target.value;
     setSelectedOption(seletedValue);
   };
-  const FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  const FILE_SIZE = 5 * 1024 * 1024; // 2MB
   const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "application/pdf"];
   const schema = yup.object().shape({
     name: yup

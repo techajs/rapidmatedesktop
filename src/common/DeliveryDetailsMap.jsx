@@ -5,7 +5,7 @@ import {
   Marker,
   DirectionsRenderer,
 } from "@react-google-maps/api";
-import { MAPS_API_KEY } from '../utils/Constants';
+import { MAPS_API_KEY } from "../utils/Constants";
 
 const containerStyle = {
   width: "100%",
@@ -76,9 +76,21 @@ export default function DeliveryDetailsMap({ addressData = null }) {
     <LoadScript
       googleMapsApiKey={MAPS_API_KEY}
       onLoad={() => console.log("Google Maps script loaded")}
-      onError={(error) => console.error("Error loading Google Maps script:", error)}
+      onError={(error) =>
+        console.error("Error loading Google Maps script:", error)
+      }
     >
-      <GoogleMap mapContainerStyle={containerStyle} center={origin} zoom={1}>
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        options={{
+          zoomControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+        }}
+        center={origin}
+        zoom={1}
+      >
         <Marker position={origin} label="Start" />
         <Marker position={destination} label="End" />
         {directionsResponse && (

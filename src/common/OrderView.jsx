@@ -56,7 +56,7 @@ function OrderView() {
             <div className="col-md-4">
               <div className={Styles.addpickupDetailSidecardMain}>
                 <img
-                  className={Styles.addpickupDetailSidecardboxIcon}
+                  className={Styles.orderPreviewDetailSidecardboxIcon}
                   src={SidebarImg}
                   alt="icon"
                 />

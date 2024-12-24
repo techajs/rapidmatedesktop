@@ -24,7 +24,7 @@ import DateTimePicker from "./common/DateTimePicker";
 import VehicleSelection from "./common/VehicleSelection";
 import { ToastContainer } from "react-toastify";
 import DropoffMarker from "../../assets/images/dropoff-marker.png";
-import PickupMarger from "../../assets/images/Location-Icon.png";
+import PickupMarger from "../../assets/images/pickup-marker.png";
 
 const libraries = ["places"];
 
