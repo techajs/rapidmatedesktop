@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperclip, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPaperclip,
+  faRepeat,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
@@ -345,14 +349,16 @@ const EnterpriseAddPickupDetails = () => {
                             backgroundColor: "#f44336",
                             color: "white",
                             border: "none",
-                            padding: "5px 10px",
+                            // padding: "5px 5px",
                             cursor: "pointer",
                             position: "absolute",
+                            height: "24px",
+                            width: "24px",
                             marginLeft: "-16px",
                             borderRadius: "50%",
                           }}
                         >
-                          <FontAwesomeIcon icon={faTrash} />
+                          x
                         </button>
                       </div>
                     ) : (

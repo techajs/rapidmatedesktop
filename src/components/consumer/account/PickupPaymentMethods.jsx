@@ -12,7 +12,7 @@ import PayPal from "../../../assets/images/PayPal-Logo.png";
 import MasterCard from "../../../assets/images/MasterCard-Logo.png";
 import PickupAddPaymentMethodsModal from "./PickupAddPaymentMethodsModal";
 import { useSelector } from "react-redux";
-import { getConsumerWallet } from "../../../data_manager/dataManage";
+import { getConsumerWallet, getDeliveryBoyWallet, getEnterprisePaymentMethod } from "../../../data_manager/dataManage";
 
 const PickupPaymentMethods = () => {
   const user = useSelector((state) => state?.auth?.user.userDetails);
@@ -22,19 +22,38 @@ const PickupPaymentMethods = () => {
   
   useEffect(() => {
     setLoading(true);
-    getConsumerWallet(
-      user.ext_id,
-      successResponse => {
-        setLoading(false);
-        console.log('successResponse==>', JSON.stringify(successResponse));
-        setWalletAmount(successResponse[0]._response?.balance.toFixed(2));
-      },
-      errorResonse => {
-        setLoading(false);
-       
-      },
-    );
-  }, []);
+  
+    const handleSuccess = (successResponse) => {
+      setLoading(false);
+      setWalletAmount(successResponse[0]?._response?.balance);
+    };
+  
+    const handleError = () => {
+      setLoading(false);
+    };
+  
+    const fetchWallet = () => {
+      const extId = user?.ext_id;
+      if (!extId) return;
+  
+      switch (user?.role) {
+        case 'CONSUMER':
+          getConsumerWallet(extId, handleSuccess, handleError);
+          break;
+  
+        case 'DELIVERY_BOY':
+          getDeliveryBoyWallet(extId, handleSuccess, handleError);
+          break;
+  
+        default:
+          getEnterprisePaymentMethod(extId, handleSuccess, handleError);
+          break;
+      }
+    };
+  
+    fetchWallet();
+  }, [user]);
+  
   const openAddModal = () => {
     setShowAddModal(true);
   };
@@ -64,7 +83,7 @@ const PickupPaymentMethods = () => {
 
               <div className={Styles.paymentMethodWalletBalanceCard}>
                 <p className={Styles.paymentMethodWalletBalance}>
-                € {walletAmount ? walletAmount : 0.00}
+                {loading ? <p>Loading...</p> : <p>€ {walletAmount}</p>}
                 </p>
                 <p className={Styles.paymentMethodWalletText}>Wallet balance</p>
               </div>

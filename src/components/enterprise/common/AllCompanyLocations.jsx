@@ -23,10 +23,10 @@ function AllCompanyLocations() {
          user.userDetails.ext_id,
          (successResponse) => {
            setLoading(false);
-           if (successResponse[0]._response.length > 0) {
+           if (successResponse[0]._response) {
             
              dispatch(
-               setBranches(successResponse[0]._response[0]?.dashboard.branch)
+               setBranches(successResponse[0]?._response?.branchOverviewData)
              );
            }
          },
@@ -105,23 +105,23 @@ function AllCompanyLocations() {
                       <div className={Styles.enterpriseHomeLocSpentCard}>
                         <div className={Styles.enterpriseHomeHrsBookedCard}>
                           <p className={Styles.enterpriseHomeLocHsbooked}>
-                            Hours booked
+                            Active booking
                           </p>
-                          <h4>{company?.bookinghr || 0}</h4>
+                          <h4>{company?.active_order ? company?.active_order: 0}</h4>
                         </div>
 
                         <div className={Styles.enterpriseHomeHrsBookedCard}>
                           <p className={Styles.enterpriseHomeLocHsbooked}>
-                            Hours spent
+                          Scheduled booking
                           </p>
-                          <h4>{company?.spenthr || 0}</h4>
+                          <h4>{company?.schedule_order ? company.schedule_order : 0}</h4>
                         </div>
 
                         <div className={Styles.enterpriseHomeHrsBookedCard}>
                           <p className={Styles.enterpriseHomeLocHsbooked}>
-                            Bookings
+                            All booking
                           </p>
-                          <h4>{company?.bookings || 0}</h4>
+                          <h4>{company?.total ? company?.total : 0}</h4>
                         </div>
                       </div>
                     </div>

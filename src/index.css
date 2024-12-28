@@ -11,3 +11,92 @@ body {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.custom-calendar {
+  background: transparent !important;
+  border: none !important;
+  width: 280px;
+  font-family: Arial, sans-serif;
+}
+
+.react-datepicker__header {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.react-datepicker__current-month {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.react-datepicker__day-name {
+  color: #666;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.react-datepicker__day {
+  background: transparent;
+  color: #333;
+  font-size: 14px;
+  font-weight: normal;
+  width: 35px;
+  height: 35px;
+  line-height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-datepicker__day--selected {
+  background-color: #ffc107 !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: #ffc107 !important;
+  color: white !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: #ffeb3b !important;
+  color: #333 !important;
+}
+
+.react-datepicker__day--today {
+  border: 1px solid #ff4081;
+  font-weight: bold;
+  color: #ff4081;
+}
+
+.react-datepicker__navigation {
+  top: 10px;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #333;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: #ff4081;
+}
+
+.dynamic-border-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd; /* Default border color */
+  border-radius: 4px; /* Optional for rounded corners */
+  outline: none; /* Remove default focus outline */
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+.dynamic-border-input:focus {
+  border-color: #ff4081; /* Border color when focused */
+  box-shadow: 0 0 5px rgba(255, 64, 129, 0.5); /* Optional for glowing effect */
+}

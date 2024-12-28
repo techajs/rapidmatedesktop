@@ -46,6 +46,7 @@ import {
   PaymentUnsuccessful,
   DriverNotAvailable,
   EnterpriseShiftDetails,
+  ScheduleSuccess,
 } from "../common/pages";
 import {
   Navigate,
@@ -242,6 +243,14 @@ function MainRoutes() {
           element={
             <ProtectedRoute requiredRole={userRole}>
               <PaymentSuccessful />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/consumer/schedule-created"
+          element={
+            <ProtectedRoute requiredRole={userRole}>
+              <ScheduleSuccess />
             </ProtectedRoute>
           }
         />

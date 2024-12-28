@@ -55,16 +55,18 @@ import { Link, useNavigate } from "react-router-dom";
 import Spinners from "../../common/Loader";
 function CommonDashboard() {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
-  const {vehicleType} = useSelector((state) => state.commonData.commonData);
+  const { vehicleType } = useSelector((state) => state.commonData.commonData);
   const { bookings, branches } = useSelector((state) => state.enterprise);
   const [bookingHour, setBookingHour] = useState(0);
   const [spendHr, setSpendHr] = useState(0);
   const [enterprisePlans, setEnterprisePlans] = useState([]);
   const [locationList, setLocationList] = useState([]);
-  const [currentDate,setCurrentDate]=useState(moment(new Date()).format("YYYY-MM-DD"))
-  const [loading,setLoading]=useState(false)
+  const [currentDate, setCurrentDate] = useState(
+    moment(new Date()).format("YYYY-MM-DD")
+  );
+  const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -73,7 +75,6 @@ function CommonDashboard() {
       },
     ],
   });
-
 
   const options = {
     responsive: true,
@@ -107,65 +108,36 @@ function CommonDashboard() {
   };
 
   const displayChartData = (branch) => {
-    // console.log("branch", branch);
-    setLoading(true)
-    let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    let hours = [0, 0, 0, 0, 0, 0, 0];
-    let usedHour = [0, 0, 0, 0, 0, 0, 0];
-    branch?.chartData?.forEach((element) => {
-      if (element.day == "Monday") {
-        hours[0] = element?.booked_hours;
-        usedHour[0] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Tuesday") {
-        hours[1] = element.booked_hours;
-        usedHour[1] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Wednesday") {
-        hours[2] = element.booked_hours;
-        usedHour[2] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Thursday") {
-        hours[3] = element.booked_hours;
-        usedHour[3] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Friday") {
-        hours[4] = element.booked_hours;
-        usedHour[4] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Saturday") {
-        hours[5] = element.booked_hours;
-        usedHour[5] = element?.is_select ? element.booked_hours : 0;
-      } else if (element.day == "Sunday") {
-        hours[6] = element.booked_hours;
-        usedHour[6] = element?.is_select ? element.booked_hours : 0;
-      }
-    });
+    setLoading(true);
+    const days = branch.map((day) => day.month);
+    const hours = branch.map((day) => day.count);
+   
     const data = {
       labels: days,
       datasets: [
         {
-          label: "Hours booked",
+          label: "booked",
           data: hours,
           backgroundColor: "rgba(255, 0, 88, 1)",
           borderColor: "rgba(255, 0, 88, 1)",
           borderWidth: 1,
         },
-        {
-          label: "Hours used",
-          data: usedHour, // Data points for Series 2
-          backgroundColor: "rgba(255, 199, 43, 1)",
-          borderColor: "rgba(255, 199, 43, 1)",
-          borderWidth: 1,
-        },
       ],
     };
+    const sum = hours.flat().reduce((total, num) => total + parseInt(num, 10), 0);
+    setBookingHour(sum);
     setChartData(data);
-    setBookingHour(branch?.bookinghr);
-    setSpendHr(branch?.spenthr);
-    setLoading(false)
+    // setBookingHour(branch?.bookinghr);
+    // setSpendHr(branch?.spenthr);
+    setLoading(false);
   };
 
   const dropdownData2 = [
-    { label: "Today", value: "Today" },
-    { label: "This week", value: "This week" },
-    { label: "This month", value: "This month" },
-    { label: "This year", value: "This year" },
+    { label: "All",value: "all" },
+    { label: "Today",value: "today" },
+    { label: "This week",value: "week" },
+    { label: "This month",value: "month" },
+    { label: "This year",value: "year" },
   ];
 
   const getEnterprisePlans = (dateString) => {
@@ -196,14 +168,15 @@ function CommonDashboard() {
       user.userDetails.ext_id,
       (successResponse) => {
         setLoading(false);
-        if (successResponse[0]._response.length > 0) {
-          dispatch(
-            setBookings(successResponse[0]._response[0]?.dashboard.bookings)
-          );
-          dispatch(
-            setBranches(successResponse[0]._response[0]?.dashboard.branch)
-          );
-          displayChartData(successResponse[0]._response[0].dashboard.branch[0]);
+        if (successResponse[0]?._response) {
+          if (successResponse[0]?._response?.branchOverviewData && successResponse[0]?._response?.branchOverviewData.length > 0){
+            const branchList = successResponse[0]?._response?.branchOverviewData;
+            dispatch(setBranches(branchList));
+            dispatch(setBookings(successResponse[0]?._response?.overviewData));
+            displayChartData(successResponse[0]?._response?.weekData);
+          }
+
+          // displayChartData(successResponse[0]._response[0].dashboard.branch[0]);
         }
       },
       (errorResponse) => {
@@ -220,16 +193,14 @@ function CommonDashboard() {
   };
 
   useEffect(() => {
-    if (!bookings || branches.length ==0) {
+    if (!bookings || branches?.length == 0) {
       getBookingList();
-      
     }
     getEnterprisePlans(currentDate);
-    if (branches) {
-      displayChartData(branches[0]);
-    }
-    
-  }, [user,currentDate]);
+    // if (branches) {
+    //   displayChartData(branches[0]);
+    // }
+  }, [user, currentDate]);
 
   const branchList = branches?.map((item, index) => ({
     label: item.branch_name,
@@ -241,19 +212,19 @@ function CommonDashboard() {
 
   const handleChange = (selectedOption) => {
     const getSinglebranch = branches.filter(
-      (branch) => branch.branch_id == selectedOption.value
+      (branch) => branch.id == selectedOption.value
     );
-    displayChartData(getSinglebranch[0]);
+
+    // displayChartData(booking[0]);
   };
-  if(loading){
-    return <Spinners />
-  
+  if (loading) {
+    return <Spinners />;
   }
 
-  const navigateHandler =(e)=>{
-    e.preventDefault()
-    navigate('/enterprise/orders')
-  }
+  const navigateHandler = (e) => {
+    e.preventDefault();
+    navigate("/enterprise/orders");
+  };
   return (
     <>
       <section className={Styles.enterpriseHomeSec}>
@@ -293,7 +264,12 @@ function CommonDashboard() {
                         <h4
                           className={Styles.enterprisesHomeActiveBookingCount}
                         >
-                          {bookings?.active}
+                        
+                          {bookings &&
+                            (bookings?.active_order < 10 &&
+                            bookings?.active_order > 0
+                              ? "0" + bookings?.active_order
+                              : bookings?.active_order)}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -315,7 +291,12 @@ function CommonDashboard() {
                         <h4
                           className={Styles.enterprisesHomeActiveBookingCount}
                         >
-                          {bookings?.scheduled}
+                          
+                          {bookings &&
+                            (bookings?.schedule_order < 10 &&
+                            bookings?.schedule_order > 0
+                              ? "0" + bookings?.schedule_order
+                              : bookings?.schedule_order)}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -327,7 +308,11 @@ function CommonDashboard() {
                   </div>
 
                   <div className="col-md-4">
-                    <div className={`${Styles.enterpriseHomeActiveBookingCard}`} style={{cursor:"pointer"}} onClick={navigateHandler}>
+                    <div
+                      className={`${Styles.enterpriseHomeActiveBookingCard}`}
+                      style={{ cursor: "pointer" }}
+                      onClick={navigateHandler}
+                    >
                       <button className={Styles.enterpriseHomeInfoButton}>
                         <FontAwesomeIcon icon={faCircleInfo} />
                       </button>
@@ -335,8 +320,12 @@ function CommonDashboard() {
                         All bookings
                       </p>
                       <div className={Styles.enterpriseBookingCountCard}>
-                        <h4 className="enterprisesHome-ActiveBookingCount">
-                          {bookings?.all}
+                        <h4 className={Styles.enterprisesHomeActiveBookingCount}>
+                        {bookings &&
+                            (bookings?.total_order < 10 &&
+                            bookings?.total_order > 0
+                              ? "0" + bookings?.total_order
+                              : bookings?.total_order)}
                         </h4>
                         <img
                           className={Styles.enterpriseHomeCheckIcon}
@@ -409,14 +398,19 @@ function CommonDashboard() {
                   </div>
                 </div>
                 <div className="d-flex justify-content-between">
-                <p className={Styles.enterpriseCompanyLocationsText}>
-                  Company locations
-                </p>
-                 <p className={`${Styles.enterpriseCompanyLocationsText}`}>
-                  <Link to="/enterprise/all-company-location" className={Styles.textColor}>See All</Link>
-                 </p>
+                  <p className={Styles.enterpriseCompanyLocationsText}>
+                    Company locations
+                  </p>
+                  <p className={`${Styles.enterpriseCompanyLocationsText}`}>
+                    <Link
+                      to="/enterprise/all-company-location"
+                      className={Styles.textColor}
+                    >
+                      See All
+                    </Link>
+                  </p>
                 </div>
-                
+
                 {branches?.slice(0, 3).map((company, index) => (
                   <div
                     key={index}
@@ -446,23 +440,27 @@ function CommonDashboard() {
                     <div className={Styles.enterpriseHomeLocSpentCard}>
                       <div className={Styles.enterpriseHomeHrsBookedCard}>
                         <p className={Styles.enterpriseHomeLocHsbooked}>
-                          Hours booked
+                          Active booking
                         </p>
-                        <h4>{company?.bookinghr || 0}</h4>
+                        <h4>
+                          {company?.active_order ? company?.active_order : 0}
+                        </h4>
                       </div>
 
                       <div className={Styles.enterpriseHomeHrsBookedCard}>
                         <p className={Styles.enterpriseHomeLocHsbooked}>
-                          Hours spent
+                          Scheduled booking
                         </p>
-                        <h4>{company?.spenthr || 0}</h4>
+                        <h4>
+                          {company?.schedule_order ? company.schedule_order : 0}
+                        </h4>
                       </div>
 
                       <div className={Styles.enterpriseHomeHrsBookedCard}>
                         <p className={Styles.enterpriseHomeLocHsbooked}>
-                          Bookings
+                          All booking
                         </p>
-                        <h4>{company?.bookings || 0}</h4>
+                        <h4>{company?.total ? company?.total : 0}</h4>
                       </div>
                     </div>
                   </div>
@@ -470,23 +468,26 @@ function CommonDashboard() {
               </div>
             </div>
             <div className="col-md-4">
-            <div className="col-md-12 mb-5">
-              <div className={Styles.enterprisePlannigHeadCard}>
-                <h4 className={Styles.enterprisePlanningTitle}>Planning</h4>
-                <div className={Styles.enterprisePlannigFilterScheduleCard}>
-                  {/* <button className={Styles.enterprisePlanningFilterBtn}>
+              <div className="col-md-12 mb-5">
+                <div className={Styles.enterprisePlannigHeadCard}>
+                  <h4 className={Styles.enterprisePlanningTitle}>Planning</h4>
+                  <div className={Styles.enterprisePlannigFilterScheduleCard}>
+                    {/* <button className={Styles.enterprisePlanningFilterBtn}>
                     <FontAwesomeIcon icon={faFilter} />
                   </button> */}
-                  <Link to="/enterprise/schedules" className={Styles.enterprisePlanningNewScheduleBtn}>
-                    <FontAwesomeIcon
-                      className={Styles.enterprisePlanningPlusIcon}
-                      icon={faPlus}
-                    />
-                    New schedule
-                  </Link>
+                    <Link
+                      to="/enterprise/schedules"
+                      className={Styles.enterprisePlanningNewScheduleBtn}
+                    >
+                      <FontAwesomeIcon
+                        className={Styles.enterprisePlanningPlusIcon}
+                        icon={faPlus}
+                      />
+                      New schedule
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
               <div className={Styles.enterpriseHomeCalenderMainCard}>
                 {/* Calender Start Here  */}
                 <EnterpriseHomeCalender setCurrentDate={setCurrentDate} />
@@ -533,7 +534,15 @@ function CommonDashboard() {
                 </div>
 
                 <div>
-                {enterprisePlans?.length >=5 &&   <div className="container"><p className="text-end"><button className="border-0 text-primary p-1">All</button></p></div>}
+                  {enterprisePlans?.length >= 5 && (
+                    <div className="container">
+                      <p className="text-end">
+                        <button className="border-0 text-primary p-1">
+                          All
+                        </button>
+                      </p>
+                    </div>
+                  )}
 
                   {enterprisePlans?.slice(0, 4).map((item, key) => (
                     <OrderCardBox

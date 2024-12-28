@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperclip, faTrash, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCross, faPaperclip, faTrash, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import SidebarImg from "../../assets/images/Pickup-Detail-SideImg.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonHeader from "../../common/CommonHeader";
@@ -21,9 +21,9 @@ const AddPickupDetails = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const { order } = location.state || {};
-
   const [selectedOption, setSelectedOption] = useState("Myself");
   const [selectCheckOption, setSelectedCheckOption] = useState("custom");
+  const [isFocused, setIsFocused] = useState(false);
   const handleRadioChange = (event) => {
     const seletedValue = event.target.value;
     setSelectedOption(seletedValue);
@@ -142,7 +142,8 @@ const AddPickupDetails = () => {
       },
     });
   };
-
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
   return (
     <>
       {/* Header Start Here  */}
@@ -220,6 +221,7 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="First name"
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                           />
                         )}
                       />
@@ -251,6 +253,7 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="Last name"
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                           />
                         )}
                       />
@@ -280,6 +283,7 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="Company"
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                           />
                         )}
                       />
@@ -310,6 +314,8 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="Email"
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
+
                           />
                         )}
                       />
@@ -340,15 +346,27 @@ const AddPickupDetails = () => {
                             value={value}
                             // onlyCountries={["fr", "in"]}
                             countryCodeEditable={false}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
                             onChange={onChange}
                             inputStyle={{
                               width: "100%",
                               paddingLeft: "42px",
+                              borderColor: isFocused ? "#ff4081" : "#ccc", // Border color changes on focus
+                              boxShadow: isFocused ? "0 0 5px rgba(255, 64, 129, 0.5)" : "none", // Glowing effect
+                              transition: "border-color 0.3s ease, box-shadow 0.3s ease", // Smooth transition
+                      
+                            }}
+                            buttonStyle={{
+                              border: "none", // Removes border from the flag dropdown
+                              background: "transparent", // Keeps flag dropdown appearance intact
                             }}
                             dropdownStyle={{ borderColor: "#ccc" }}
+                        
                             enableSearch
                             searchPlaceholder="Search country"
                             specialLabel=""
+
                           />
                         )}
                       />
@@ -396,14 +414,16 @@ const AddPickupDetails = () => {
                             backgroundColor: "#f44336",
                             color: "white",
                             border: "none",
-                            padding: "5px 10px",
+                            // padding: "5px 5px",
                             cursor: "pointer",
                             position:"absolute",
+                            height:"24px",
+                            width:"24px",
                             marginLeft:"-16px",
                             borderRadius:"50%"
                           }}
                         >
-                          <FontAwesomeIcon icon={faTrash} />
+                          x
                         </button>
                       </div>
                     ) : (
@@ -465,6 +485,7 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="Package Id ..."
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                           />
                         )}
                       />
@@ -493,6 +514,7 @@ const AddPickupDetails = () => {
                             type="text"
                             placeholder="Type here..."
                             style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                           />
                         )}
                       />
@@ -532,6 +554,7 @@ const AddPickupDetails = () => {
                               type="text"
                               placeholder="First name"
                               style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
                             />
                           )}
                         />
@@ -561,6 +584,8 @@ const AddPickupDetails = () => {
                               type="text"
                               placeholder="Last name"
                               style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
+
                             />
                           )}
                         />
@@ -590,6 +615,8 @@ const AddPickupDetails = () => {
                               type="text"
                               placeholder="Company"
                               style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
+
                             />
                           )}
                         />
@@ -618,6 +645,8 @@ const AddPickupDetails = () => {
                               type="text"
                               placeholder="Email"
                               style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
+
                             />
                           )}
                         />
@@ -646,10 +675,20 @@ const AddPickupDetails = () => {
                               value={value}
                               // onlyCountries={["fr", "in"]}
                               countryCodeEditable={false}
+                              onFocus={handleFocus}
+                              onBlur={handleBlur}
                               onChange={onChange}
                               inputStyle={{
                                 width: "100%",
                                 paddingLeft: "42px",
+                                borderColor: isFocused ? "#ff4081" : "#ccc", // Border color changes on focus
+                                boxShadow: isFocused ? "0 0 5px rgba(255, 64, 129, 0.5)" : "none", // Glowing effect
+                                transition: "border-color 0.3s ease, box-shadow 0.3s ease", // Smooth transition
+                        
+                              }}
+                              buttonStyle={{
+                                border: "none", // Removes border from the flag dropdown
+                                background: "transparent", // Keeps flag dropdown appearance intact
                               }}
                               dropdownStyle={{ borderColor: "#ccc" }}
                               enableSearch
@@ -683,6 +722,8 @@ const AddPickupDetails = () => {
                               type="text"
                               placeholder="Type here..."
                               style={{ width: "100%", padding: "5px" }}
+                            className="dynamic-border-input"
+
                             />
                           )}
                         />

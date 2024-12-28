@@ -65,6 +65,7 @@ import PaymentSuccessful from "../common/PaymentSuccessful"
 import PaymentUnsuccessful from "../common/PaymentUnsuccessful"
 import DriverNotAvailable from "../common/DriverNotAvailable"
 import EnterpriseShiftDetails from "../components/enterprise/EnterpriseShiftDetails"
+import ScheduleSuccess from "./ScheduleSuccess"
 export {
     Home,
     HomeHeader,
@@ -133,4 +134,5 @@ export {
     PaymentUnsuccessful,
     DriverNotAvailable,
     EnterpriseShiftDetails,
+    ScheduleSuccess,
 }

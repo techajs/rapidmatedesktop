@@ -926,6 +926,18 @@ a {
   align-items: center;
   margin-top: 20px;
 }
+.checkboxCard input[type="checkbox"]:focus {
+  outline: none; /* Remove default outline */
+  border: 2px solid var(--secondary-color); /* Custom border color */
+  box-shadow: 0 0 5px rgba(255, 64, 129, 0.5); /* Glowing effect */
+  border-radius: 4px; /* Optional: Smooth border */
+}
+
+.checkboxCard input[type="checkbox"]:checked {
+  background-color: var(--secondary-color); 
+  border-color: var(--secondary-color);; /* Optional: Green border when checked */
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
 
 .noAccount {
   font-size: 12px;
@@ -5250,29 +5262,32 @@ a {
   cursor: pointer;
 }
 
-.addPickupDetailRadioBtn input[type="radio"] + .form-check-label::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px; /* Adjust size */
-  height: 20px; /* Adjust size */
-  border: 2px solid var(--secondary-color); /* Default border color */
+.addPickupDetailRadioBtn {
+  appearance: none; /* Hides the default radio button */
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
   border-radius: 50%;
-  background-color: #fff;
-  transition: background-color 0.2s, border-color 0.2s;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  margin-right: 8px;
 }
 
-.addPickupDetailRadioBtn
-  input[type="radio"]:checked
-  + .form-check-label::before {
-  background-color: var(--secondary-color); /* Primary color when selected */
-  border-color: var(--secondary-color);
+.addPickupDetailRadioBtn:checked {
+  border-color:  var(--secondary-color); /* Changes the outer border color */
 }
 
-.addPickupDetailRadioBtn input[type="radio"]:checked + .form-check-label {
-  color: var(--secondary-color); /* Change label color when selected */
+.addPickupDetailRadioBtn:checked::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background-color: var(--secondary-color) ;/* Dot color */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .addPickupDetailRadioCard {
@@ -5281,10 +5296,7 @@ a {
   justify-content: space-around;
 }
 
-.addPickupDetailRadioBtn {
-  padding-left: 0px !important;
-  padding-right: 40px;
-}
+
 
 .addPickupDetailFormCards {
   margin-right: 20px;

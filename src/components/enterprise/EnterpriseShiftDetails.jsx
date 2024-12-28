@@ -30,16 +30,24 @@ const EnterpriseShiftDetails = () => {
     const [loading,setLoading]=useState(false)
   
   const getBranch = (branchId) => {
-    let result = branches.filter((branch) => branch.id == branchId);
-    return {
-      branch_name:result[0]?.branch_name,
-      address:buildAddress(result[0]?.address,result[0]?.city,result[0]?.state,result[0]?.country,result[0]?.postal_code)
+    let result = branches?.filter((branch) => branch.id == branchId);
+
+    if(result==undefined){
+      return {
+        branch_name:"not found",
+        address:"not found"
+      }
+    }else{
+      return {
+        branch_name:result && result[0]?.branch_name,
+        address:buildAddress(result[0]?.address,result[0]?.city,result[0]?.state,result[0]?.country,result[0]?.postal_code)
+      }
     }
+    
   };
 
   const getVehicleType= (vehicleId) =>{
-    const vehicletype= vehicleType.filter((vehicle) => vehicle.id == vehicleId);
-    console.log(vehicleId)
+    const vehicletype= vehicleType?.filter((vehicle) => vehicle.id == vehicleId);
     return vehicletype
   }
 

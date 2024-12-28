@@ -101,12 +101,15 @@ function EnterpriseNotificationModal({ show, handleClose }) {
                       </p>
                     </div>
                   </div>
+                  <div>
                   <FontAwesomeIcon
-                    className="pickupNotification-NotificationClose"
+                    className={Styles.pickupNotificationNotificationClose}
                     icon={faX}
                     style={{cursor:"pointer"}}
                     onClick={() => deleteHandler(info?._id)}
                   />
+                  </div>
+                  
                 </div>
               ))}
             </div>

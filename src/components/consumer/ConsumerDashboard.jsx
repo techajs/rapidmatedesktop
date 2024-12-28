@@ -52,7 +52,7 @@ function ConsumerDashboard() {
   const [addPickupLocation, setAddPickupLocation] = useState(null);
   const [addDestinationLocation, setAddDestinationLocation] = useState(null);
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [isSchedule, setIsSchedule] = useState(false);
   const [map, setMap] = useState(null);
 
   useEffect(() => {
@@ -163,7 +163,7 @@ function ConsumerDashboard() {
       addPickupLocation,
       addDestinationLocation,
       date,
-      time,
+      isSchedule,
       selectedVehicle,
       distance,
       duration,
@@ -200,7 +200,7 @@ function ConsumerDashboard() {
               calculateRoute={calculateRoute}
             />
 
-            <DateTimePicker setDate={setDate} setTime={setTime} />
+            <DateTimePicker setDate={setDate} setIsSchedule={setIsSchedule} />
 
             <VehicleSelection
               vehicleTypeList={vehicleTypeList}
@@ -270,7 +270,7 @@ function ConsumerDashboard() {
           <GoogleMap
             center={center}
             zoom={14}
-            mapContainerStyle={{ width: "100%", height: "90.5vh" }}
+            mapContainerStyle={{ width: "100%", height: "100vh" }}
             options={{
               zoomControl: false,
               streetViewControl: false,
@@ -284,7 +284,7 @@ function ConsumerDashboard() {
                 position={pickupLocation}
                 icon={{
                   url: PickupMarger,
-                  scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  scaledSize: new window.google.maps.Size(35, 35), // Adjust size as needed
                 }}
               />
             )}
@@ -293,7 +293,7 @@ function ConsumerDashboard() {
                 position={dropoffLocation}
                 icon={{
                   url: DropoffMarker,
-                  scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
+                  scaledSize: new window.google.maps.Size(35, 35), // Adjust size as needed
                 }}
               />
             )}
@@ -302,7 +302,7 @@ function ConsumerDashboard() {
                 position={currentLocation}
                 icon={{
                   url: PickupMarger,
-                  scaledSize: new window.google.maps.Size(40, 40),
+                  scaledSize: new window.google.maps.Size(35, 35),
                 }}
               />
             )}
@@ -312,7 +312,7 @@ function ConsumerDashboard() {
                 options={{  polylineOptions: {
                   strokeColor: "#FF0058", // Blue color
                   strokeOpacity: 0.9,    // 90% opacity
-                  strokeWeight: 5,       // 5px thick line
+                  strokeWeight: 3,       // 5px thick line
                 },suppressMarkers: true }}
               />
             )}

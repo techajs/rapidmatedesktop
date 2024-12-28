@@ -23,7 +23,7 @@ import EnterpriseOrderFilterModal from "./common/EnterpriseOrderFilterModal";
 
 const OneTime = memo(({ orders, locations, vehicles, navigation }) => {
   const getLocationAddress = (locationId) => {
-    let result = locations.filter((location) => location.id == locationId);
+    let result = locations?.filter((location) => location.id == locationId);
     return buildAddress(
       result[0]?.address,
       result[0]?.city,
@@ -34,7 +34,7 @@ const OneTime = memo(({ orders, locations, vehicles, navigation }) => {
   };
 
   const getVehicleType = (vehicleId) => {
-    let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
+    let result = vehicles?.filter((vehicle) => vehicle.id == vehicleId);
     return result[0]?.vehicle_type;
   };
   const detailHandler = (order_number) => {
@@ -48,7 +48,7 @@ const OneTime = memo(({ orders, locations, vehicles, navigation }) => {
     <section id="content1">
       <div className="row">
         <div className="col-md-12">
-          {orders.length > 0 ? (
+          {orders && orders?.length > 0 ? (
             orders.map((item, index) => (
               <div key={index} onClick={() => detailHandler(item.order_number)}>
                 <div className={Styles.pickuphistoryMainCard}>
@@ -147,7 +147,7 @@ const MultipleTimeOrder = memo(
     const [searchText, setSearchText] = useState("");
     const [index, setIndex] = useState(0);
     const getLocationAddress = (locationId) => {
-      let result = locations.filter((location) => location.id == locationId);
+      let result = locations?.filter((location) => location.id == locationId);
       return buildAddress(
         result[0]?.address,
         result[0]?.city,
@@ -158,7 +158,7 @@ const MultipleTimeOrder = memo(
     };
 
     const getVehicleType = (vehicleId) => {
-      let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
+      let result = vehicles?.filter((vehicle) => vehicle.id == vehicleId);
       return result[0]?.vehicle_type;
     };
     const detailHandler = (order_number) => {
@@ -272,8 +272,8 @@ const MultipleTimeOrder = memo(
 
 const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
   const getBranchAddress = (branchId) => {
-    let result = branches.filter((branch) => branch.branch_id == branchId);
-    if (result.length > 0) {
+    let result = branches?.filter((branch) => branch.branch_id == branchId);
+    if (result?.length > 0) {
       return buildAddress(
         result[0]?.address,
         result[0]?.city,
@@ -286,7 +286,7 @@ const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
   };
 
   const getVehicleType = (vehicleId) => {
-    let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
+    let result = vehicles?.filter((vehicle) => vehicle.id == vehicleId);
     return result[0]?.vehicle_type;
   };
 
@@ -397,7 +397,7 @@ const ShiftOrder = memo(({ orders, branches, vehicles, navigation }) => {
 
 const PastOrder = memo(({ orders, locations, vehicles, navigation }) => {
   const getLocationAddress = (locationId) => {
-    let result = locations.filter((location) => location.id == locationId);
+    let result = locations?.filter((location) => location.id == locationId);
     return buildAddress(
       result[0]?.address,
       result[0]?.city,
@@ -408,7 +408,7 @@ const PastOrder = memo(({ orders, locations, vehicles, navigation }) => {
   };
 
   const getVehicleType = (vehicleId) => {
-    let result = vehicles.filter((vehicle) => vehicle.id == vehicleId);
+    let result = vehicles?.filter((vehicle) => vehicle.id == vehicleId);
     return result[0]?.vehicle_type;
   };
   const detailHandler = (order_number) => {

@@ -2,10 +2,10 @@ import React from 'react';
 import DateAndTimePicker from '../../../common/PickupHomeDateTimePicker'; // assuming you have this component
 import Styles from '../../../assets/css/home.module.css';
 
-const DateTimePicker = ({ setDate, setTime }) => {
-  const handleDateTimeChange = (selectedDate, selectedTime) => {
+const DateTimePicker = ({ setDate, setIsSchedule }) => {
+  const handleDateTimeChange = (selectedDate, isNow) => {
     setDate(selectedDate);
-    setTime(selectedTime);
+    setIsSchedule(isNow);
   };
 
   return (

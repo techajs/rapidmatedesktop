@@ -32,7 +32,7 @@ import {
 } from "../data_manager/dataManage";
 import { ToastContainer } from "react-toastify";
 import { showErrorToast, showSuccessToast } from "../utils/Toastify";
-import { addLocation, BASE_URL, uploadImage } from "../utils/Constants";
+import { addLocation, BASE_URL, localToUTC, uploadImage } from "../utils/Constants";
 import PickupAddPaymentMethodsModal from "../components/consumer/account/PickupAddPaymentMethodsModal";
 
 const stripePromise = loadStripe(
@@ -118,9 +118,9 @@ const PaymentPage = ({
   }, [sourceLocationId, destinationLocationId, packageImageId]);
   const placePickUpOrder = async () => {
     if (user.userDetails) {
-      if (order.date) {
+      if (order.isSchedule) {
         var scheduleParam = {
-          schedule_date_time: order?.date + " " + order?.time,
+          schedule_date_time: localToUTC(order?.date),
         };
       }
       const distance = order?.distance;
@@ -129,7 +129,7 @@ const PaymentPage = ({
         : 0;
       let requestParams = {
         consumer_ext_id: user.userDetails.ext_id,
-        service_type_id: order?.date ? 1 : 2,
+        service_type_id: order?.isSchedule ? 1 : 2,
         vehicle_type_id: order?.selectedVehicleDetails.id,
         pickup_location_id: sourceLocationId || 1,
         dropoff_location_id: destinationLocationId || 2,
@@ -137,14 +137,18 @@ const PaymentPage = ({
         total_amount: parseFloat(paymentAmount),
         discount: offerDiscount,
         pickup_notes: orderCustomerDetails?.pickupNotes || "",
+        mobile: orderCustomerDetails?.phoneNumber,
         company_name: orderCustomerDetails?.company || "",
+
         drop_first_name: dropoffDetail?.first_name || "",
         drop_last_name: dropoffDetail?.last_name || "",
         drop_mobile: dropoffDetail?.phone ? "+" + dropoffDetail.phone : "",
-        package_photo: packageImageId,
+        drop_email: dropoffDetail.email,
         drop_company_name: dropoffDetail?.company || "",
         drop_notes: dropoffDetail?.dropoff_note || "",
+        package_photo: packageImageId,
         ...scheduleParam,
+        order_date: localToUTC(),
       };
 
       if (promoCodeResponse) {
@@ -288,6 +292,7 @@ const PaymentPage = ({
           navigate("/payment-successfull", {
             state: {
               orderNumber: orderNumber,
+              date:order?.date,
             },
           });
         }
@@ -479,16 +484,18 @@ const PaymentPage = ({
                         ))}
 
                         <div>
-                          <div className={Styles.paymentAddCardMain}>
-                            <button
+                          <div className={Styles.paymentAddCardMain } >
+                            <div
                               onClick={openAddModal}
-                              className={Styles.paymentAddCardBtn}
+                              className={`${Styles.paymentAddCardBtn}`}
+                              style={{cursor:"pointer"}}
                             >
-                              <FontAwesomeIcon icon={faCirclePlus} />
-                            </button>
-                            <p className={Styles.paymentAddCardText}>
-                              Add New Card
-                            </p>
+                              
+                              <p className={`${Styles.paymentAddCardText} p-2`}>
+                              <FontAwesomeIcon icon={faCirclePlus} /> Add New Card
+                              </p>
+                            </div>
+                            
                           </div>
                         </div>
                       </div>
@@ -521,7 +528,7 @@ const PaymentPage = ({
                 </div>
 
                 <div className={Styles.addPickupDetailsBtnCard}>
-                  <button className={Styles.addPickupDetailsCancelBTn}>
+                  <button className={Styles.addPickupDetailsCancelBTn} onClick={()=>navigate('/consumer/dashboard')}>
                     Cancel
                   </button>
                 </div>

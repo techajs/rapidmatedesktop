@@ -58,7 +58,7 @@ const schema = yup.object().shape({
     .string()
     .required("Phone number is required")
     .matches(/^\d+$/, "Phone number should contain only digits")
-    .min(8, "Phone number must be at least 8 digits"),
+    .min(7, "Phone number must be at least 7 digits"),
   country: yup
     .object({
       value: yup.string().required("Country is required"),

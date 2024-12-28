@@ -52,6 +52,7 @@ a {
 }
 
 .pickupNotificationModalCard {
+  position: relative;
   display: flex;
   background-color: var(--white-color);
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -98,6 +99,11 @@ a {
 .pickupNotificationNotificationClose{
     font-size: 12px;
     color: #909090;
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    cursor: pointer;
+    z-index: 10; /* Ensure it appears above other elements */
 }
 
 .pickupNotificationSeeallBtn{
@@ -106,4 +112,7 @@ a {
     border: none;
     background-color: transparent;
     color: var(--secondary-color);
+}
+.pickupNotificationModalCard:hover .pickupNotificationNotificationClose {
+  color: var(--secondary-color); /* Optional: Change color on hover */
 }

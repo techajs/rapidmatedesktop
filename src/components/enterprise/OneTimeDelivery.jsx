@@ -23,7 +23,7 @@ import LocationInputs from "./common/LocationInputs";
 import { showErrorToast } from "../../utils/Toastify";
 import OneLocation from "./common/OneLocation";
 import DropoffMarker from "../../assets/images/dropoff-marker.png";
-import PickupMarker from "../../assets/images/Location-Icon.png";
+import PickupMarker from "../../assets/images/pickup-marker.png";
 
 const libraries = ["places"];
 

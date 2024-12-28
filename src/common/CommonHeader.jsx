@@ -86,11 +86,11 @@ const CommonHeader = memo(({ userData }) => {
                 <Link to={routes.path}>{routes.title}</Link>
               </li>
             ))}
-          {/* {userDetails?.role === 'DELIVERY_BOY' && deliveryboyRoute.map((routes, index) => (
+          {userDetails?.role === 'DELIVERY_BOY' && deliveryboyRoute.map((routes, index) => (
             <li key={index}>
               <Link to={routes.path}>{routes.title}</Link>
             </li>
-          ))} */}
+          ))}
 
           <div className={Styles.loginNavList}>
             {userDetails?.role !== "DELIVERY_BOY" && (

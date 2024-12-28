@@ -9,14 +9,24 @@ const PaymentSuccessful = () => {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
   const navigate = useNavigate();
-  const {orderNumber} = location.state || {};
+  const {orderNumber,date} = location.state || {};
+  console.log(date)
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/consumer/find-driver", {
-        state: {
-          orderNumber: orderNumber,
-        },
-      });
+      if(date){
+        navigate("/consumer/schedule-created", {
+          state: {
+            date: date,
+          },
+        });
+      }else{
+        navigate("/consumer/find-driver", {
+          state: {
+            orderNumber: orderNumber,
+          },
+        });
+      }
+      
     }, 4000);
 
     // Cleanup timer on component unmount

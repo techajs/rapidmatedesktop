@@ -33,17 +33,17 @@ const consumerRoute = [
 ];
 const deliveryboyRoute = [
   {
-    title: "Deliveries",
-    path: "/deliveryboy/deliveries",
+    title: "Dashboard",
+    path: "/deliveryboy/dashboard",
   },
-  {
-    title: "Orders",
-    path: "/deliveryboy/orders",
-  },
-  {
-    title: "Message",
-    path: "#",
-  },
+  // {
+  //   title: "Orders",
+  //   path: "/deliveryboy/orders",
+  // },
+  // {
+  //   title: "Message",
+  //   path: "#",
+  // },
 ];
 
 export { enterpriseRoute, consumerRoute, deliveryboyRoute };
