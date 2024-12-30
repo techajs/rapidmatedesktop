@@ -97,6 +97,6 @@ body {
 }
 
 .dynamic-border-input:focus {
-  border-color: #ff4081; /* Border color when focused */
+  border-color: #ff4081 !important;  /* Border color when focused */
   box-shadow: 0 0 5px rgba(255, 64, 129, 0.5); /* Optional for glowing effect */
 }

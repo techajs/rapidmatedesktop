@@ -24,9 +24,12 @@ import {
   consumerRoute,
 } from "../utils/RoutePath";
 import { persistor } from "../redux/store";
+import MessageModal from "./MessageModal";
+import { useTranslation } from "react-i18next";
 
 const CommonHeader = memo(({ userData }) => {
   const location = useLocation();
+  const {t}=useTranslation()
   const currentPath = location.pathname;
   const isDashboard = ["/dashboard", "/schedules"].some((route) =>
     currentPath.includes(route)
@@ -34,6 +37,7 @@ const CommonHeader = memo(({ userData }) => {
   const isNotification = currentPath.includes("notifications");
   const { userDetails, userInfo } = { ...userData };
   const [showModal, setShowModal] = useState(false);
+  const [supportModal, setSupportModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, role } = useSelector((state) => state.auth);
@@ -51,6 +55,10 @@ const CommonHeader = memo(({ userData }) => {
   };
   const openModal = () => {
     setShowModal(true);
+  };
+
+  const openSupportModal = () => {
+    setSupportModal(true);
   };
 
   return (
@@ -77,20 +85,21 @@ const CommonHeader = memo(({ userData }) => {
           {userDetails?.role === "ENTERPRISE" &&
             enterpriseRoute.map((routes, index) => (
               <li key={index}>
-                <Link to={routes.path}>{routes.title}</Link>
+                <Link to={routes.path}>{t(routes.title)}</Link>
               </li>
             ))}
           {userDetails?.role === "CONSUMER" &&
             consumerRoute.map((routes, index) => (
               <li key={index}>
-                <Link to={routes.path}>{routes.title}</Link>
+                <Link to={routes.path}>{t(routes.title)}</Link>
               </li>
             ))}
-          {userDetails?.role === 'DELIVERY_BOY' && deliveryboyRoute.map((routes, index) => (
-            <li key={index}>
-              <Link to={routes.path}>{routes.title}</Link>
-            </li>
-          ))}
+          {userDetails?.role === "DELIVERY_BOY" &&
+            deliveryboyRoute.map((routes, index) => (
+              <li key={index}>
+                <Link to={routes.path}>{t(routes.title)}</Link>
+              </li>
+            ))}
 
           <div className={Styles.loginNavList}>
             {userDetails?.role !== "DELIVERY_BOY" && (
@@ -101,12 +110,20 @@ const CommonHeader = memo(({ userData }) => {
                       to="/enterprise/schedules"
                       className={Styles.pickupHomeSettingsBtn}
                     >
-                      <FontAwesomeIcon icon={faPlus} /> New schedule
+                      <FontAwesomeIcon icon={faPlus} /> {t("new_schedule")}
                     </Link>
                   </li>
                 )}
               </>
             )}
+            <li>
+              <button
+                onClick={openSupportModal}
+                className={Styles.pickupHomeSettingsBtn}
+              >
+                {t("message")}
+              </button>
+            </li>
             {isNotification == false && (
               <li>
                 <button
@@ -117,6 +134,7 @@ const CommonHeader = memo(({ userData }) => {
                 </button>
               </li>
             )}
+
             <li>
               <Dropdown>
                 <Dropdown.Toggle
@@ -143,7 +161,7 @@ const CommonHeader = memo(({ userData }) => {
                       className={Styles.pickupHeaderAccountsIcons}
                       icon={faUser}
                     />{" "}
-                    Account
+                    {t("accounts")}
                   </Dropdown.Item>
                   {/* <Dropdown.Item
                     className={Styles.pickupHeaderAccountTextsActions}
@@ -162,7 +180,7 @@ const CommonHeader = memo(({ userData }) => {
                       className={Styles.pickupHeaderAccountsIcons}
                       icon={faRightToBracket}
                     />{" "}
-                    Sign Out
+                    {t("sign_out")}
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
@@ -173,6 +191,11 @@ const CommonHeader = memo(({ userData }) => {
       <EnterpriseNotificationModal
         show={showModal}
         handleClose={() => setShowModal(false)}
+      />
+
+      <MessageModal
+        show={supportModal}
+        handleClose={() => setSupportModal(false)}
       />
     </div>
   );

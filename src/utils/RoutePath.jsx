@@ -1,6 +1,6 @@
 const enterpriseRoute = [
   {
-    title: "Dashboard",
+    title: "dashboard",
     path: "/enterprise/dashboard",
   },
   // {
@@ -9,31 +9,31 @@ const enterpriseRoute = [
   // },
 
   {
-    title: "Orders",
+    title: "orders",
     path: "/enterprise/orders",
   },
-  {
-    title: "Message",
-    path: "#",
-  },
+  // {
+  //   title: "Message",
+  //   path: "#",
+  // },
 ];
 const consumerRoute = [
   {
-    title: "Request delivery",
+    title: "request_delivery",
     path: "/consumer/dashboard",
   },
   {
-    title: "Orders",
+    title: "orders",
     path: "/consumer/orders",
   },
-  {
-    title: "Message",
-    path: "#",
-  },
+  // {
+  //   title: "Message",
+  //   path: "#",
+  // },
 ];
 const deliveryboyRoute = [
   {
-    title: "Dashboard",
+    title: "dashbaord",
     path: "/deliveryboy/dashboard",
   },
   // {

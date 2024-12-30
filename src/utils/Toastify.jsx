@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
  * @param {string} message - The success message to display.
  */
 export const showSuccessToast = (message) => {
-  toast.success(message, {
+  toast.warning(message, {
     position: 'top-right',
     autoClose: 3000,
     hideProgressBar: false,

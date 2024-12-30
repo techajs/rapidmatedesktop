@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Styles from "../../assets/css/home.module.css";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,10 +50,23 @@ const AddPickupDetails = () => {
       .required("Email is required")
       .email("Please enter a valid email"),
     phoneNumber: yup
-      .string()
-      .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number should contain only digits")
-      .min(8, "Phone number must be at least 8 digits"),
+        .string()
+        .required("Phone number is required")
+        .matches(/^\d+$/, "Phone number should contain only digits")
+        .test("length", "Phone number length is invalid", function (value) {
+          const { country } = this.parent; // Assuming country is selected in the form
+          const phoneLengthByCountry = {
+            101: { min: 12, max:12 }, // Example for France: minimum and maximum length is 10
+            75: { min: 11, max: 11 }, // Example for the US: 10 digits
+            // Add other countries and their phone number lengths here
+          };
+          const countryCode = country ? country.value : null;
+          if (countryCode && phoneLengthByCountry[countryCode]) {
+            const { min, max } = phoneLengthByCountry[countryCode];
+            return value.length >= min && value.length <= max;
+          }
+          return true; // If no country is selected, do not apply length validation
+        }),
     file: yup
       .mixed()
       .required("A file is required")
@@ -77,11 +90,24 @@ const AddPickupDetails = () => {
       .string()
       .required("Email is required")
       .email("Please enter a valid email"),
-    dphoneNumber: yup
-      .string()
-      .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number should contain only digits")
-      .min(8, "Phone number must be at least 8 digits"),
+    dphoneNumber:yup
+        .string()
+        .required("Phone number is required")
+        .matches(/^\d+$/, "Phone number should contain only digits")
+        .test("length", "Phone number length is invalid", function (value) {
+          const { country } = this.parent; // Assuming country is selected in the form
+          const phoneLengthByCountry = {
+            101: { min: 12, max:12 }, // Example for France: minimum and maximum length is 10
+            75: { min: 11, max: 11 }, // Example for the US: 10 digits
+            // Add other countries and their phone number lengths here
+          };
+          const countryCode = country ? country.value : null;
+          if (countryCode && phoneLengthByCountry[countryCode]) {
+            const { min, max } = phoneLengthByCountry[countryCode];
+            return value.length >= min && value.length <= max;
+          }
+          return true; // If no country is selected, do not apply length validation
+        }),
   });
   const handleCheckboxChange = (event) => {
     const seletedValue = event.target.value;
@@ -144,6 +170,24 @@ const AddPickupDetails = () => {
   };
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
+
+  useEffect(() => {
+    if (selectedOption === "Myself") {
+      setValue("name", defaultFirstName);
+      setValue("lastname", defaultLastName);
+      setValue("email", defaultEmail);
+      setValue("phoneNumber", defaultPhone);
+    } else {
+      setValue("name", "");
+      setValue("lastname", "");
+      setValue("email", "");
+      setValue("phoneNumber", "");
+    }
+  }, [selectedOption]);
+
+  const goBack = () => {
+    navigate(-1);
+  };
   return (
     <>
       {/* Header Start Here  */}
@@ -207,14 +251,11 @@ const AddPickupDetails = () => {
                         htmlFor="name"
                         className={Styles.addPickupDetailFormLabels}
                       >
-                        First name:
+                        First name: <span className={Styles.textColor}>*</span>
                       </label>
                       <Controller
                         name="name"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultFirstName : " "
-                        }
                         render={({ field }) => (
                           <input
                             {...field}
@@ -239,14 +280,12 @@ const AddPickupDetails = () => {
                         htmlFor="lastname"
                         className={Styles.addPickupDetailFormLabels}
                       >
-                        Last name:
+                        Last name: <span className={Styles.textColor}>*</span>
                       </label>
                       <Controller
                         name="lastname"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultLastName : " "
-                        }
+                       
                         render={({ field }) => (
                           <input
                             {...field}
@@ -276,7 +315,6 @@ const AddPickupDetails = () => {
                       <Controller
                         name="company"
                         control={control}
-                        defaultValue=""
                         render={({ field }) => (
                           <input
                             {...field}
@@ -300,14 +338,12 @@ const AddPickupDetails = () => {
                         htmlFor="email"
                         className={Styles.addPickupDetailFormLabels}
                       >
-                        Email:
+                        Email: <span className={Styles.textColor}>*</span>
                       </label>
                       <Controller
                         name="email"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultEmail : " "
-                        }
+                        
                         render={({ field }) => (
                           <input
                             {...field}
@@ -332,14 +368,11 @@ const AddPickupDetails = () => {
                         htmlFor="phoneNumber"
                         className={Styles.addPickupDetailFormLabels}
                       >
-                        Phone Number:
+                        Phone Number: <span className={Styles.textColor}>*</span>
                       </label>
                       <Controller
                         name="phoneNumber"
                         control={control}
-                        defaultValue={
-                          selectedOption === "Myself" ? defaultPhone : " "
-                        }
                         render={({ field: { onChange, value } }) => (
                           <PhoneInput
                             country={"fr"}
@@ -387,8 +420,8 @@ const AddPickupDetails = () => {
                       htmlFor="file"
                       className={Styles.addPickupDetailFormLabels}
                     >
-                      Package photo
-                    </label>
+                      Package photo <span className={Styles.textColor}>*</span>
+                    </label> 
 
                     {imagePreview ? (
                       // Show only the package preview if an image has been uploaded
@@ -473,7 +506,7 @@ const AddPickupDetails = () => {
                         htmlFor="packageId"
                         className={Styles.addPickupDetailFormLabels}
                       >
-                        Package ID
+                        Package ID <span className={Styles.textColor}>*</span>
                       </label>
                       <Controller
                         name="packageId"
@@ -542,7 +575,7 @@ const AddPickupDetails = () => {
                           htmlFor="dname"
                           className={Styles.addPickupDetailFormLabels}
                         >
-                          First name:
+                          First name: <span className={Styles.textColor}>*</span>
                         </label>
                         <Controller
                           name="dname"
@@ -572,7 +605,7 @@ const AddPickupDetails = () => {
                           htmlFor="dlastname"
                           className={Styles.addPickupDetailFormLabels}
                         >
-                          Last name:
+                          Last name: <span className={Styles.textColor}>*</span>
                         </label>
                         <Controller
                           name="dlastname"
@@ -633,7 +666,7 @@ const AddPickupDetails = () => {
                           htmlFor="demail"
                           className={Styles.addPickupDetailFormLabels}
                         >
-                          Email:
+                          Email: <span className={Styles.textColor}>*</span>
                         </label>
                         <Controller
                           name="demail"
@@ -663,7 +696,7 @@ const AddPickupDetails = () => {
                           htmlFor="dphoneNumber"
                           className={Styles.addPickupDetailFormLabels}
                         >
-                          Phone Number:
+                          Phone Number: <span className={Styles.textColor}>*</span>
                         </label>
                         <Controller
                           name="dphoneNumber"
@@ -673,7 +706,7 @@ const AddPickupDetails = () => {
                             <PhoneInput
                               country={"fr"}
                               value={value}
-                              // onlyCountries={["fr", "in"]}
+                              onlyCountries={["fr", "in"]}
                               countryCodeEditable={false}
                               onFocus={handleFocus}
                               onBlur={handleBlur}
@@ -742,7 +775,8 @@ const AddPickupDetails = () => {
                       <Link
                         className={Styles.addPickupDetailsCancelBTn}
                         style={{ color: "#000" }}
-                        to="/consumer/dashboard"
+                        to="#"
+                        onClick={goBack}
                       >
                         Back
                       </Link>

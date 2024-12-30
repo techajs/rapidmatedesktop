@@ -41,7 +41,7 @@ const schema = yup.object().shape({
     .string()
     .required("First is required")
     .min(2, "First name must be at least 2 characters long"),
-  lastname: yup.string(), 
+  lastname: yup.string(),
   email: yup
     .string()
     .required("Email is required")
@@ -58,7 +58,20 @@ const schema = yup.object().shape({
     .string()
     .required("Phone number is required")
     .matches(/^\d+$/, "Phone number should contain only digits")
-    .min(7, "Phone number must be at least 7 digits"),
+    .test("length", "Phone number length is invalid", function (value) {
+      const { country } = this.parent; // Assuming country is selected in the form
+      const phoneLengthByCountry = {
+        101: { min: 12, max: 12 }, // Example for France: minimum and maximum length is 10
+        75: { min: 11, max: 11 }, // Example for the US: 10 digits
+        // Add other countries and their phone number lengths here
+      };
+      const countryCode = country ? country.value : null;
+      if (countryCode && phoneLengthByCountry[countryCode]) {
+        const { min, max } = phoneLengthByCountry[countryCode];
+        return value.length >= min && value.length <= max;
+      }
+      return true; // If no country is selected, do not apply length validation
+    }),
   country: yup
     .object({
       value: yup.string().required("Country is required"),
@@ -104,7 +117,7 @@ const EnterpriseSignup = () => {
   const [masterCountryList, setMasterCountryList] = useState([]);
   const [masterStateList, setMasterStateList] = useState([]);
   const [masterCityList, setMasterCityList] = useState([]);
-  
+
   const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
@@ -112,7 +125,10 @@ const EnterpriseSignup = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
-
+  const [isFocused, setIsFocused] = useState(false);
+  const [countryCode, setCountryCode] = useState("fr");
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -126,12 +142,12 @@ const EnterpriseSignup = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = (data) => {
-    setHitButton(true)
+    setHitButton(true);
     let params = {
       info: {
         userName: data.email,
         email: data.email,
-        phoneNumber: '+'+data.phoneNumber,
+        phoneNumber: "+" + data.phoneNumber,
         password: data.password,
         userrole: "ENTERPRISE",
         firstName: data.name,
@@ -153,7 +169,6 @@ const EnterpriseSignup = () => {
       params,
       (successResponse) => {
         if (successResponse[0]._success) {
-          console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               showErrorToast(successResponse[0]._response.name);
@@ -181,7 +196,7 @@ const EnterpriseSignup = () => {
         } else {
           err = errorResponse[0]._errors.message;
         }
-        showErrorToast(err)
+        showErrorToast(err);
         setFailedError(true);
         setHitButton(false);
       }
@@ -214,40 +229,43 @@ const EnterpriseSignup = () => {
       }
     });
   }, []);
- // Handle country change
- const handleCountryChange = (selectedOption) => {
-  setSelectedCountry(selectedOption);
-  setSelectedState(null); // Reset state selection
-  setSelectedCity(null);  // Reset city selection
+  // Handle country change
+  const handleCountryChange = (selectedOption) => {
+    setSelectedCountry(selectedOption);
+    setSelectedState(null); // Reset state selection
+    setSelectedCity(null); // Reset city selection
+    const countryListcode = masterCountryList.filter(
+      (country) => country.id === selectedOption.value
+    );
+    const countryCode = countryListcode[0]?.country_code?.toLowerCase();
+    setCountryCode(countryCode);
+    // Filter states based on selected country
+    const filteredStates = masterStateList.filter(
+      (state) => state.country_id === selectedOption.value
+    );
+    const formattedStateList = filteredStates.map((state) => ({
+      label: state.state_name,
+      value: state.id,
+    }));
+    setStateList(formattedStateList);
+    setCityList([]); // Clear city list
+  };
 
-  // Filter states based on selected country
-  const filteredStates = masterStateList.filter(
-    (state) => state.country_id === selectedOption.value
-  );
-  const formattedStateList = filteredStates.map((state) => ({
-    label: state.state_name,
-    value: state.id,
-  }));
-  setStateList(formattedStateList);
-  setCityList([]); // Clear city list
-};
+  // Handle state change
+  const handleStateChange = (selectedOption) => {
+    setSelectedState(selectedOption);
+    setSelectedCity(null); // Reset city selection
 
- // Handle state change
- const handleStateChange = (selectedOption) => {
-  setSelectedState(selectedOption);
-  setSelectedCity(null); // Reset city selection
-
-  // Filter cities based on selected state
-  const filteredCities = masterCityList.filter(
-    (city) => city.state_id === selectedOption.value
-  );
-  const formattedCityList = filteredCities.map((city) => ({
-    label: city.city_name,
-    value: city.id,
-  }));
-  setCityList(formattedCityList);
-};
-
+    // Filter cities based on selected state
+    const filteredCities = masterCityList.filter(
+      (city) => city.state_id === selectedOption.value
+    );
+    const formattedCityList = filteredCities.map((city) => ({
+      label: city.city_name,
+      value: city.id,
+    }));
+    setCityList(formattedCityList);
+  };
 
   const industryList = [
     { label: "Restaurant and takeaway", value: 1 },
@@ -287,10 +305,18 @@ const EnterpriseSignup = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="name"
@@ -301,14 +327,16 @@ const EnterpriseSignup = () => {
                                 {...field}
                                 type="text"
                                 placeholder="First name"
-                                style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.name && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.name.message}
                           </p>
                         )}
@@ -316,10 +344,18 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="lastname"
@@ -331,13 +367,16 @@ const EnterpriseSignup = () => {
                                 type="text"
                                 placeholder="Last name"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.lastname && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.lastname.message}
                           </p>
                         )}
@@ -345,10 +384,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faEnvelope}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="email"
@@ -360,13 +406,16 @@ const EnterpriseSignup = () => {
                                 type="text"
                                 placeholder="Email"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.email && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.email.message}
                           </p>
                         )}
@@ -374,10 +423,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faLock}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="password"
@@ -389,7 +445,7 @@ const EnterpriseSignup = () => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Password..."
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -397,10 +453,17 @@ const EnterpriseSignup = () => {
                             icon={showPassword ? faEye : faEyeSlash}
                             onClick={togglePasswordVisibility}
                             className={Styles.signupPasswordEyeIcon}
+                            style={{
+                              position: "absolute",
+                              color: "#787272",
+                            }}
                           />
                         </div>
                         {errors.password && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.password.message}
                           </p>
                         )}
@@ -408,10 +471,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faLock}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="confirmPassword"
@@ -423,7 +493,7 @@ const EnterpriseSignup = () => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Confirm your password"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -431,10 +501,17 @@ const EnterpriseSignup = () => {
                             icon={showPassword ? faEye : faEyeSlash}
                             onClick={togglePasswordVisibility}
                             className={Styles.signupPasswordEyeIcon}
+                            style={{
+                              position: "absolute",
+                              color: "#787272",
+                            }}
                           />
                         </div>
                         {errors.confirmPassword && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.confirmPassword.message}
                           </p>
                         )}
@@ -448,13 +525,26 @@ const EnterpriseSignup = () => {
                           defaultValue=""
                           render={({ field: { onChange, value } }) => (
                             <PhoneInput
-                              country={"fr"}
+                              country={countryCode}
+                              onlyCountries={["fr", "in"]}
                               value={value}
                               countryCodeEditable={false}
+                              onFocus={handleFocus}
+                              onBlur={handleBlur}
                               onChange={onChange}
                               inputStyle={{
                                 width: "100%",
                                 paddingLeft: "42px",
+                                borderColor: isFocused ? "#ff4081" : "#ccc",
+                                boxShadow: isFocused
+                                  ? "0 0 5px rgba(255, 64, 129, 0.5)"
+                                  : "none",
+                                transition:
+                                  "border-color 0.3s ease, box-shadow 0.3s ease",
+                              }}
+                              buttonStyle={{
+                                border: "none",
+                                background: "transparent",
                               }}
                               dropdownStyle={{ borderColor: "#ccc" }}
                               enableSearch
@@ -464,7 +554,10 @@ const EnterpriseSignup = () => {
                           )}
                         />
                         {errors.phoneNumber && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.phoneNumber.message}
                           </p>
                         )}
@@ -490,7 +583,10 @@ const EnterpriseSignup = () => {
                           )}
                         />
                         {errors.country && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.country.message}
                           </p>
                         )}
@@ -498,10 +594,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="company"
@@ -513,13 +616,16 @@ const EnterpriseSignup = () => {
                                 type="text"
                                 placeholder="Company"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.company && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.company.message}
                           </p>
                         )}
@@ -535,7 +641,6 @@ const EnterpriseSignup = () => {
                             <Select
                               {...field}
                               options={industryList}
-
                               placeholder="Select your industry"
                               styles={customSelectStyles}
                               isSearchable={true}
@@ -543,7 +648,10 @@ const EnterpriseSignup = () => {
                           )}
                         />
                         {errors.industry && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.industry.message}
                           </p>
                         )}
@@ -551,10 +659,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faTruckFast}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="deliveries"
@@ -566,13 +681,16 @@ const EnterpriseSignup = () => {
                                 type="text"
                                 placeholder="Deliveries per month / Hours per month"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.deliveries && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.deliveries.message}
                           </p>
                         )}
@@ -600,7 +718,10 @@ const EnterpriseSignup = () => {
                           )}
                         />
                         {errors.state && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.state.message}
                           </p>
                         )}
@@ -624,7 +745,10 @@ const EnterpriseSignup = () => {
                           )}
                         />
                         {errors.city && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.city.message}
                           </p>
                         )}
@@ -632,10 +756,17 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faBuilding}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="siret"
@@ -647,13 +778,16 @@ const EnterpriseSignup = () => {
                                 type="text"
                                 placeholder="Siret no..."
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.siret && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.siret.message}
                           </p>
                         )}
@@ -661,7 +795,10 @@ const EnterpriseSignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
+                          
                           <Controller
                             name="comments"
                             control={control}
@@ -673,13 +810,16 @@ const EnterpriseSignup = () => {
                                 row={2}
                                 placeholder="Describe your projects here"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
                         {errors.comments && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.comments.message}
                           </p>
                         )}
@@ -720,7 +860,10 @@ const EnterpriseSignup = () => {
                           />
                         </div>
                         {errors.terms && (
-                          <p className={Styles.termsCheck} style={{fontSize:'13px'}}>
+                          <p
+                            className={Styles.termsCheck}
+                            style={{ fontSize: "13px" }}
+                          >
                             {errors.terms.message}
                           </p>
                         )}
@@ -782,11 +925,16 @@ const EnterpriseSignup = () => {
 };
 
 const customSelectStyles = {
-  control: (styles) => ({
+  control: (styles, state) => ({
     ...styles,
     backgroundColor: "#fff",
     width: "100%",
     fontSize: "13px",
+    borderColor: state.isFocused ? "#ff0058" : "#ccc",
+    boxShadow: state.isFocused ? "0 0 5px rgba(255, 64, 129, 0.5)" : "none",
+    "&:hover": {
+      borderColor: state.isFocused ? "#ff0058" : "#999",
+    },
   }),
   option: (styles, { isFocused, isSelected }) => ({
     ...styles,

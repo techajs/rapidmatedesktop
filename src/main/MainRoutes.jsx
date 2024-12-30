@@ -47,6 +47,7 @@ import {
   DriverNotAvailable,
   EnterpriseShiftDetails,
   ScheduleSuccess,
+  LanguageSwitcher,
 } from "../common/pages";
 import {
   Navigate,
@@ -285,6 +286,14 @@ function MainRoutes() {
             element={
               <ProtectedRoute requiredRole={userRole}>
                 <PickupNotificationSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="language"
+            element={
+              <ProtectedRoute requiredRole={userRole}>
+                <LanguageSwitcher />
               </ProtectedRoute>
             }
           />

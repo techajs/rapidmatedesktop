@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faLock,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 import {
   faUser,
   faEnvelope,
@@ -52,7 +50,20 @@ const schema = yup.object().shape({
     .string()
     .required("Phone number is required")
     .matches(/^\d+$/, "Phone number should contain only digits")
-    .min(7, "Phone number must be at least 7 digits"),
+    .test("length", "Phone number length is invalid", function (value) {
+      const { country } = this.parent; // Assuming country is selected in the form
+      const phoneLengthByCountry = {
+        101: { min: 12, max: 12 }, // Example for France: minimum and maximum length is 10
+        75: { min: 11, max: 11 }, // Example for the US: 10 digits
+        // Add other countries and their phone number lengths here
+      };
+      const countryCode = country ? country.value : null;
+      if (countryCode && phoneLengthByCountry[countryCode]) {
+        const { min, max } = phoneLengthByCountry[countryCode];
+        return value.length >= min && value.length <= max;
+      }
+      return true; // If no country is selected, do not apply length validation
+    }),
   country: yup
     .object({
       value: yup.string().required("Country is required"),
@@ -90,7 +101,11 @@ const DeliveryboySignup = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [countryCode, setCountryCode] = useState("fr");
+  const [isFocused, setIsFocused] = useState(false);
 
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -104,7 +119,6 @@ const DeliveryboySignup = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = (data) => {
-    // console.log("data-----------------", data)
     setHitButton(true);
     let params = {
       info: {
@@ -122,7 +136,7 @@ const DeliveryboySignup = () => {
         termone: data.terms === true ? 1 : 0,
       },
     };
-    
+
     signUpUser(
       params,
       (successResponse) => {
@@ -153,11 +167,10 @@ const DeliveryboySignup = () => {
         } else {
           err = errorResponse[0]._errors.message;
         }
-        showErrorToast(err)
+        showErrorToast(err);
         setHitButton(false);
       }
     );
-
   };
   useEffect(() => {
     // Fetch Country List
@@ -191,7 +204,11 @@ const DeliveryboySignup = () => {
     setSelectedCountry(selectedOption);
     setSelectedState(null); // Reset state selection
     setSelectedCity(null); // Reset city selection
-
+    const countrycode = masterCountryList.filter(
+      (country) => country.id === selectedOption.value
+    );
+    const countryCode = countrycode[0]?.country_code?.toLowerCase();
+    setCountryCode(countryCode);
     // Filter states based on selected country
     const filteredStates = masterStateList.filter(
       (state) => state.country_id === selectedOption.value
@@ -248,10 +265,18 @@ const DeliveryboySignup = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="name"
@@ -263,7 +288,7 @@ const DeliveryboySignup = () => {
                                 type="text"
                                 placeholder="First name"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -280,10 +305,18 @@ const DeliveryboySignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faUser}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="lastname"
@@ -295,7 +328,7 @@ const DeliveryboySignup = () => {
                                 type="text"
                                 placeholder="Last name"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -312,10 +345,18 @@ const DeliveryboySignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faEnvelope}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="email"
@@ -327,7 +368,7 @@ const DeliveryboySignup = () => {
                                 type="text"
                                 placeholder="Email"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -344,10 +385,18 @@ const DeliveryboySignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faLock}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="password"
@@ -359,7 +408,7 @@ const DeliveryboySignup = () => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Password..."
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
@@ -367,6 +416,10 @@ const DeliveryboySignup = () => {
                             icon={showPassword ? faEye : faEyeSlash}
                             onClick={togglePasswordVisibility}
                             className={Styles.signupPasswordEyeIcon}
+                            style={{
+                              position: "absolute",
+                              color: "#787272",
+                            }}
                           />
                         </div>
                         {errors.password && (
@@ -381,10 +434,18 @@ const DeliveryboySignup = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
                             className={Styles.pickupSignupFieldsIcons}
                             icon={faLock}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="confirmPassword"
@@ -396,14 +457,18 @@ const DeliveryboySignup = () => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Confirm your password"
                                 style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                           <FontAwesomeIcon
                             icon={showPassword ? faEye : faEyeSlash}
-                            onClick={toggleConfirmPasswordVisibility}
+                            onClick={togglePasswordVisibility}
                             className={Styles.signupPasswordEyeIcon}
+                            style={{
+                              position: "absolute",
+                              color: "#787272",
+                            }}
                           />
                         </div>
                         {errors.confirmPassword && (
@@ -424,13 +489,26 @@ const DeliveryboySignup = () => {
                           defaultValue=""
                           render={({ field: { onChange, value } }) => (
                             <PhoneInput
-                              country={"fr"}
+                              country={countryCode}
+                              onlyCountries={["fr", "in"]}
                               value={value}
                               countryCodeEditable={false}
+                              onFocus={handleFocus}
+                              onBlur={handleBlur}
                               onChange={onChange}
                               inputStyle={{
                                 width: "100%",
                                 paddingLeft: "42px",
+                                borderColor: isFocused ? "#ff4081" : "#ccc",
+                                boxShadow: isFocused
+                                  ? "0 0 5px rgba(255, 64, 129, 0.5)"
+                                  : "none",
+                                transition:
+                                  "border-color 0.3s ease, box-shadow 0.3s ease",
+                              }}
+                              buttonStyle={{
+                                border: "none",
+                                background: "transparent",
                               }}
                               dropdownStyle={{ borderColor: "#ccc" }}
                               enableSearch
@@ -538,10 +616,18 @@ const DeliveryboySignup = () => {
                     </div>
                     <div className="col-md-12">
                       <div className="mb-3">
-                        <div className={Styles.pickupSignupContainer}>
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ position: "relative", width: "100%" }}
+                        >
                           <FontAwesomeIcon
-                            className={Styles.pickupSignupFieldsIcons}
+                            className={`${Styles.pickupSignupFieldsIcons}`}
                             icon={faBuilding}
+                            style={{
+                              position: "absolute",
+                              left: "8px", // Adjust icon padding
+                              color: "#787272",
+                            }}
                           />
                           <Controller
                             name="siret"
@@ -552,12 +638,12 @@ const DeliveryboySignup = () => {
                                 {...field}
                                 type="text"
                                 placeholder="Siret no..."
-                                style={{ width: "100%", padding: "5px" }}
-                                className={Styles.signupUserName}
+                                className={`${Styles.signupInput} dynamic-border-input`}
                               />
                             )}
                           />
                         </div>
+
                         {errors.siret && (
                           <p
                             className={Styles.termsCheck}
@@ -598,8 +684,13 @@ const DeliveryboySignup = () => {
                                   We collect this data for the purposes of
                                   processing your application to become a
                                   courier. By clicking this box, you acknowledge
-                                  that you have read and understood the {" "}
-                                  <Link className={Styles.deliverySignupPolicyCheck} to="#">Privacy Policy</Link>
+                                  that you have read and understood the{" "}
+                                  <Link
+                                    className={Styles.deliverySignupPolicyCheck}
+                                    to="#"
+                                  >
+                                    Privacy Policy
+                                  </Link>
                                 </div>
                               </label>
                             )}
@@ -665,11 +756,16 @@ const DeliveryboySignup = () => {
 };
 
 const customSelectStyles = {
-  control: (styles) => ({
+  control: (styles, state) => ({
     ...styles,
     backgroundColor: "#fff",
     width: "100%",
     fontSize: "13px",
+    borderColor: state.isFocused ? "#ff0058" : "#ccc",
+    boxShadow: state.isFocused ? "0 0 5px rgba(255, 64, 129, 0.5)" : "none",
+    "&:hover": {
+      borderColor: state.isFocused ? "#ff0058" : "#999",
+    },
   }),
   option: (styles, { isFocused, isSelected }) => ({
     ...styles,

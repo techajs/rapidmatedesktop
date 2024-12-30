@@ -6,7 +6,7 @@ import { combineReducers } from 'redux';
 import commonDataSlice from "./commonDataSlice";
 import authSlice from './authSlice';
 import enterpriseSlice from './enterpriseSlice'
-
+import languageReducer from './languageSlice'
 // Persist configuration
 const persistConfig = {
   key: 'root',
@@ -18,6 +18,7 @@ const rootReducer = combineReducers({
   commonData: commonDataSlice,
   enterprise:enterpriseSlice,
   auth: authSlice,
+  language: languageReducer,
 });
 
 // Persisted reducer

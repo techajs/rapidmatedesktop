@@ -66,6 +66,7 @@ import PaymentUnsuccessful from "../common/PaymentUnsuccessful"
 import DriverNotAvailable from "../common/DriverNotAvailable"
 import EnterpriseShiftDetails from "../components/enterprise/EnterpriseShiftDetails"
 import ScheduleSuccess from "./ScheduleSuccess"
+import LanguageSwitcher from "../components/consumer/account/LanguageSwitcher"
 export {
     Home,
     HomeHeader,
@@ -135,4 +136,5 @@ export {
     DriverNotAvailable,
     EnterpriseShiftDetails,
     ScheduleSuccess,
+    LanguageSwitcher,
 }

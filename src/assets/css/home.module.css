@@ -874,6 +874,16 @@ a {
   padding: 8px !important;
 }
 
+
+
+/* Focused input style */
+.loginInputs:focus {
+  border-color: var(--secondary-color) !important; /* Change border color on focus */
+  background-color: #f1f8ff; /* Light background on focus */
+  outline: none;  /* Remove the default browser outline */
+  box-shadow: 0 0 5px rgba(255, 64, 129, 0.5) !important;
+}
+
 .manageRow {
   --bs-gutter-x: 0px !important;
 }
@@ -1122,12 +1132,22 @@ a {
   position: relative;
 }
 
+
 .signupUserName {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   font-size: 12px !important;
   font-weight: 400 !important;
+  font-family: "Montserrat", sans-serif;
+}
+
+.signupInput{
+  width: 100% !important;
+  padding: 9px 9px 9px 29px !important ;
+  border: 1px solid #ccc ;
+  border-radius: 4px;
+  font-size:12px;
   font-family: "Montserrat", sans-serif;
 }
 
@@ -5251,8 +5271,26 @@ a {
 }
 
 .deliveryBoySignupCheckboxCard {
-  display: flex;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+
 }
+
+.deliveryBoySignupCheckboxCard:focus {
+  outline: none;
+  border-color: var(--secondary-color); /* Focus color */
+  box-shadow: 0 0 4px var(--secondary-color);
+}
+
+.deliveryBoySignupCheckboxCard:checked {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important; 
+}
+
 /* end  */
 
 /* add radio */
@@ -5861,3 +5899,4 @@ a {
   max-width: 75% !important;
   margin: 0 auto;
 }
+

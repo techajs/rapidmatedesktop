@@ -9,7 +9,9 @@ import { logout } from "../../../redux/authSlice";
 import localforage from "localforage";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 function Setting() {
+  const {t}=useTranslation()
   const user = useSelector((state) => state.auth.user);
   const userRole = useSelector((state) => state.auth.role);
     const baseUrl = userRole?.toLowerCase().replace(/_/g, "");
@@ -74,7 +76,7 @@ function Setting() {
                         : ""
                     }`}
                   >
-                    Address book
+                   {t("address_book")}
                   </Link>
                 </div>
 
@@ -94,7 +96,7 @@ function Setting() {
                           : ""
                       }`}
                     >
-                      Delivery Preferance
+                      {t("delivery_preference")}
                     </Link>
                   </div>
                 )}
@@ -114,7 +116,7 @@ function Setting() {
                           : ""
                       }`}
                     >
-                      Manager company locations
+                      {t("manage_company_locations")}
                     </Link>
                   </div>
                 )}
@@ -135,7 +137,7 @@ function Setting() {
                           : ""
                       }`}
                     >
-                      Billing details
+                      {t("billing_details")}
                     </Link>
                   </div>
                 )}
@@ -154,7 +156,7 @@ function Setting() {
                         : ""
                     }`}
                   >
-                    Wallets
+                    {t("wallets")}
                   </Link>
                 </div>
                 <div
@@ -172,7 +174,7 @@ function Setting() {
                         : ""
                     }`}
                   >
-                    Change password
+                    {t("change_password")}
                   </Link>
                 </div>
 
@@ -191,7 +193,7 @@ function Setting() {
                         : ""
                     }`}
                   >
-                    Notifications
+                    {t("notifications")}
                   </Link>
                 </div>
 
@@ -206,7 +208,7 @@ function Setting() {
                       currentPath.includes("language") ? Styles.activeLink : ""
                     }`}
                   >
-                    Language
+                    {t("language")}
                   </Link>
                 </div>
                 <div
@@ -222,7 +224,7 @@ function Setting() {
                     }`}
                     onClick={LogoutHandler}
                   >
-                    Logout
+                    {t("logout")}
                   </Link>
                 </div>
               </div>
